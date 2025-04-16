@@ -8,6 +8,7 @@ public class Ability
     public float cooldown; // Cooldown time in seconds
     public float manaCost; // Mana cost to use the ability
     public float range; // Range of the ability
+    public float duration; // Duration of the ability effect (if applicable)
 
     public Ability(string name, string description, float cooldown, float manaCost, float range)
     {
@@ -16,11 +17,7 @@ public class Ability
         this.cooldown = cooldown;
         this.manaCost = manaCost;
         this.range = range;
-    }
-
-    public void UseAbility()
-    {
-        Debug.Log($"Using ability: {name} - {description}");
+        this.duration = 0f; // Default duration to 0, can be set later if needed
     }
 
     public void setCooldown(float cooldown)
@@ -30,5 +27,13 @@ public class Ability
     public void setManaCost(float manaCost)
     {
         this.manaCost = manaCost;
+    }
+    public void setRange(float range)
+    {
+        this.range = range;
+    }
+    public void setDuration(float duration)
+    {
+        this.duration = duration;
     }
 }
