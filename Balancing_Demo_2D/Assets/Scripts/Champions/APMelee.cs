@@ -2,11 +2,6 @@ using UnityEngine;
 
 public class APMelee : BaseChampion
 {
-   
-    public Ability passiveAbility;
-    public Ability ability1; // Q
-    public Ability ability2; // W
-    public Ability ability3; // E
 
     [Header("Champion Settings")]
     public int attackStacks = 0; // Gwen generates passive stacks per auto attack.
@@ -46,7 +41,7 @@ public class APMelee : BaseChampion
 
     private void AddAbilities()
     {
-        passiveAbility = new Ability(
+        passive = new Ability(
             "Thousand Cuts",
             "Basic attacks and Snip Snip! deal bonus magic damage based on own AP and the target's maximum health. Attack also heals.",
             0f, // No cooldown for passive
