@@ -12,11 +12,10 @@ GameObject:
   - component: {fileID: 6039711689436714808}
   - component: {fileID: 4159768203496051542}
   - component: {fileID: 5485799469301071788}
-  - component: {fileID: -1913961977428918984}
   - component: {fileID: 4794529158683969135}
   - component: {fileID: 2187371524109663207}
   m_Layer: 0
-  m_Name: Player
+  m_Name: ADMelee
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -104,7 +103,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1777303687
+  GlobalObjectIdHash: 1527158526
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -124,7 +123,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3807404536498382476}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c4be52e2c32ba8246b58441123491aa2, type: 3}
   m_Name: 
@@ -182,72 +181,6 @@ MonoBehaviour:
     duration: 0
   attackConsecutive: 0
   regenTimer: 0
---- !u!114 &-1913961977428918984
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3807404536498382476}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2343708a6c991ea4ba51fb19b3d22c3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  championType: 
-  maxHealth: 600
-  healthRegen: 5
-  AD: 60
-  AP: 0
-  armor: 25
-  magicResist: 30
-  attackSpeed: 0.65
-  movementSpeed: 300
-  maxMana: 300
-  manaRegen: 7
-  abilityHaste: 0
-  critChance: 0
-  critDamage: 1.75
-  health: 0
-  mana: 0
-  autoAttack:
-    name: Auto Attack
-    description: Basic attack
-    cooldown: 0
-    manaCost: 0
-    range: 0
-    duration: 0
-  passive:
-    name: 
-    description: 
-    cooldown: 0
-    manaCost: 0
-    range: 0
-    duration: 0
-  ability1:
-    name: 
-    description: 
-    cooldown: 0
-    manaCost: 0
-    range: 0
-    duration: 0
-  ability2:
-    name: 
-    description: 
-    cooldown: 0
-    manaCost: 0
-    range: 0
-    duration: 0
-  ability3:
-    name: 
-    description: 
-    cooldown: 0
-    manaCost: 0
-    range: 0
-    duration: 0
-  attackConsecutive: 0
-  regenTimer: 0
-  attackStacks: 0
 --- !u!114 &4794529158683969135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -295,8 +228,8 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 0
-  SyncScaleX: 0
-  SyncScaleY: 0
+  SyncScaleX: 1
+  SyncScaleY: 1
   SyncScaleZ: 0
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01

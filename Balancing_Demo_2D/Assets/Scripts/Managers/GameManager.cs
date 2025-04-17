@@ -6,6 +6,11 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance; // Singleton instance
+    public List<ulong> playerList = new List<ulong>(); // List of connected players
+
+    [Header("Player Class Prefabs")]
+    public GameObject APMeleePrefab; // Prefab for melee champion
+    public GameObject ADMeleePrefab; // Prefab for mage champion
 
     [Header("Player References")]
     public BaseChampion player1;
