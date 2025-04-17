@@ -18,7 +18,7 @@ public class BaseChampion : MonoBehaviour
     public float critChance = 0f;
     public float critDamage = 1.75f; // 175% damage on crit
 
-    [header("Champion Resources")]
+    [Header("Champion Resources")]
     public float health;
     public float mana;
 
@@ -35,7 +35,7 @@ public class BaseChampion : MonoBehaviour
     public int attackConsecutive = 0; // Number of consecutive attacks against oneself
     public float regenTimer = 0f;
 
-    void Start()
+    public void Start()
     {
         // Initialization logic if needed
     }
@@ -90,11 +90,11 @@ public class BaseChampion : MonoBehaviour
             // Regenerate health and mana
             if (health < maxHealth){
                 health = Mathf.Min(health + healthRegen, maxHealth); // Ensure health does not exceed maxHealth
-                Debug.log ($"Regenerating health: {healthRegen}");
+                Debug.Log ($"Regenerating health: {healthRegen}");
             }
             if (mana < maxMana){
                 mana = Mathf.Min(mana + manaRegen, maxMana); // Ensure mana does not exceed maxMana
-                Debug.log ($"Regenerating mana: {manaRegen}");
+                Debug.Log ($"Regenerating mana: {manaRegen}");
             }
         }
     }

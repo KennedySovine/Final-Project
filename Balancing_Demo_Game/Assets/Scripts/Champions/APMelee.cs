@@ -9,7 +9,7 @@ public class APMelee : BaseChampion
     public Ability ability3; // E
 
     [Header("Champion Settings")]
-    public int attackStacks = 0f; // Gwen generates passive stacks per auto attack.
+    public int attackStacks = 0; // Gwen generates passive stacks per auto attack.
 
     void Start()
     {
