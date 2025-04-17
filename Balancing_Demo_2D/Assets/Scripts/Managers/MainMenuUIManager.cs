@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class MainMenuUIManager : MonoBehaviour
 {
@@ -43,6 +44,10 @@ public class MainMenuUIManager : MonoBehaviour
         else{
             beginButton.GetComponent<Button>().interactable = false;
         }
+    }
 
+    public void enterGame(){
+        // Load the game scene here
+        SceneManager.LoadScene(sceneBuildIndex: 1);
     }
 }
