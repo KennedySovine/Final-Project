@@ -1038,9 +1038,6 @@ MonoBehaviour:
   champSelectUI: {fileID: 1786432962}
   startButton: {fileID: 2044015324}
   exitButton: {fileID: 1859307603}
-  beginButton: {fileID: 2128061377}
-  champSelectDropdown: {fileID: 736549738}
-  networkSelectDropdown: {fileID: 0}
 --- !u!224 &896505103
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2962,7 +2959,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
-        m_MethodName: startButtonClick
+        m_MethodName: enterGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

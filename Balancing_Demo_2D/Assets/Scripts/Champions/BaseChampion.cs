@@ -41,10 +41,7 @@ public class BaseChampion : MonoBehaviour
     }
 
     void Update(){
-        // Check if the player presses the right mouse button
-        if (Input.GetMouseButtonDown(1)){
-            FireAutoAttack();
-        }
+
         //Regen Logic
         HealthandManaRegen();
     }
