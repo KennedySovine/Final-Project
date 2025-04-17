@@ -1204,7 +1204,8 @@ MonoBehaviour:
   augmentBuffer: 40
   augmentChosing: 0
   championPrefab: {fileID: 0}
-  spawnPoints: []
+  spawnPoints:
+  - {fileID: 0}
 --- !u!4 &605605212
 Transform:
   m_ObjectHideFlags: 0
