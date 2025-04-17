@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 public class MainMenuUIManager : MonoBehaviour
 {
@@ -37,11 +38,12 @@ public class MainMenuUIManager : MonoBehaviour
     }
 
     public void dropDownSelectLogic(){
-        Debug.Log("Dropdown value: " + champSelectDropdown.value);
+        Debug.Log("CHAMP SELECT Dropdown value changed: " + champSelectDropdown.value);
+        // Cant begin game unless you select which you connect as
         if (champSelectDropdown.value != 0){
             beginButton.GetComponent<Button>().interactable = true;
         }
-        else{
+        else {
             beginButton.GetComponent<Button>().interactable = false;
         }
     }

@@ -2,10 +2,6 @@ using UnityEngine;
 
 public class ADMelee : BaseChampion
 {
-    public Ability passiveAbility;
-    public Ability ability1; // Q
-    public Ability ability2; // W
-    public Ability ability3; // E
 
     void Start()
     {
@@ -35,7 +31,7 @@ public class ADMelee : BaseChampion
 
     private void AddAbilities()
     {
-        passiveAbility = new Ability(
+        passive = new Ability(
             "Night Hunter",
             "Gain bonus movement speed when moving towards an enemy champion.",
             0f, // No cooldown for passive

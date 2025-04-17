@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Netcode;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,7 +10,6 @@ public class GameManager : MonoBehaviour
     [Header("Player References")]
     public BaseChampion player1;
     public BaseChampion player2;
-
 
     [Header("Game Settings")]
     public int maxPlayers = 2;
@@ -38,7 +39,6 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         Debug.Log("Game Manager Initialized");
-        SpawnChampions();
     }
 
     private void Update()
@@ -71,15 +71,6 @@ public class GameManager : MonoBehaviour
             // After selection, reset the buffer time
             augmentBuffer = 40f;
             augmentChosing = false; //End the augment choosing process
-    }
-
-    public void SpawnChampions()
-    {
-        // Spawn champions at each spawn point
-        foreach (Transform spawnPoint in spawnPoints)
-        {
-            Instantiate(championPrefab, spawnPoint.position, spawnPoint.rotation);
-        }
     }
 
     public void EndGame()
