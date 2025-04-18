@@ -26,15 +26,6 @@ public class PlayerNetwork : NetworkBehaviour
                 Debug.LogError("No camera found on the player's prefab!");
             }
         }
-        else
-        {
-            Debug.Log("Non-local player spawned.");
-            if (personalCamera != null)
-            {
-                personalCamera.enabled = false;
-                Debug.Log("Camera disabled for non-local player.");
-            }
-        }
     }
     // Update is called once per frame
     void Update()
