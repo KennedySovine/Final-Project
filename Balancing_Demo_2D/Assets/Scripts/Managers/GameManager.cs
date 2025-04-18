@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using TMPro;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     public static GameManager Instance; // Singleton instance
-    //public List<ulong> playerList = new List<ulong>(); // List of connected players
-
-    // Used to prevent duplicate Server/Host creation
-    public Dictionary<string, ulong> playerList = new Dictionary<string, ulong>(); // Dictionary to store player 'role' and IDs
-
-    // Used to store the player prefab and connect it to the client ID
     public Dictionary<ulong, GameObject> playerChampions = new Dictionary<ulong, GameObject>(); // Dictionary to store player prefabs and connect it to the client ID
     public List<ulong> playerIDsSpawned = new List<ulong>(); // List of player IDs that have spawned champions
+    
+    public ulong ServerID = 0; // ID of the server
+
+    public NetworkManager networkManager; // Reference to the NetworkManager
 
     [Header("Player Class Prefabs")]
     public List<GameObject> playerPrefabsList = new List<GameObject>(); // List of player prefabs
@@ -45,6 +43,12 @@ public class GameManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+
+        networkManager = FindObjectOfType<NetworkManager>(); // Find the NetworkManager in the scene
+        if (networkManager == null)
+        {
+            Debug.LogError("NetworkManager not found in the scene. Ensure it is present.");
         }
     }
 
@@ -81,10 +85,11 @@ public class GameManager : MonoBehaviour
         {
             
             //Debug.Log("Player Count: " + playerList.Count); // Debug log for player count
-            if (playerList.Count == maxPlayers) // Check if the maximum number of players is reached
+            if (playerCount == maxPlayers) // Check if the maximum number of players is reached
             {
                 // Start the game logic here
                 //Debug.Log("Game Starting with " + playerList.Count + " players.");
+                
                 spawnChampions(); // Spawn champions for both players
                 if (augmentChosing)
                 {
@@ -115,7 +120,6 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log($"Client {clientId} connected.");
         playerCount++; // Increment player count
-        playerList.Add("Client", NetworkManager.Singleton.LocalClientId); // Add the local client ID to the player list
     }
 
     public void InitializeNetworkCallbacks()
@@ -138,7 +142,8 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("Only the server can spawn champions!");
             return;
         }
-        if (playerChampions.Count != 2){
+        if (playerChampions.Count < 2){
+            Debug.Log(playerChampions.Count + " players in the game. Waiting for more players.");
             Debug.LogWarning("Not enough players to spawn champions. Waiting for more players.");
             return;
         }
@@ -190,17 +195,25 @@ public class GameManager : MonoBehaviour
         // Add logic to handle end of the game (e.g., show results, restart, etc.)
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    public void AddClientToGameServerRpc(ulong clientID, GameObject champChoice)
+   /* [Rpc(SendTo.Server)]
+    public void AddClientToGameRpc(ulong clientID, int champChoiceIndex)
     {
-        Debug.Log($"Server received request from Client {clientID} to join");
-
         if (NetworkManager.Singleton.IsServer) // Ensure this runs only on the server
         {
+            Debug.Log($"Server received request from Client {clientID} to join");
+
             if (!playerChampions.ContainsKey(clientID))
             {
-                playerChampions.Add(clientID, champChoice); // Add the player prefab to the player list
-                Debug.Log($"Client {clientID} added to game with champion {champChoice.name}.");
+                if (champChoiceIndex >= 0 && champChoiceIndex < playerPrefabsList.Count)
+                {
+                    GameObject champChoice = playerPrefabsList[champChoiceIndex];
+                    playerChampions.Add(clientID, champChoice); // Add the player prefab to the player list
+                    Debug.Log($"Client {clientID} added to game with champion {champChoice.name}.");
+                }
+                else
+                {
+                    Debug.LogWarning($"Invalid champion index {champChoiceIndex} for Client {clientID}.");
+                }
             }
             else
             {
@@ -211,5 +224,5 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogWarning("Only the server can add clients to the game!");
         }
-    }
+    }*/
 }

@@ -5,11 +5,10 @@ using UnityEngine.UI;
 using Unity.Netcode;
 using TMPro;
 
-public class InGameManager : MonoBehaviour
+
+public class InGameManager : NetworkBehaviour
 {
     private GameManager GM;
-    [SerializeField] private TMP_Dropdown networkDropdown;
-    [SerializeField] private GameObject netDropDown;
     [SerializeField] private GameObject beginButton;
     [SerializeField] private TMP_Dropdown champSelectDropdown;
     [SerializeField] private GameObject ChampSelectUI;
@@ -18,12 +17,17 @@ public class InGameManager : MonoBehaviour
     void Start()
     {
         GM = GameManager.Instance; // Get the GameManager instance
+        if (GM == null)
+        {
+            Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
+        }
 
         // Initialize spawn points
         GM.spawnPoints[0] = GameObject.Find("SpawnPoint1").transform;
         GM.spawnPoints[1] = GameObject.Find("SpawnPoint2").transform;
 
         Debug.Log("Spawn points initialized.");
+         beginButton.GetComponent<Button>().interactable = false;
     }
 
     // Update is called once per frame
@@ -35,7 +39,7 @@ public class InGameManager : MonoBehaviour
     public void dropDownSelectLogic()
     {
         // Enable the begin button only if a valid connection type and champion are selected
-        if ((champSelectDropdown.value != 0 && networkDropdown.value != 0) || networkDropdown.value == 1)
+        if ((champSelectDropdown.value != 0 ))
         {
             beginButton.GetComponent<Button>().interactable = true;
         }
@@ -45,70 +49,49 @@ public class InGameManager : MonoBehaviour
         }
     }
 
-    public void connectionType()
+    public void beginButtonLogic()
     {
-        if (networkDropdown.value == 1)
+        if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost)
         {
-            Debug.Log("Starting as Server");
-            NetworkManager.Singleton.StartServer();
-            GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the server
-            ChampSelectUI.SetActive(false);
-            GM.playerList.Add("Server", NetworkManager.Singleton.LocalClientId); // Add the local client ID to the player list
-        }
-        else if (networkDropdown.value == 2)
-        {
-            Debug.Log("Starting as Host");
-            NetworkManager.Singleton.StartHost();
-            GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the host
+            Debug.Log("Client requesting to join the game.");
             ChampSelectUI.SetActive(false);
 
-            // Request to join the game and select a champion
+            // Debug before calling the RPC
+            ulong clientId = NetworkManager.Singleton.LocalClientId;
             int selectedChampion = champSelectDropdown.value - 1; // Adjust index to match prefab list
-            if (selectedChampion >= 0 && selectedChampion < GM.playerPrefabsList.Count)
-            {
-                GM.AddClientToGameServerRpc(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[selectedChampion]);
-                Debug.Log("Host RPC request sent to the server.");
-            }
-            else
-            {
-                Debug.LogWarning("Invalid champion selection for the host.");
-            }
-        }
-        else if (networkDropdown.value == 3)
-        {
-            Debug.Log("Starting as Client");
-            NetworkManager.Singleton.StartClient();
-            ChampSelectUI.SetActive(false);
+            Debug.Log($"Calling AddClientToGameRpc with ClientID: {clientId}, ChampionIndex: {selectedChampion}");
 
-            // Subscribe to the OnClientConnectedCallback to send the join request after connecting
-            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            AddClientToGameRpc(clientId, selectedChampion); // Call the RPC
         }
-        else
+        else if (NetworkManager.Singleton.IsServer)
         {
-            Debug.Log("No connection type selected");
+            Debug.Log("Server starting the game.");
+            // Start the game logic here
+            // GM.StartGame();
         }
     }
 
-    private void OnClientConnected(ulong clientId)
+    [Rpc(SendTo.Server)]
+    public void AddClientToGameRpc(ulong clientID, int champChoiceIndex)
     {
-        if (clientId == NetworkManager.Singleton.LocalClientId)
-        {
-            Debug.Log("Client successfully connected to the server.");
+        Debug.Log($"Server received request from Client {clientID} to join");
 
-            // Request to join the game and select a champion
-            int selectedChampion = champSelectDropdown.value - 1; // Adjust index to match prefab list
-            if (selectedChampion >= 0 && selectedChampion < GM.playerPrefabsList.Count)
+        if (!GM.playerChampions.ContainsKey(clientID))
+        {
+            if (champChoiceIndex >= 0 && champChoiceIndex < GM.playerPrefabsList.Count)
             {
-                GM.AddClientToGameServerRpc(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[selectedChampion]);
-                Debug.Log("Client RPC request sent to the server.");
+                GameObject champChoice = GM.playerPrefabsList[champChoiceIndex];
+                GM.playerChampions.Add(clientID, champChoice); // Add the player prefab to the player list
+                Debug.Log($"Client {clientID} added to game with champion {champChoice.name}.");
             }
             else
             {
-                Debug.LogWarning("Invalid champion selection for the client.");
+                Debug.LogWarning($"Invalid champion index {champChoiceIndex} for Client {clientID}.");
             }
-
-            // Unsubscribe from the callback to avoid duplicate calls
-            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+        }
+        else
+        {
+            Debug.LogWarning($"Client {clientID} is already in the game.");
         }
     }
 }
