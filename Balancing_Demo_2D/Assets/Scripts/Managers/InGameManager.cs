@@ -60,15 +60,14 @@ public class InGameManager : MonoBehaviour
             Debug.Log("Starting as Host");
             NetworkManager.Singleton.StartHost();
             GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the host
-            GM.playerCount++;
             ChampSelectUI.SetActive(false);
-            GM.playerList.Add("Host", NetworkManager.Singleton.LocalClientId); // Add the local client ID to the player list
 
-            // Assign champion for the host
+            // Request to join the game and select a champion
             int selectedChampion = champSelectDropdown.value - 1; // Adjust index to match prefab list
             if (selectedChampion >= 0 && selectedChampion < GM.playerPrefabsList.Count)
             {
-                GM.playerChampions.Add(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[selectedChampion]);
+                GM.AddClientToGameServerRpc(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[selectedChampion]);
+                Debug.Log("Host RPC request sent to the server.");
             }
             else
             {
@@ -101,6 +100,7 @@ public class InGameManager : MonoBehaviour
             if (selectedChampion >= 0 && selectedChampion < GM.playerPrefabsList.Count)
             {
                 GM.AddClientToGameServerRpc(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[selectedChampion]);
+                Debug.Log("Client RPC request sent to the server.");
             }
             else
             {

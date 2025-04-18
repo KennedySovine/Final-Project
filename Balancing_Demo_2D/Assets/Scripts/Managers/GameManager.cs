@@ -138,7 +138,12 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("Only the server can spawn champions!");
             return;
         }
+        if (playerChampions.Count != 2){
+            Debug.LogWarning("Not enough players to spawn champions. Waiting for more players.");
+            return;
+        }
         Debug.Log(playerChampions.Count + " players in the game. Spawning champions.");
+    
         foreach (var player in playerChampions)
         {
             GameObject playerClass = player.Value;
@@ -186,19 +191,25 @@ public class GameManager : MonoBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void AddClientToGameServerRpc(ulong clientID, GameObject champChoice){
+    public void AddClientToGameServerRpc(ulong clientID, GameObject champChoice)
+    {
         Debug.Log($"Server received request from Client {clientID} to join");
+
         if (NetworkManager.Singleton.IsServer) // Ensure this runs only on the server
         {
-            playerChampions.Add(clientID, champChoice); // Add the player prefab to the player list
-            Debug.Log($"Client {clientID} added to game with champion {champChoice.name}.");
+            if (!playerChampions.ContainsKey(clientID))
+            {
+                playerChampions.Add(clientID, champChoice); // Add the player prefab to the player list
+                Debug.Log($"Client {clientID} added to game with champion {champChoice.name}.");
+            }
+            else
+            {
+                Debug.LogWarning($"Client {clientID} is already in the game.");
+            }
         }
         else
         {
             Debug.LogWarning("Only the server can add clients to the game!");
         }
-
     }
-
-    
 }
