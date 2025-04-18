@@ -13,47 +13,34 @@ public class InGameManager : MonoBehaviour
     [SerializeField] private GameObject beginButton;
     [SerializeField] private TMP_Dropdown champSelectDropdown;
     [SerializeField] private GameObject ChampSelectUI;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         GM = GameManager.Instance; // Get the GameManager instance
 
-        GM.spawnPoints[0] = GameObject.Find("SpawnPoint1").transform; // Find the spawn point in the scene
-        GM.spawnPoints[1] = GameObject.Find("SpawnPoint2").transform; // Find the spawn point in the scene
+        // Initialize spawn points
+        GM.spawnPoints[0] = GameObject.Find("SpawnPoint1").transform;
+        GM.spawnPoints[1] = GameObject.Find("SpawnPoint2").transform;
+
+        Debug.Log("Spawn points initialized.");
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        // Optional: Add any logic that needs to run every frame
     }
 
-    public void dropDownSelectLogic(){
-        //Debug.Log("CHAMP SELECT Dropdown value changed: " + champSelectDropdown.value);
-        //Check to see if host/server is already created
-        /*if (GM.playerList.Count > 0 ){
-            if (networkDropdown.value == 1 && GM.playerList.ContainsKey("Server")){
-                //Pop up message saying the debug log
-                Debug.Log("Server already created, cannot create another one.");
-                networkDropdown.value = 0; // Reset the dropdown value to 0
-                beginButton.GetComponent<Button>().interactable = false;
-            }
-            else if (networkDropdown.value == 2 && GM.playerList.ContainsKey("Host")){
-                //Pop up message saying the debug log
-                Debug.Log("Host already created, cannot create another one.");
-                networkDropdown.value = 0; // Reset the dropdown value to 0
-                beginButton.GetComponent<Button>().interactable = false;
-            }
-        }
-        if ((!GM.playerList.ContainsKey("Host") || !GM.playerList.ContainsKey("Server")) && networkDropdown.value == 3){
-            //Pop up that says you cannot start as a client without a host/server
-        }*/
-        // Cant begin game unless you select which you connect as
-        // Sever does not have to select a champion
-        if ((champSelectDropdown.value != 0 && networkDropdown.value != 0) || networkDropdown.value == 1){
+    public void dropDownSelectLogic()
+    {
+        // Enable the begin button only if a valid connection type and champion are selected
+        if ((champSelectDropdown.value != 0 && networkDropdown.value != 0) || networkDropdown.value == 1)
+        {
             beginButton.GetComponent<Button>().interactable = true;
         }
-        else {
+        else
+        {
             beginButton.GetComponent<Button>().interactable = false;
         }
     }
@@ -78,17 +65,14 @@ public class InGameManager : MonoBehaviour
             GM.playerList.Add("Host", NetworkManager.Singleton.LocalClientId); // Add the local client ID to the player list
 
             // Assign champion for the host
-            switch (champSelectDropdown.value)
+            int selectedChampion = champSelectDropdown.value - 1; // Adjust index to match prefab list
+            if (selectedChampion >= 0 && selectedChampion < GM.playerPrefabsList.Count)
             {
-                case 1:
-                    GM.playerChampions.Add(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[0]); // Add the player prefab to the player list
-                    break;
-                case 2:
-                    GM.playerChampions.Add(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[1]); // Add the player prefab to the player list
-                    break;
-                default:
-                    Debug.Log("No champion selected");
-                    break;
+                GM.playerChampions.Add(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[selectedChampion]);
+            }
+            else
+            {
+                Debug.LogWarning("Invalid champion selection for the host.");
             }
         }
         else if (networkDropdown.value == 3)
@@ -97,19 +81,8 @@ public class InGameManager : MonoBehaviour
             NetworkManager.Singleton.StartClient();
             ChampSelectUI.SetActive(false);
 
-            // Request to join the game and select a champion
-            switch (champSelectDropdown.value)
-            {
-                case 1:
-                    GM.AddClientToGame(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[0]); // Add the player prefab to the player list
-                    break;
-                case 2:
-                    GM.AddClientToGame(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[1]); // Add the player prefab to the player list
-                    break;
-                default:
-                    Debug.Log("No champion selected");
-                    break;
-            }
+            // Subscribe to the OnClientConnectedCallback to send the join request after connecting
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
         }
         else
         {
@@ -117,4 +90,25 @@ public class InGameManager : MonoBehaviour
         }
     }
 
+    private void OnClientConnected(ulong clientId)
+    {
+        if (clientId == NetworkManager.Singleton.LocalClientId)
+        {
+            Debug.Log("Client successfully connected to the server.");
+
+            // Request to join the game and select a champion
+            int selectedChampion = champSelectDropdown.value - 1; // Adjust index to match prefab list
+            if (selectedChampion >= 0 && selectedChampion < GM.playerPrefabsList.Count)
+            {
+                GM.AddClientToGameServerRpc(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[selectedChampion]);
+            }
+            else
+            {
+                Debug.LogWarning("Invalid champion selection for the client.");
+            }
+
+            // Unsubscribe from the callback to avoid duplicate calls
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+        }
+    }
 }

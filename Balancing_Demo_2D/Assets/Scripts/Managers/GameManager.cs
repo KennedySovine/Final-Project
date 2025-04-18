@@ -138,7 +138,7 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("Only the server can spawn champions!");
             return;
         }
-
+        Debug.Log(playerChampions.Count + " players in the game. Spawning champions.");
         foreach (var player in playerChampions)
         {
             GameObject playerClass = player.Value;
@@ -186,7 +186,7 @@ public class GameManager : MonoBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void AddClientToGame(ulong clientID, GameObject champChoice){
+    public void AddClientToGameServerRpc(ulong clientID, GameObject champChoice){
         Debug.Log($"Server received request from Client {clientID} to join");
         if (NetworkManager.Singleton.IsServer) // Ensure this runs only on the server
         {
