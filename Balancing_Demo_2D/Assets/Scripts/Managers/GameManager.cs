@@ -11,7 +11,7 @@ public class GameManager : NetworkBehaviour
     
     public ulong ServerID = 0; // ID of the server
 
-    public NetworkManager networkManager; // Reference to the NetworkManager
+    //public NetworkManager networkManager; // Reference to the NetworkManager
 
     [Header("Player Class Prefabs")]
     public List<GameObject> playerPrefabsList = new List<GameObject>(); // List of player prefabs
@@ -45,11 +45,11 @@ public class GameManager : NetworkBehaviour
             Destroy(gameObject);
         }
 
-        networkManager = FindObjectOfType<NetworkManager>(); // Find the NetworkManager in the scene
+        /*networkManager = FindObjectOfType<NetworkManager>(); // Find the NetworkManager in the scene
         if (networkManager == null)
         {
             Debug.LogError("NetworkManager not found in the scene. Ensure it is present.");
-        }
+        }*/
     }
 
     private void OnEnable()
@@ -81,14 +81,15 @@ public class GameManager : NetworkBehaviour
 
     private void Update()
     {
-        if (NetworkManager.Singleton.IsServer) // Ensure this runs only on the server
+        playerCount = playerChampions.Count; // Update player count
+        if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost) // Ensure this runs only on the server
         {
             
-            //Debug.Log("Player Count: " + playerList.Count); // Debug log for player count
+            //Debug.Log("Player Count: " + playerCount); // Debug log for player count
             if (playerCount == maxPlayers) // Check if the maximum number of players is reached
             {
                 // Start the game logic here
-                //Debug.Log("Game Starting with " + playerList.Count + " players.");
+                Debug.Log("Game Starting with " + playerCount + " players.");
                 
                 spawnChampions(); // Spawn champions for both players
                 if (augmentChosing)
@@ -119,7 +120,6 @@ public class GameManager : NetworkBehaviour
     private void OnClientConnected(ulong clientId)
     {
         Debug.Log($"Client {clientId} connected.");
-        playerCount++; // Increment player count
     }
 
     public void InitializeNetworkCallbacks()
@@ -137,7 +137,7 @@ public class GameManager : NetworkBehaviour
 
     public void spawnChampions()
     {
-        if (!NetworkManager.Singleton.IsServer) // Ensure only the server can execute this
+        if (!NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost) // Ensure only the server can execute this
         {
             Debug.LogWarning("Only the server can spawn champions!");
             return;
@@ -147,6 +147,7 @@ public class GameManager : NetworkBehaviour
             Debug.LogWarning("Not enough players to spawn champions. Waiting for more players.");
             return;
         }
+
         Debug.Log(playerChampions.Count + " players in the game. Spawning champions.");
     
         foreach (var player in playerChampions)
