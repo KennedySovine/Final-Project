@@ -28,7 +28,23 @@ public class InGameManager : MonoBehaviour
     }
 
     public void dropDownSelectLogic(){
-        Debug.Log("CHAMP SELECT Dropdown value changed: " + champSelectDropdown.value);
+        //Debug.Log("CHAMP SELECT Dropdown value changed: " + champSelectDropdown.value);
+        //Check to see if host/server is already created
+        if (GM.playerList.Count > 0 ){
+            if (networkDropdown.value == 1 && GM.playerList.ContainsKey("Server")){
+                //Pop up message saying the debug log
+                Debug.Log("Server already created, cannot create another one.");
+                networkDropdown.value = 0; // Reset the dropdown value to 0
+            }
+            else if (networkDropdown.value == 2 && GM.playerList.ContainsKey("Host")){
+                //Pop up message saying the debug log
+                Debug.Log("Host already created, cannot create another one.");
+                networkDropdown.value = 0; // Reset the dropdown value to 0
+            }
+        }
+        if (!GM.playerList.ContainsKey("Host") && !GM.playerList.ContainsKey("Server") && networkDropdown.value == 3){
+            //Pop up that says you cannot start as a client without a host/server
+        }
         // Cant begin game unless you select which you connect as
         if (champSelectDropdown.value != 0 && networkDropdown.value != 0){
             beginButton.GetComponent<Button>().interactable = true;
@@ -44,6 +60,7 @@ public class InGameManager : MonoBehaviour
             Debug.Log("Starting as Server");
             NetworkManager.Singleton.StartServer();
             ChampSelectUI.SetActive(false);
+            GM.playerList.Add("Server", NetworkManager.Singleton.LocalClientId); // Add the local client ID to the player list
             //AssignClass();
         }
         else if (networkDropdown.value == 2)
@@ -51,6 +68,7 @@ public class InGameManager : MonoBehaviour
             Debug.Log("Starting as Host");
             NetworkManager.Singleton.StartHost();
             ChampSelectUI.SetActive(false);
+            GM.playerList.Add("Host", NetworkManager.Singleton.LocalClientId); // Add the local client ID to the player list
             //AssignClass();
         }
         else if (networkDropdown.value == 3)
@@ -58,6 +76,7 @@ public class InGameManager : MonoBehaviour
             Debug.Log("Starting as Client");
             NetworkManager.Singleton.StartClient();
             ChampSelectUI.SetActive(false);
+            GM.playerList.Add("Client", NetworkManager.Singleton.LocalClientId); // Add the local client ID to the player list
             //AssignClass();
         }
         else{
@@ -92,15 +111,6 @@ public class InGameManager : MonoBehaviour
             Debug.LogError("Invalid champion selection!");
             return;
         }
-
-        // Spawn the selected prefab at the first spawn point
-        Transform spawnPoint = GM.spawnPoints[0]; // Assuming you want to spawn at the first spawn point
-        GameObject championInstance = Instantiate(selectedChampionPrefab, spawnPoint.position, Quaternion.identity);
-        championInstance.GetComponent<NetworkObject>().Spawn(); // Spawn the champion on the network
-
-        // Set the player as the owner of the champion instance
-        NetworkObject networkObject = championInstance.GetComponent<NetworkObject>();
-        networkObject.ChangeOwnership(NetworkManager.Singleton.LocalClientId);
     }
 
 }

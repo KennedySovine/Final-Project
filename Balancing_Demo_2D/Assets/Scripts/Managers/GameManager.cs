@@ -6,7 +6,8 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance; // Singleton instance
-    public List<ulong> playerList = new List<ulong>(); // List of connected players
+    //public List<ulong> playerList = new List<ulong>(); // List of connected players
+    public Dictionary<string, ulong> playerList = new Dictionary<string, ulong>(); // Dictionary to store player 'role' and IDs
 
     [Header("Player Class Prefabs")]
     public GameObject APMeleePrefab; // Prefab for melee champion
