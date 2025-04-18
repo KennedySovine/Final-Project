@@ -554,17 +554,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de191db52fb8a824dba70d6b7b14dfc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerList: 
-  APMeleePrefab: {fileID: 0}
-  ADMeleePrefab: {fileID: 0}
+  playerIDsSpawned: 
+  playerPrefabsList:
+  - {fileID: 4431904003385403123, guid: 69aed170a264bdd4c8de738e2ae1ea26, type: 3}
+  - {fileID: 3807404536498382476, guid: 465cb82f5f0ec4349bc0ac5ced3965f3, type: 3}
   player1: {fileID: 0}
   player2: {fileID: 0}
+  playerCount: 0
   maxPlayers: 2
   gameTime: 120
   augmentBuffer: 40
   augmentChosing: 0
   championPrefab: {fileID: 0}
-  spawnPoints: []
+  spawnPoints:
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!4 &566942286
 Transform:
   m_ObjectHideFlags: 0
@@ -1234,7 +1238,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1135946711}
-    PlayerPrefab: {fileID: 3807404536498382476, guid: 379c8454240c53548922159d4bd5280f, type: 3}
+    PlayerPrefab: {fileID: 0}
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: c160a6325a880b545ab1eea3fe2cf324, type: 2}

@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Champion Management")]
     public GameObject championPrefab; // Prefab for spawning champions
-    public Transform[] spawnPoints; // Array of spawn points
+    public Transform[] spawnPoints; // Array of spawn points for champions
 
 
     private void Awake()
@@ -55,8 +55,9 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+
         //Check if 2 players have connected
-        if (playerList.Count == 2)
+        if (playerList.Count > 0)
         {
             //Start the game logic
             //Spawn in champions and update the controllers to each player
@@ -80,26 +81,27 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void spawnChampions(){
-        // Spawn champions for each player
+    public void spawnChampions()
+    {
         foreach (var player in playerChampions)
         {
             GameObject playerClass = player.Value;
             ulong playerId = player.Key;
 
-            // Check if the player has already spawned a champion
             if (!playerIDsSpawned.Contains(playerId))
             {
-                switch (playerIDsSpawned.Count){
+                switch (playerIDsSpawned.Count)
+                {
                     case 0:
-                        player1 = Instantiate(playerClass, spawnPoints[0].position, Quaternion.identity); // Spawn the first champion at the first spawn point
-                        player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId); // Spawn the player object on the network
-                        playerIDsSpawned.Add(playerId); // Add the player ID to the list of spawned players
+                        player1 = Instantiate(playerClass, spawnPoints[0].position, Quaternion.identity);
+                        player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
+                        playerIDsSpawned.Add(playerId);
                         break;
+
                     case 1:
-                        player2 = Instantiate(playerClass, spawnPoints[1].position, Quaternion.identity); // Spawn the second champion at the second spawn point
-                        player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId); // Spawn the player object on the network
-                        playerIDsSpawned.Add(playerId); // Add the player ID to the list of spawned players
+                        player2 = Instantiate(playerClass, spawnPoints[1].position, Quaternion.identity);
+                        player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
+                        playerIDsSpawned.Add(playerId);
                         break;
                 }
             }

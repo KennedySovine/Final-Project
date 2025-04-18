@@ -16,9 +16,10 @@ public class InGameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
         GM = GameManager.Instance; // Get the GameManager instance
 
+        GM.spawnPoints[0] = GameObject.Find("SpawnPoint1").transform; // Find the spawn point in the scene
+        GM.spawnPoints[1] = GameObject.Find("SpawnPoint2").transform; // Find the spawn point in the scene
     }
 
     // Update is called once per frame
@@ -30,21 +31,23 @@ public class InGameManager : MonoBehaviour
     public void dropDownSelectLogic(){
         //Debug.Log("CHAMP SELECT Dropdown value changed: " + champSelectDropdown.value);
         //Check to see if host/server is already created
-        if (GM.playerList.Count > 0 ){
+        /*if (GM.playerList.Count > 0 ){
             if (networkDropdown.value == 1 && GM.playerList.ContainsKey("Server")){
                 //Pop up message saying the debug log
                 Debug.Log("Server already created, cannot create another one.");
                 networkDropdown.value = 0; // Reset the dropdown value to 0
+                beginButton.GetComponent<Button>().interactable = false;
             }
             else if (networkDropdown.value == 2 && GM.playerList.ContainsKey("Host")){
                 //Pop up message saying the debug log
                 Debug.Log("Host already created, cannot create another one.");
                 networkDropdown.value = 0; // Reset the dropdown value to 0
+                beginButton.GetComponent<Button>().interactable = false;
             }
         }
         if ((!GM.playerList.ContainsKey("Host") || !GM.playerList.ContainsKey("Server")) && networkDropdown.value == 3){
             //Pop up that says you cannot start as a client without a host/server
-        }
+        }*/
         // Cant begin game unless you select which you connect as
         // Sever does not have to select a champion
         if ((champSelectDropdown.value != 0 && networkDropdown.value != 0) || networkDropdown.value == 1){

@@ -43,7 +43,7 @@ public class BaseChampion : MonoBehaviour
     void Update(){
 
         //Regen Logic
-        HealthandManaRegen();
+        //HealthandManaRegen();
     }
 
     private void FireAutoAttack(){
