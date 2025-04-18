@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -1913961977428918984}
   - component: {fileID: 4794529158683969135}
   - component: {fileID: 2187371524109663207}
+  - component: {fileID: -6108788103372724668}
   m_Layer: 0
   m_Name: APMelee
   m_TagString: Untagged
@@ -112,7 +113,7 @@ MonoBehaviour:
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
+  DontDestroyWithOwner: 1
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
@@ -242,3 +243,15 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &-6108788103372724668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3807404536498382476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7b654bf2df4d6747851331525a9c138, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

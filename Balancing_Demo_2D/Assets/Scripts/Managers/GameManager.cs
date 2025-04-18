@@ -7,17 +7,23 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance; // Singleton instance
     //public List<ulong> playerList = new List<ulong>(); // List of connected players
+
+    // Used to prevent duplicate Server/Host creation
     public Dictionary<string, ulong> playerList = new Dictionary<string, ulong>(); // Dictionary to store player 'role' and IDs
 
+    // Used to store the player prefab and connect it to the client ID
+    public Dictionary<ulong, GameObject> playerChampions = new Dictionary<ulong, GameObject>(); // Dictionary to store player prefabs and connect it to the client ID
+    public List<ulong> playerIDsSpawned = new List<ulong>(); // List of player IDs that have spawned champions
+
     [Header("Player Class Prefabs")]
-    public GameObject APMeleePrefab; // Prefab for melee champion
-    public GameObject ADMeleePrefab; // Prefab for mage champion
+    public List<GameObject> playerPrefabsList = new List<GameObject>(); // List of player prefabs
 
     [Header("Player References")]
-    public BaseChampion player1;
-    public BaseChampion player2;
+    public GameObject player1;
+    public GameObject player2;
 
     [Header("Game Settings")]
+    public int playerCount = 0; // Number of players connected
     public int maxPlayers = 2;
     public float gameTime = 120f; // Game duration in seconds
     public float augmentBuffer = 40f; //Choose aug every 40 seconds
@@ -49,24 +55,54 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        // Countdown the game time
-        if (augmentChosing){} //If the player is choosing an augment, dont countdown the game time
-        else if (gameTime > 0)
+        //Check if 2 players have connected
+        if (playerList.Count == 2)
         {
-            gameTime -= Time.deltaTime;
-        }
-        else
-        {
-            EndGame();
-        }
+            //Start the game logic
+            //Spawn in champions and update the controllers to each player
+            spawnChampions();
+        
+            // Countdown the game time
+            if (augmentChosing){} //If the player is choosing an augment, dont countdown the game time
+            else if (gameTime > 0){
+                gameTime -= Time.deltaTime;
+            }
+            else{
+                EndGame();
+            }
 
-        if (augmentBuffer > 0)
-        {
-            augmentBuffer -= Time.deltaTime;
+            if (augmentBuffer > 0){
+                augmentBuffer -= Time.deltaTime;
+            }
+            else{
+                augmentLogic();
+            }
         }
-        else
+    }
+
+    public void spawnChampions(){
+        // Spawn champions for each player
+        foreach (var player in playerChampions)
         {
-            augmentLogic();
+            GameObject playerClass = player.Value;
+            ulong playerId = player.Key;
+
+            // Check if the player has already spawned a champion
+            if (!playerIDsSpawned.Contains(playerId))
+            {
+                switch (playerIDsSpawned.Count){
+                    case 0:
+                        player1 = Instantiate(playerClass, spawnPoints[0].position, Quaternion.identity); // Spawn the first champion at the first spawn point
+                        player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId); // Spawn the player object on the network
+                        playerIDsSpawned.Add(playerId); // Add the player ID to the list of spawned players
+                        break;
+                    case 1:
+                        player2 = Instantiate(playerClass, spawnPoints[1].position, Quaternion.identity); // Spawn the second champion at the second spawn point
+                        player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId); // Spawn the player object on the network
+                        playerIDsSpawned.Add(playerId); // Add the player ID to the list of spawned players
+                        break;
+                }
+            }
         }
     }
 

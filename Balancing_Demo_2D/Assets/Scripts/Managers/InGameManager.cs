@@ -42,11 +42,12 @@ public class InGameManager : MonoBehaviour
                 networkDropdown.value = 0; // Reset the dropdown value to 0
             }
         }
-        if (!GM.playerList.ContainsKey("Host") && !GM.playerList.ContainsKey("Server") && networkDropdown.value == 3){
+        if ((!GM.playerList.ContainsKey("Host") || !GM.playerList.ContainsKey("Server")) && networkDropdown.value == 3){
             //Pop up that says you cannot start as a client without a host/server
         }
         // Cant begin game unless you select which you connect as
-        if (champSelectDropdown.value != 0 && networkDropdown.value != 0){
+        // Sever does not have to select a champion
+        if ((champSelectDropdown.value != 0 && networkDropdown.value != 0) || networkDropdown.value == 1){
             beginButton.GetComponent<Button>().interactable = true;
         }
         else {
@@ -61,55 +62,49 @@ public class InGameManager : MonoBehaviour
             NetworkManager.Singleton.StartServer();
             ChampSelectUI.SetActive(false);
             GM.playerList.Add("Server", NetworkManager.Singleton.LocalClientId); // Add the local client ID to the player list
-            //AssignClass();
+            //Dont add the server to the champion pool
         }
         else if (networkDropdown.value == 2)
         {
             Debug.Log("Starting as Host");
             NetworkManager.Singleton.StartHost();
+            GM.playerCount++;
             ChampSelectUI.SetActive(false);
             GM.playerList.Add("Host", NetworkManager.Singleton.LocalClientId); // Add the local client ID to the player list
-            //AssignClass();
+            switch (champSelectDropdown.value)
+            {
+                case 1:
+                    GM.playerChampions.Add(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[0]); // Add the player prefab to the player list
+                    break;
+                case 2:
+                    GM.playerChampions.Add(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[1]); // Add the player prefab to the player list
+                    break;
+                default:
+                    Debug.Log("No champion selected");
+                    break;
+            }
         }
         else if (networkDropdown.value == 3)
         {
             Debug.Log("Starting as Client");
             NetworkManager.Singleton.StartClient();
+            GM.playerCount++;
             ChampSelectUI.SetActive(false);
-            GM.playerList.Add("Client", NetworkManager.Singleton.LocalClientId); // Add the local client ID to the player list
-            //AssignClass();
+            switch (champSelectDropdown.value)
+            {
+                case 1:
+                    GM.playerChampions.Add(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[0]); // Add the player prefab to the player list
+                    break;
+                case 2:
+                    GM.playerChampions.Add(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[1]); // Add the player prefab to the player list
+                    break;
+                default:
+                    Debug.Log("No champion selected");
+                    break;
+            }
         }
         else{
             Debug.Log("No connection type selected");
-        }
-    }
-    
-    public void AssignClass()
-    {
-        // Ensure the dropdown value is valid
-        if (champSelectDropdown.value == 0)
-        {
-            Debug.LogError("No champion selected!");
-            return;
-        }
-
-        // Determine which prefab to spawn based on the dropdown value
-        GameObject selectedChampionPrefab = null;
-
-        if (champSelectDropdown.value == 1)
-        {
-            Debug.Log("Spawning ADMelee prefab");
-            selectedChampionPrefab = GM.ADMeleePrefab;
-        }
-        else if (champSelectDropdown.value == 2)
-        {
-            Debug.Log("Spawning APMelee prefab");
-            selectedChampionPrefab = GM.APMeleePrefab;
-        }
-        else
-        {
-            Debug.LogError("Invalid champion selection!");
-            return;
         }
     }
 
