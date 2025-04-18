@@ -48,6 +48,28 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            Debug.Log("Subscribing to NetworkManager callbacks in OnEnable.");
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        }
+        else
+        {
+            Debug.LogWarning("NetworkManager.Singleton is null in OnEnable. Ensure InitializeNetworkCallbacks is called after starting the host/server.");
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            Debug.Log("Unsubscribing from NetworkManager callbacks.");
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+        }
+    }
+
     private void Start()
     {
         Debug.Log("Game Manager Initialized");
@@ -55,34 +77,68 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-
-        //Check if 2 players have connected
-        if (playerList.Count > 0)
+        if (NetworkManager.Singleton.IsServer) // Ensure this runs only on the server
         {
-            //Start the game logic
-            //Spawn in champions and update the controllers to each player
-            spawnChampions();
-        
-            // Countdown the game time
-            if (augmentChosing){} //If the player is choosing an augment, dont countdown the game time
-            else if (gameTime > 0){
-                gameTime -= Time.deltaTime;
-            }
-            else{
-                EndGame();
-            }
+            
+            //Debug.Log("Player Count: " + playerList.Count); // Debug log for player count
+            if (playerList.Count == maxPlayers) // Check if the maximum number of players is reached
+            {
+                // Start the game logic here
+                //Debug.Log("Game Starting with " + playerList.Count + " players.");
+                spawnChampions(); // Spawn champions for both players
+                if (augmentChosing)
+                {
+                    // Augment logic
+                }
+                else if (gameTime > 0)
+                {
+                    gameTime -= Time.deltaTime;
+                }
+                else
+                {
+                    EndGame();
+                }
 
-            if (augmentBuffer > 0){
-                augmentBuffer -= Time.deltaTime;
+                if (augmentBuffer > 0)
+                {
+                    augmentBuffer -= Time.deltaTime;
+                }
+                else
+                {
+                    augmentLogic();
+                }
             }
-            else{
-                augmentLogic();
-            }
+        }
+    }
+
+    private void OnClientConnected(ulong clientId)
+    {
+        Debug.Log($"Client {clientId} connected.");
+        playerCount++; // Increment player count
+        playerList.Add("Client", NetworkManager.Singleton.LocalClientId); // Add the local client ID to the player list
+    }
+
+    public void InitializeNetworkCallbacks()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            Debug.Log("Subscribing to NetworkManager callbacks.");
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        }
+        else
+        {
+            Debug.LogError("NetworkManager.Singleton is null. Ensure the NetworkManager is active in the scene.");
         }
     }
 
     public void spawnChampions()
     {
+        if (!NetworkManager.Singleton.IsServer) // Ensure only the server can execute this
+        {
+            Debug.LogWarning("Only the server can spawn champions!");
+            return;
+        }
+
         foreach (var player in playerChampions)
         {
             GameObject playerClass = player.Value;
@@ -96,12 +152,18 @@ public class GameManager : MonoBehaviour
                         player1 = Instantiate(playerClass, spawnPoints[0].position, Quaternion.identity);
                         player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                         playerIDsSpawned.Add(playerId);
+                        Debug.Log($"Spawned champion for Player 1 (Client {playerId}).");
                         break;
 
                     case 1:
                         player2 = Instantiate(playerClass, spawnPoints[1].position, Quaternion.identity);
                         player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                         playerIDsSpawned.Add(playerId);
+                        Debug.Log($"Spawned champion for Player 2 (Client {playerId}).");
+                        break;
+
+                    default:
+                        Debug.LogWarning("No available spawn points for additional players.");
                         break;
                 }
             }
@@ -122,4 +184,21 @@ public class GameManager : MonoBehaviour
         Debug.Log("Game Over!");
         // Add logic to handle end of the game (e.g., show results, restart, etc.)
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void AddClientToGame(ulong clientID, GameObject champChoice){
+        Debug.Log($"Server received request from Client {clientID} to join");
+        if (NetworkManager.Singleton.IsServer) // Ensure this runs only on the server
+        {
+            playerChampions.Add(clientID, champChoice); // Add the player prefab to the player list
+            Debug.Log($"Client {clientID} added to game with champion {champChoice.name}.");
+        }
+        else
+        {
+            Debug.LogWarning("Only the server can add clients to the game!");
+        }
+
+    }
+
+    
 }

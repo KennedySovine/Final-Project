@@ -58,22 +58,26 @@ public class InGameManager : MonoBehaviour
         }
     }
 
-    public void connectionType(){
+    public void connectionType()
+    {
         if (networkDropdown.value == 1)
         {
             Debug.Log("Starting as Server");
             NetworkManager.Singleton.StartServer();
+            GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the server
             ChampSelectUI.SetActive(false);
             GM.playerList.Add("Server", NetworkManager.Singleton.LocalClientId); // Add the local client ID to the player list
-            //Dont add the server to the champion pool
         }
         else if (networkDropdown.value == 2)
         {
             Debug.Log("Starting as Host");
             NetworkManager.Singleton.StartHost();
+            GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the host
             GM.playerCount++;
             ChampSelectUI.SetActive(false);
             GM.playerList.Add("Host", NetworkManager.Singleton.LocalClientId); // Add the local client ID to the player list
+
+            // Assign champion for the host
             switch (champSelectDropdown.value)
             {
                 case 1:
@@ -91,22 +95,24 @@ public class InGameManager : MonoBehaviour
         {
             Debug.Log("Starting as Client");
             NetworkManager.Singleton.StartClient();
-            GM.playerCount++;
             ChampSelectUI.SetActive(false);
+
+            // Request to join the game and select a champion
             switch (champSelectDropdown.value)
             {
                 case 1:
-                    GM.playerChampions.Add(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[0]); // Add the player prefab to the player list
+                    GM.AddClientToGame(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[0]); // Add the player prefab to the player list
                     break;
                 case 2:
-                    GM.playerChampions.Add(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[1]); // Add the player prefab to the player list
+                    GM.AddClientToGame(NetworkManager.Singleton.LocalClientId, GM.playerPrefabsList[1]); // Add the player prefab to the player list
                     break;
                 default:
                     Debug.Log("No champion selected");
                     break;
             }
         }
-        else{
+        else
+        {
             Debug.Log("No connection type selected");
         }
     }
