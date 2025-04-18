@@ -8,6 +8,8 @@ public class GameManager : NetworkBehaviour
     public static GameManager Instance; // Singleton instance
     public Dictionary<ulong, GameObject> playerChampions = new Dictionary<ulong, GameObject>(); // Dictionary to store player prefabs and connect it to the client ID
     public List<ulong> playerIDsSpawned = new List<ulong>(); // List of player IDs that have spawned champions
+
+    private bool playerSpawningStart = false;
     
     public ulong ServerID = 0; // ID of the server
 
@@ -89,9 +91,19 @@ public class GameManager : NetworkBehaviour
             if (playerCount == maxPlayers) // Check if the maximum number of players is reached
             {
                 // Start the game logic here
-                Debug.Log("Game Starting with " + playerCount + " players.");
+                //Debug.Log("Game Starting with " + playerCount + " players.");
+
+                if (!playerSpawningStart) // Check if champions have not been spawned yet
+                {
+                    //Debug.Log("Spawning champions for players.");
+                    spawnChampions(); // Spawn champions for both players
+                    playerSpawningStart = true; // Set the flag to true to prevent multiple spawns
+                }
+                else
+                {
+                    //Debug.Log("Champions already spawned. Waiting for game time to end.");
+                }
                 
-                spawnChampions(); // Spawn champions for both players
                 if (augmentChosing)
                 {
                     // Augment logic
@@ -137,14 +149,9 @@ public class GameManager : NetworkBehaviour
 
     public void spawnChampions()
     {
-        if (!NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost) // Ensure only the server can execute this
+        if (!NetworkManager.Singleton.IsServer || !NetworkManager.Singleton.IsHost) // Ensure only the server can execute this
         {
             Debug.LogWarning("Only the server can spawn champions!");
-            return;
-        }
-        if (playerChampions.Count < 2){
-            Debug.Log(playerChampions.Count + " players in the game. Waiting for more players.");
-            Debug.LogWarning("Not enough players to spawn champions. Waiting for more players.");
             return;
         }
 
