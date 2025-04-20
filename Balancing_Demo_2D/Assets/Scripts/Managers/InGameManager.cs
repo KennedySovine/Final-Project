@@ -5,102 +5,94 @@ using UnityEngine.UI;
 using Unity.Netcode;
 using TMPro;
 
-public class InGameManager : MonoBehaviour
+
+public class InGameManager : NetworkBehaviour
 {
     private GameManager GM;
-    [SerializeField] private TMP_Dropdown networkDropdown;
-    [SerializeField] private GameObject netDropDown;
     [SerializeField] private GameObject beginButton;
     [SerializeField] private TMP_Dropdown champSelectDropdown;
     [SerializeField] private GameObject ChampSelectUI;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
         GM = GameManager.Instance; // Get the GameManager instance
+        if (GM == null)
+        {
+            Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
+        }
 
+        // Initialize spawn points
+        GM.spawnPoints[0] = GameObject.Find("SpawnPoint1").transform;
+        GM.spawnPoints[1] = GameObject.Find("SpawnPoint2").transform;
+
+        Debug.Log("Spawn points initialized.");
+         beginButton.GetComponent<Button>().interactable = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        // Optional: Add any logic that needs to run every frame
     }
 
-    public void dropDownSelectLogic(){
-        Debug.Log("CHAMP SELECT Dropdown value changed: " + champSelectDropdown.value);
-        // Cant begin game unless you select which you connect as
-        if (champSelectDropdown.value != 0 && networkDropdown.value != 0){
+    public void dropDownSelectLogic()
+    {
+        // Enable the begin button only if a valid connection type and champion are selected
+        if ((champSelectDropdown.value != 0 ))
+        {
             beginButton.GetComponent<Button>().interactable = true;
         }
-        else {
+        else
+        {
             beginButton.GetComponent<Button>().interactable = false;
         }
     }
 
-    public void connectionType(){
-        if (networkDropdown.value == 1)
+    public void beginButtonLogic()
+    {
+        if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost)
         {
-            Debug.Log("Starting as Server");
-            NetworkManager.Singleton.StartServer();
+            Debug.Log("Client requesting to join the game.");
             ChampSelectUI.SetActive(false);
-            //AssignClass();
+
+            // Debug before calling the RPC
+            ulong clientId = NetworkManager.Singleton.LocalClientId;
+            int selectedChampion = champSelectDropdown.value - 1; // Adjust index to match prefab list
+            Debug.Log($"Calling AddClientToGameRpc with ClientID: {clientId}, ChampionIndex: {selectedChampion}");
+
+            AddClientToGameRpc(clientId, selectedChampion); // Call the RPC
         }
-        else if (networkDropdown.value == 2)
+        else if (NetworkManager.Singleton.IsServer)
         {
-            Debug.Log("Starting as Host");
-            NetworkManager.Singleton.StartHost();
-            ChampSelectUI.SetActive(false);
-            //AssignClass();
-        }
-        else if (networkDropdown.value == 3)
-        {
-            Debug.Log("Starting as Client");
-            NetworkManager.Singleton.StartClient();
-            ChampSelectUI.SetActive(false);
-            //AssignClass();
-        }
-        else{
-            Debug.Log("No connection type selected");
+            Debug.Log("Server starting the game.");
+            // Start the game logic here
+            // GM.StartGame();
         }
     }
-    
-    public void AssignClass()
+
+    [Rpc(SendTo.Server)]
+    public void AddClientToGameRpc(ulong clientID, int champChoiceIndex)
     {
-        // Ensure the dropdown value is valid
-        if (champSelectDropdown.value == 0)
-        {
-            Debug.LogError("No champion selected!");
-            return;
-        }
+        Debug.Log($"Server received request from Client {clientID} to join");
 
-        // Determine which prefab to spawn based on the dropdown value
-        GameObject selectedChampionPrefab = null;
-
-        if (champSelectDropdown.value == 1)
+        if (!GM.playerChampions.ContainsKey(clientID))
         {
-            Debug.Log("Spawning ADMelee prefab");
-            selectedChampionPrefab = GM.ADMeleePrefab;
-        }
-        else if (champSelectDropdown.value == 2)
-        {
-            Debug.Log("Spawning APMelee prefab");
-            selectedChampionPrefab = GM.APMeleePrefab;
+            if (champChoiceIndex >= 0 && champChoiceIndex < GM.playerPrefabsList.Count)
+            {
+                GameObject champChoice = GM.playerPrefabsList[champChoiceIndex];
+                GM.playerChampions.Add(clientID, champChoice); // Add the player prefab to the player list
+                Debug.Log($"Client {clientID} added to game with champion {champChoice.name}.");
+                ChampSelectUI.SetActive(false); // Hide the champion selection UI
+            }
+            else
+            {
+                Debug.LogWarning($"Invalid champion index {champChoiceIndex} for Client {clientID}.");
+            }
         }
         else
         {
-            Debug.LogError("Invalid champion selection!");
-            return;
+            Debug.LogWarning($"Client {clientID} is already in the game.");
         }
-
-        // Spawn the selected prefab at the first spawn point
-        Transform spawnPoint = GM.spawnPoints[0]; // Assuming you want to spawn at the first spawn point
-        GameObject championInstance = Instantiate(selectedChampionPrefab, spawnPoint.position, Quaternion.identity);
-        championInstance.GetComponent<NetworkObject>().Spawn(); // Spawn the champion on the network
-
-        // Set the player as the owner of the champion instance
-        NetworkObject networkObject = championInstance.GetComponent<NetworkObject>();
-        networkObject.ChangeOwnership(NetworkManager.Singleton.LocalClientId);
     }
-
 }

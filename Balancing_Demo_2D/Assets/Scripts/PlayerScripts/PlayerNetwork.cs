@@ -6,12 +6,27 @@ public class PlayerNetwork : NetworkBehaviour
 {
     public Vector3 mousePosition; // Mouse position in world space
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public Camera personalCamera;
+
+    public BaseChampion champion; // Reference to the champion script
+
     void Start()
     {
-        
+        if (IsOwner)
+        {
+            Debug.Log("Local player spawned.");
+            if (personalCamera != null)
+            {
+                personalCamera.enabled = true;
+                personalCamera.transform.rotation = Quaternion.Euler(90f, 0f, 0f); // Lock the camera's rotation
+                Debug.Log("Camera enabled for local player.");
+            }
+            else
+            {
+                Debug.LogError("No camera found on the player's prefab!");
+            }
+        }
     }
-
     // Update is called once per frame
     void Update()
     {
@@ -19,8 +34,8 @@ public class PlayerNetwork : NetworkBehaviour
 
         if (Input.GetMouseButtonDown(1)) // Check if the right mouse button is pressed
         {
-            mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition); // Get the mouse position in world space
-            mousePosition.z = 0; // Set z to 0 to keep it in 2D space
+            mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition); // Get the mouse position in world space
+            mousePosition.z = -1; // Set z to 0 to keep it in 2D space
             Vector3 direction = mousePosition - transform.position;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.Euler(0, 0, angle); // Rotate the player to face the mouse position
