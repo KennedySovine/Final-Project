@@ -939,12 +939,13 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   playerIDsSpawned: 
   ServerID: 0
-  networkManager: {fileID: 0}
   playerPrefabsList:
   - {fileID: 4431904003385403123, guid: 69aed170a264bdd4c8de738e2ae1ea26, type: 3}
   - {fileID: 6453171085482971729, guid: 465cb82f5f0ec4349bc0ac5ced3965f3, type: 3}
   player1: {fileID: 0}
+  player1Controller: {fileID: 0}
   player2: {fileID: 0}
+  player2Controller: {fileID: 0}
   playerCount: 0
   maxPlayers: 2
   gameTime: 120
@@ -1764,7 +1765,7 @@ MonoBehaviour:
     TimeResyncInterval: 30
     EnsureNetworkVariableLengthSafety: 0
     EnableSceneManagement: 1
-    ForceSamePrefabs: 1
+    ForceSamePrefabs: 0
     RecycleNetworkIds: 1
     NetworkIdRecycleDelay: 120
     RpcHashSize: 0

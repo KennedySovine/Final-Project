@@ -19,7 +19,7 @@ public class PlayerNetwork : NetworkBehaviour
             if (personalCamera != null)
             {
                 personalCamera.enabled = true;
-                personalCamera.transform.rotation = Quaternion.Euler(90f, 0f, 0f); // Lock the camera's rotation
+                //personalCamera.transform.rotation = Quaternion.Euler(90f, 0f, 0f); // Lock the camera's rotation
                 Debug.Log("Camera enabled for local player.");
             }
             else
@@ -47,7 +47,7 @@ public class PlayerNetwork : NetworkBehaviour
             targetPosition.y = mousePosition.y; // Set the target position's y coordinate
             Vector3 direction = targetPosition - transform.position;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0, 0, angle); // Rotate the player to face the mouse position
+            champion.transform.rotation = Quaternion.Euler(0, 0, angle); // Rotate the player to face the mouse position
         }
 
         if (transform.position != targetPosition){
