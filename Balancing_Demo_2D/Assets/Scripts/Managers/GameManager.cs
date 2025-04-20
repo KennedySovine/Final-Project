@@ -20,7 +20,9 @@ public class GameManager : NetworkBehaviour
 
     [Header("Player References")]
     public GameObject player1;
+    public GameObject player1Controller; // Reference to the player controller for player 1
     public GameObject player2;
+    public GameObject player2Controller; // Reference to the player controller for player 2
 
     [Header("Game Settings")]
     public int playerCount = 0; // Number of players connected
@@ -168,6 +170,8 @@ public class GameManager : NetworkBehaviour
                 {
                     case 0:
                         player1 = Instantiate(playerClass, spawnPoints[0].position, Quaternion.identity);
+                        findPlayerControllers(player1, ref player1Controller); // Find the PlayerController for player 1
+                        player1Controller.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
                         player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                         playerIDsSpawned.Add(playerId);
                         Debug.Log($"Spawned champion for Player 1 (Client {playerId}).");
@@ -175,6 +179,8 @@ public class GameManager : NetworkBehaviour
 
                     case 1:
                         player2 = Instantiate(playerClass, spawnPoints[1].position, Quaternion.identity);
+                        findPlayerControllers(player2, ref player2Controller); // Find the PlayerController for player 2
+                        player2Controller.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // Set the linear velocity to 0 for the second player
                         player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                         playerIDsSpawned.Add(playerId);
                         Debug.Log($"Spawned champion for Player 2 (Client {playerId}).");
@@ -185,6 +191,20 @@ public class GameManager : NetworkBehaviour
                         break;
                 }
             }
+        }
+    }
+
+    private void findPlayerControllers(GameObject parent, ref GameObject controller)
+    {
+        Transform childTransform = parent.transform.Find("PlayerController");
+        if (childTransform != null)
+        {
+            controller = childTransform.gameObject; // Assign the found child object to the controller variable
+            Debug.Log("Found PlayerController: " + controller.name);
+        }
+        else
+        {
+            Debug.LogWarning("PlayerController not found in " + parent.name);
         }
     }
 
@@ -202,35 +222,4 @@ public class GameManager : NetworkBehaviour
         Debug.Log("Game Over!");
         // Add logic to handle end of the game (e.g., show results, restart, etc.)
     }
-
-   /* [Rpc(SendTo.Server)]
-    public void AddClientToGameRpc(ulong clientID, int champChoiceIndex)
-    {
-        if (NetworkManager.Singleton.IsServer) // Ensure this runs only on the server
-        {
-            Debug.Log($"Server received request from Client {clientID} to join");
-
-            if (!playerChampions.ContainsKey(clientID))
-            {
-                if (champChoiceIndex >= 0 && champChoiceIndex < playerPrefabsList.Count)
-                {
-                    GameObject champChoice = playerPrefabsList[champChoiceIndex];
-                    playerChampions.Add(clientID, champChoice); // Add the player prefab to the player list
-                    Debug.Log($"Client {clientID} added to game with champion {champChoice.name}.");
-                }
-                else
-                {
-                    Debug.LogWarning($"Invalid champion index {champChoiceIndex} for Client {clientID}.");
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"Client {clientID} is already in the game.");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Only the server can add clients to the game!");
-        }
-    }*/
 }

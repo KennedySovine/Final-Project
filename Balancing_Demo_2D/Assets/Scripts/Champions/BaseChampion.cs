@@ -35,6 +35,8 @@ public class BaseChampion : MonoBehaviour
     public int attackConsecutive = 0; // Number of consecutive attacks against oneself
     public float regenTimer = 0f;
 
+    //[Header("Other Player Stats")]
+
     public void Start()
     {
         // Initialization logic if needed
@@ -44,6 +46,9 @@ public class BaseChampion : MonoBehaviour
 
         //Regen Logic
         //HealthandManaRegen();
+        // Check if the champion is alive
+
+        //Debug.Log($"Current velocity: {velocity}");
     }
 
     private void FireAutoAttack(){
