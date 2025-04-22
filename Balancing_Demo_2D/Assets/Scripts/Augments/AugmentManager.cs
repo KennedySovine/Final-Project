@@ -20,6 +20,7 @@ public class AugmentManager : MonoBehaviour
     public GameObject augment1; //Prefab for augment 1
     public GameObject augment2; //Prefab for augment 2
     public GameObject augment3; //Prefab for augment 3
+    private List<Augment> allAugments = new List<Augment>(); // List to hold all augments
     void Start()
     {
         GM = GameManager.Instance; // Get the GameManager instance
@@ -52,7 +53,7 @@ public class AugmentManager : MonoBehaviour
         if (jsonFile != null)
         {
             // Deserialize the JSON into a list of Augments
-            List<Augment> allAugments = JsonUtility.FromJson<AugmentListWrapper>("{\"augments\":" + jsonFile.text + "}").augments;
+            allAugments = JsonUtility.FromJson<AugmentListWrapper>("{\"augments\":" + jsonFile.text + "}").augments;
 
             // Categorize augments by rarity
             foreach (Augment augment in allAugments)
@@ -80,6 +81,16 @@ public class AugmentManager : MonoBehaviour
         {
             Debug.LogError("Augments.json file not found in Resources folder!");
         }
+    }
+
+    private Augment augmentFromID (int ID){
+        foreach (Augment augment in allAugments) {
+            if (augment.id == ID){
+                Debug.Log($"Augment found: {augment.name}");
+                return augment;
+            }
+        }
+        return null; // Return null if no augment is found with the given ID
     }
 
     private void PrintAugments()
@@ -111,9 +122,12 @@ public class AugmentManager : MonoBehaviour
     }
 
     //Add Augments to UI for Choosing
+    // Send to specified clients only
     [Rpc(SendTo.SpecifiedInParams)]
-    public void loadAugments(ulong clientID, RpcParams rpcParams){
+    public void loadAugmentsClientRpc(RpcParams rpcParams){
         augmentUI.SetActive(true); // Show the augment UI
+
+        List<Augment> augOptions = new List<Augment>(); // List to hold augment choices
 
         //Loads augments to the UI
         for (int i = 0; i < augmentUIList.Count; i++)
@@ -132,6 +146,8 @@ public class AugmentManager : MonoBehaviour
                     break;
             }
 
+            augOptions.Add(chosenAugment); // Add the chosen augment to the list
+
             //Access augment name and description from the chosen augment
             TextMeshProUGUI augmentName = augmentUIList[i].transform.Find("AugName").GetComponent<TextMeshProUGUI>();
             TextMeshProUGUI augmentDescription = augmentUIList[i].transform.Find("AugDesc").GetComponent<TextMeshProUGUI>();
@@ -142,20 +158,25 @@ public class AugmentManager : MonoBehaviour
         
     }
 
+    // Send to server
     [Rpc(SendTo.Server)]
-    public void sendAugmentChoice(ulong clientID, int augmentIndex, RpcParams rpcParams){
-        // Handle the augment choice made by the client
-        if (GM.playerChampions.ContainsKey(clientID))
-        {
-            Augment chosenAugment = GM.playerChampions[clientID].GetComponent<AugmentManager>().silverAugments[augmentIndex]; // Get the chosen augment
-            Debug.Log($"Client {clientID} chose augment: {chosenAugment.name}");
-            // Apply the augment to the player's champion or perform any other necessary actions
+    public void sendAugmentChoiceServerRpc(int augmentID, RpcParams rpcParam = default){
+        ulong SenderClientID = rpcParams.Receive.SenderClientId; // Get the client ID of the sender
+        // Aug choice for player1
+        if (GM.player1ID == SenderClientID){
+            GM.player1Augments.Add(augmentID); // Add the chosen augment to player1's list
         }
-        else
-        {
-            Debug.LogWarning($"Client {clientID} not found in player champions.");
+        // Aug choice for player2
+        else if (GM.player2ID == SenderClientID){
+            GM.player2Augments.Add(augmentID); // Add the chosen augment to player2's list
         }
+ 
     }
 
-    // Function to send augment choices based on clientID to GM
+    // Function for button click
+
+    public void augmentSelection(int augID){
+        sendAugmentChoiceServerRpc(augID); // Send the augment choice to the server
+        Debug.Log($"Augment {augID} selected!"); // Log the selected augment ID
+    }
 }

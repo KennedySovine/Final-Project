@@ -42,6 +42,7 @@ public class GameManager : NetworkBehaviour
 
     private Camera serverCamera; // Reference to the server camera
     public AugmentManager AM; // Reference to the AugmentManager
+    public InGameManager IGM; // Reference to the InGameManager
 
     private void Awake()
     {
@@ -88,6 +89,9 @@ public class GameManager : NetworkBehaviour
     private void Start()
     {
         Debug.Log("Game Manager Initialized");
+
+        var target = Rpc.Target.Single(0, RpcTargetUse.Temp);
+        Debug.Log(target);
     }
 
     private void Update()
@@ -118,8 +122,8 @@ public class GameManager : NetworkBehaviour
                 {
                     gamePaused = true; // Pause the game time while choosing an augment
                     // Augment logic
-                    AM.loadAugments(player1ID, Rpc.Target.Single(rpcParams.Recieve.SenderClientID, RpcTargetUse.Temp)); // Load augments for player 1
-                    AM.loadAugments(player2ID, Rpc.Target.Single(rpcParams.Recieve.SenderClientID, RpcTargetUse.Temp)); // Load augments for player 2
+                    AM.loadAugmentsClientRpc(Rpc.Target.Single(player1ID, RpcTargetUse.Temp));
+                    AM.loadAugmentsClientRpc(Rpc.Target.Single(player2ID, RpcTargetUse.Temp));
 
                 }
                 else if (gameTime > 0 && !gamePaused)
@@ -161,7 +165,7 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    
+
 
     public void spawnChampions()
     {
@@ -187,7 +191,7 @@ public class GameManager : NetworkBehaviour
                         findPlayerControllers(player1, ref player1Controller); // Find the PlayerController for player 1
                         player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                         playerIDsSpawned.Add(playerId);
-                        player1UD = playerId; // Store the ID of player 1
+                        player1ID = playerId; // Store the ID of player 1
                         Debug.Log($"Spawned champion for Player 1 (Client {playerId}).");
                         break;
 
@@ -196,7 +200,7 @@ public class GameManager : NetworkBehaviour
                         findPlayerControllers(player2, ref player2Controller); // Find the PlayerController for player 2
                         player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                         playerIDsSpawned.Add(playerId);
-                        player2UD = playerId; // Store the ID of player 2
+                        player2ID = playerId; // Store the ID of player 2
                         Debug.Log($"Spawned champion for Player 2 (Client {playerId}).");
                         break;
 

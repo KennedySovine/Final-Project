@@ -22,6 +22,8 @@ public class InGameManager : NetworkBehaviour
         {
             Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
         }
+        
+        GM.IGM = this; // Set the InGameManager instance in GameManager
 
         // Initialize spawn points
         GM.spawnPoints[0] = GameObject.Find("SpawnPoint1").transform;
@@ -98,6 +100,10 @@ public class InGameManager : NetworkBehaviour
             // Start the game logic here
             // GM.StartGame();
         }
+    }
+
+    public void augmentCalls(){
+        
     }
 
     [Rpc(SendTo.Server)]
