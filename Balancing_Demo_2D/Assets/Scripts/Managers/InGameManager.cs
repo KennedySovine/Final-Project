@@ -55,10 +55,6 @@ public class InGameManager : NetworkBehaviour
         }
 
         GM.AM = AM; // Get the AugmentManager instance
-        if (GM.AM == null)
-        {
-            Debug.LogError("AugmentManager instance is null. Ensure the AugmentManager is active in the scene.");
-        }
     }
 
     // Update is called once per frame
@@ -100,10 +96,6 @@ public class InGameManager : NetworkBehaviour
             // Start the game logic here
             // GM.StartGame();
         }
-    }
-
-    public void augmentCalls(){
-        
     }
 
     [Rpc(SendTo.Server)]
