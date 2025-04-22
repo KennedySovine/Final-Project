@@ -248,15 +248,6 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    public void augmentLogic(){
-        augmentChoosing = true; //Start the augment choosing process
-            // UI LOGIC to show the augment options to the player
-            // Augment randomization (including which ones pop up and the stats they will give)
-            // After selection, reset the buffer time
-            augmentBuffer = 40f;
-            augmentChoosing = false; //End the augment choosing process
-    }
-
     public void EndGame()
     {
         Debug.Log("Game Over!");
