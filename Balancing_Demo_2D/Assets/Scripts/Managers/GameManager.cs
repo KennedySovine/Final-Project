@@ -132,16 +132,19 @@ public class GameManager : NetworkBehaviour
                     EndGame();
                 }
 
-                if (augmentBuffer > 0 && !augmentChoosing && !gamePaused) // If Augment buffer is greater than 0, players are not choosing augments, and the game isnt paused.
+                if (augmentBuffer > 0 && !augmentChoosing && !gamePaused) // If Augment buffer is greater than 0, players are not choosing augments, and the game isn't paused.
                 {
                     augmentBuffer -= Time.deltaTime;
                 }
-                else
+                else if (!augmentChoosing) // Ensure this block runs only once when augmentChoosing is false
                 {
                     AM.loadAugmentsClientRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
+                    Debug.Log("Loading Augments for Player 1: " + player1ID);
                     AM.loadAugmentsClientRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
+                    Debug.Log("Loading Augments for Player 2: " + player2ID);
 
                     augmentChoosing = true; // Start the augment choosing process
+                    augmentBuffer = 40f; // Reset the augment buffer for the next cycle
                 }
             }
         }

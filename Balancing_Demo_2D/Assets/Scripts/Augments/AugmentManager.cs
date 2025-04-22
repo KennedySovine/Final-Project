@@ -125,6 +125,7 @@ public class AugmentManager : MonoBehaviour
     // Send to specified clients only
     [Rpc(SendTo.SpecifiedInParams)]
     public void loadAugmentsClientRpc(RpcParams rpcParams){
+        Debug.Log("Loading Augments for Client" + rpcParams.Receive.SenderClientId);
         augmentUI.SetActive(true); // Show the augment UI
 
         List<Augment> augOptions = new List<Augment>(); // List to hold augment choices
