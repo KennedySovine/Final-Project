@@ -6,12 +6,6 @@ using TMPro;
 public class GameManager : NetworkBehaviour
 {
     public static GameManager Instance; // Singleton instance
-    public Dictionary<ulong, GameObject> playerChampions = new Dictionary<ulong, GameObject>(); // Dictionary to store player prefabs and connect it to the client ID
-    public List<ulong> playerIDsSpawned = new List<ulong>(); // List of player IDs that have spawned champions
-
-    private bool playerSpawningStart = false;
-    
-    public ulong ServerID = 0; // ID of the server
 
     //public NetworkManager networkManager; // Reference to the NetworkManager
 
@@ -24,9 +18,15 @@ public class GameManager : NetworkBehaviour
     public GameObject player2;
     public GameObject player2Controller; // Reference to the player controller for player 2
 
+    [Header("Server Settings")]
+    public Dictionary<ulong, GameObject> playerChampions = new Dictionary<ulong, GameObject>(); // Dictionary to store player prefabs and connect it to the client ID
+    public List<ulong> playerIDsSpawned = new List<ulong>(); // List of player IDs that have spawned champions
+    private bool playerSpawningStart = false;
+    public ulong ServerID = 0; // ID of the server
     [Header("Game Settings")]
     public int playerCount = 0; // Number of players connected
     public int maxPlayers = 2;
+    public bool gamePaused = false; // Flag to pause the game time
     public float gameTime = 120f; // Game duration in seconds
     public float augmentBuffer = 40f; //Choose aug every 40 seconds
     public bool augmentChosing = false; //If the player is choosing an augment, dont countdown the game time
@@ -35,6 +35,7 @@ public class GameManager : NetworkBehaviour
     public GameObject championPrefab; // Prefab for spawning champions
     public Transform[] spawnPoints; // Array of spawn points for champions
 
+    private Camera serverCamera; // Reference to the server camera
 
     private void Awake()
     {
@@ -86,6 +87,7 @@ public class GameManager : NetworkBehaviour
     private void Update()
     {
         playerCount = playerChampions.Count; // Update player count
+
         if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost) // Ensure this runs only on the server
         {
             
@@ -97,7 +99,7 @@ public class GameManager : NetworkBehaviour
 
                 if (!playerSpawningStart) // Check if champions have not been spawned yet
                 {
-                    //Debug.Log("Spawning champions for players.");
+                    Debug.Log("Spawning champions for players.");
                     spawnChampions(); // Spawn champions for both players
                     playerSpawningStart = true; // Set the flag to true to prevent multiple spawns
                 }
@@ -108,9 +110,10 @@ public class GameManager : NetworkBehaviour
                 
                 if (augmentChosing)
                 {
+                    gamePaused = true; // Pause the game time while choosing an augment
                     // Augment logic
                 }
-                else if (gameTime > 0)
+                else if (gameTime > 0 && !gamePaused)
                 {
                     gameTime -= Time.deltaTime;
                 }
@@ -119,7 +122,7 @@ public class GameManager : NetworkBehaviour
                     EndGame();
                 }
 
-                if (augmentBuffer > 0)
+                if (augmentBuffer > 0 && !augmentChosing && !gamePaused) // If Augment buffer is greater than 0, players are not choosing augments, and the game isnt paused.
                 {
                     augmentBuffer -= Time.deltaTime;
                 }
@@ -151,7 +154,7 @@ public class GameManager : NetworkBehaviour
 
     public void spawnChampions()
     {
-        if (!NetworkManager.Singleton.IsServer || !NetworkManager.Singleton.IsHost) // Ensure only the server can execute this
+        if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost) // Ensure only the server can execute this
         {
             Debug.LogWarning("Only the server can spawn champions!");
             return;
@@ -190,6 +193,28 @@ public class GameManager : NetworkBehaviour
                         Debug.LogWarning("No available spawn points for additional players.");
                         break;
                 }
+            }
+        }
+    }
+
+    public void EnableServerObserverMode()
+    {
+        if (NetworkManager.Singleton.IsServer)
+        {
+            if (serverCamera == null)
+            {
+                // Find the camera even if it's inactive
+                serverCamera = GameObject.FindWithTag("MainCamera")?.GetComponent<Camera>();
+            }
+
+            if (serverCamera != null)
+            {
+                serverCamera.enabled = true;
+                Debug.Log("Server observer mode enabled.");
+            }
+            else
+            {
+                Debug.LogWarning("No camera found for the server.");
             }
         }
     }

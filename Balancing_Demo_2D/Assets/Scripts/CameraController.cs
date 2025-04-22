@@ -9,6 +9,7 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
+
         personalCamera = GetComponent<Camera>();
 
         if (target != null && target.GetComponent<NetworkBehaviour>().IsOwner)
