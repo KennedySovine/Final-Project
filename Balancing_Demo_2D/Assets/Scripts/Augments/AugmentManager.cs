@@ -161,7 +161,7 @@ public class AugmentManager : MonoBehaviour
     // Send to server
     [Rpc(SendTo.Server)]
     public void sendAugmentChoiceServerRpc(int augmentID, RpcParams rpcParam = default){
-        ulong SenderClientID = rpcParams.Receive.SenderClientId; // Get the client ID of the sender
+        ulong SenderClientID = rpcParam.Receive.SenderClientId; // Get the client ID of the sender
         // Aug choice for player1
         if (GM.player1ID == SenderClientID){
             GM.player1Augments.Add(augmentID); // Add the chosen augment to player1's list

@@ -90,7 +90,7 @@ public class GameManager : NetworkBehaviour
     {
         Debug.Log("Game Manager Initialized");
 
-        var target = Rpc.Target.Single(0, RpcTargetUse.Temp);
+        var target = RpcTarget.Single(0, RpcTargetUse.Temp);
         Debug.Log(target);
     }
 
@@ -122,8 +122,8 @@ public class GameManager : NetworkBehaviour
                 {
                     gamePaused = true; // Pause the game time while choosing an augment
                     // Augment logic
-                    AM.loadAugmentsClientRpc(Rpc.Target.Single(player1ID, RpcTargetUse.Temp));
-                    AM.loadAugmentsClientRpc(Rpc.Target.Single(player2ID, RpcTargetUse.Temp));
+                    AM.loadAugmentsClientRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
+                    AM.loadAugmentsClientRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
 
                 }
                 else if (gameTime > 0 && !gamePaused)
