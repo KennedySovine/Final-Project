@@ -11,8 +11,11 @@ public class PlayerNetwork : NetworkBehaviour
 
     public BaseChampion champion; // Reference to the champion script
 
+    private GameManager GM; // Reference to the GameManager
+
     void Start()
     {
+        GM = GameManager.Instance; // Get the GameManager instance
         if (IsOwner)
         {
             Debug.Log("Local player spawned.");
@@ -36,6 +39,9 @@ public class PlayerNetwork : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        //If game paused, disable input
+
         if (!IsOwner) return; // Only the owner can control the player
 
         if (Input.GetMouseButtonDown(1)) // Check if the right mouse button is pressed

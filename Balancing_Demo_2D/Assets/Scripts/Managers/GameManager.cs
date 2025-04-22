@@ -34,7 +34,7 @@ public class GameManager : NetworkBehaviour
     public bool gamePaused = false; // Flag to pause the game time
     public float gameTime = 120f; // Game duration in seconds
     public float augmentBuffer = 40f; //Choose aug every 40 seconds
-    public bool augmentChosing = false; //If the player is choosing an augment, dont countdown the game time
+    public bool augmentChoosing = false; //If the player is choosing an augment, dont countdown the game time
 
     [Header("Champion Management")]
     public GameObject championPrefab; // Prefab for spawning champions
@@ -118,12 +118,9 @@ public class GameManager : NetworkBehaviour
                     //Debug.Log("Champions already spawned. Waiting for game time to end.");
                 }
                 
-                if (augmentChosing)
+                if (augmentChoosing)
                 {
                     gamePaused = true; // Pause the game time while choosing an augment
-                    // Augment logic
-                    AM.loadAugmentsClientRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
-                    AM.loadAugmentsClientRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
 
                 }
                 else if (gameTime > 0 && !gamePaused)
@@ -135,13 +132,16 @@ public class GameManager : NetworkBehaviour
                     EndGame();
                 }
 
-                if (augmentBuffer > 0 && !augmentChosing && !gamePaused) // If Augment buffer is greater than 0, players are not choosing augments, and the game isnt paused.
+                if (augmentBuffer > 0 && !augmentChoosing && !gamePaused) // If Augment buffer is greater than 0, players are not choosing augments, and the game isnt paused.
                 {
                     augmentBuffer -= Time.deltaTime;
                 }
                 else
                 {
-                    augmentChosing = true; // Start the augment choosing process
+                    AM.loadAugmentsClientRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
+                    AM.loadAugmentsClientRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
+
+                    augmentChoosing = true; // Start the augment choosing process
                 }
             }
         }
@@ -249,12 +249,12 @@ public class GameManager : NetworkBehaviour
     }
 
     public void augmentLogic(){
-        augmentChosing = true; //Start the augment choosing process
+        augmentChoosing = true; //Start the augment choosing process
             // UI LOGIC to show the augment options to the player
             // Augment randomization (including which ones pop up and the stats they will give)
             // After selection, reset the buffer time
             augmentBuffer = 40f;
-            augmentChosing = false; //End the augment choosing process
+            augmentChoosing = false; //End the augment choosing process
     }
 
     public void EndGame()
