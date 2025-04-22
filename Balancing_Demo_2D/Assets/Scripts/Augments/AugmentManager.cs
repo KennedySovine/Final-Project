@@ -47,6 +47,14 @@ public class AugmentManager : MonoBehaviour
 
     }
 
+    public int GetFirstTwoDigits_Math(int value){
+        int v = Mathf.Abs(value);
+        int digits = (int)Mathf.Floor(Mathf.Log10(v)) + 1;
+        if (digits <= 2) return v;
+        // divide off the trailing (digits−2) places
+        return v / (int)Mathf.Pow(10, digits - 2);
+    }
+
      private void LoadAugments()
     {
         // Load the JSON file from the Resources folder
@@ -84,29 +92,50 @@ public class AugmentManager : MonoBehaviour
         }
     }
 
-    public List<Augment> augmentSelector(){
-        List<Augment> augOptions = new List<Augment>(); // List to hold augment choices
+    public List<Augment> augmentSelector()
+    {
+        var augOptions    = new List<Augment>();
+        var usedPrefixes  = new HashSet<int>();
+        int maxAttempts   = 100;       // avoid infinite loop
 
         for (int i = 0; i < augmentUIList.Count; i++)
         {
-            int randomIndex = Random.Range(0, 100); //random number to choose augment rarity
-            Augment chosenAugment = null;
-            switch (randomIndex){
-                case < 50:
-                    chosenAugment = silverAugments[Random.Range(0, silverAugments.Count)];
-                    break;
-                case < 80:
-                    chosenAugment = goldAugments[Random.Range(0, goldAugments.Count)];
-                    break;
-                case < 100:
-                    chosenAugment = prismaticAugments[Random.Range(0, prismaticAugments.Count)];
-                    break;
-            }
+            Augment chosenAug = null;
+            int prefix = 0;
+            int attempts = 0;
 
-            augOptions.Add(chosenAugment); // Add the chosen augment to the list
+            // keep rolling until we find one whose first‑two digits haven't been used
+            do
+            {
+                attempts++;
+                int roll = Random.Range(0, 100);
+                if (roll < 50 && silverAugments.Count > 0)
+                    chosenAug = silverAugments[Random.Range(0, silverAugments.Count)];
+                else if (roll < 80 && goldAugments.Count > 0)
+                    chosenAug = goldAugments[Random.Range(0, goldAugments.Count)];
+                else if (prismaticAugments.Count > 0)
+                    chosenAug = prismaticAugments[Random.Range(0, prismaticAugments.Count)];
+
+                if (chosenAug == null)
+                    break;  // no candidates in that rarity
+
+                prefix = GetFirstTwoDigits_Math(chosenAug.id);
+
+                if (attempts >= maxAttempts)
+                {
+                    Debug.LogWarning($"Could not find unique augment for slot {i} after {maxAttempts} tries. " +
+                                     $"Allowing duplicate prefix {prefix}.");
+                    break;
+                }
+            }
+            while (usedPrefixes.Contains(prefix));
+
+            // record and add
+            usedPrefixes.Add(prefix);
+            augOptions.Add(chosenAug);
         }
 
-        return augOptions; // Return the list of chosen augments
+        return augOptions;
     }
 
     public void augmentUISetup(List<Augment> augOptions){
