@@ -24,7 +24,7 @@ public class GameManager : NetworkBehaviour
     public Dictionary<ulong, GameObject> playerChampions = new Dictionary<ulong, GameObject>(); // Dictionary to store player prefabs and connect it to the client ID
     public List<ulong> playerIDsSpawned = new List<ulong>(); // List of player IDs that have spawned champions
     private bool playerSpawningStart = false;
-    public ulong ServerID = 0; // ID of the server
+    public ulong ServerID = 3; // ID of the server
     public ulong player1ID = 0; // ID of player 1
     public ulong player2ID = 0; // ID of player 2
 
@@ -33,7 +33,7 @@ public class GameManager : NetworkBehaviour
     public int maxPlayers = 2;
     public bool gamePaused = false; // Flag to pause the game time
     public float gameTime = 120f; // Game duration in seconds
-    public float augmentBuffer = 40f; //Choose aug every 40 seconds
+    public float augmentBuffer = 20f; //Choose aug every 40 seconds
     public bool augmentChoosing = false; //If the player is choosing an augment, dont countdown the game time
 
     [Header("Champion Management")]
@@ -138,13 +138,13 @@ public class GameManager : NetworkBehaviour
                 }
                 else if (!augmentChoosing) // Ensure this block runs only once when augmentChoosing is false
                 {
-                    AM.loadAugmentsClientRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
                     Debug.Log("Loading Augments for Player 1: " + player1ID);
-                    AM.loadAugmentsClientRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
+                    AM.loadAugmentsClientRpc(RpcTarget.Single(player1ID, RpcTargetUse.Persistent));
                     Debug.Log("Loading Augments for Player 2: " + player2ID);
+                    AM.loadAugmentsClientRpc(RpcTarget.Single(player2ID, RpcTargetUse.Persistent));
 
                     augmentChoosing = true; // Start the augment choosing process
-                    augmentBuffer = 40f; // Reset the augment buffer for the next cycle
+                    augmentBuffer = 20f; // Reset the augment buffer for the next cycle
                 }
             }
         }
@@ -217,7 +217,7 @@ public class GameManager : NetworkBehaviour
 
     public void EnableServerObserverMode()
     {
-        if (NetworkManager.Singleton.IsServer)
+        if (NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
         {
             if (serverCamera == null)
             {
