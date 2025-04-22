@@ -83,54 +83,9 @@ public class AugmentManager : MonoBehaviour
         }
     }
 
-    private Augment augmentFromID (int ID){
-        foreach (Augment augment in allAugments) {
-            if (augment.id == ID){
-                Debug.Log($"Augment found: {augment.name}");
-                return augment;
-            }
-        }
-        return null; // Return null if no augment is found with the given ID
-    }
-
-    private void PrintAugments()
-{
-    Debug.Log("Silver Augments:");
-    foreach (var augment in silverAugments)
-    {
-        Debug.Log($"- {augment.name}: {augment.description}");
-    }
-
-    Debug.Log("Gold Augments:");
-    foreach (var augment in goldAugments)
-    {
-        Debug.Log($"- {augment.name}: {augment.description}");
-    }
-
-    Debug.Log("Prismatic Augments:");
-    foreach (var augment in prismaticAugments)
-    {
-        Debug.Log($"- {augment.name}: {augment.description}");
-    }
-}
-
-    // Wrapper class to handle JSON arrays
-    [System.Serializable]
-    private class AugmentListWrapper
-    {
-        public List<Augment> augments;
-    }
-
-    //Add Augments to UI for Choosing
-    // Send to specified clients only
-    [Rpc(SendTo.SpecifiedInParams)]
-    public void loadAugmentsClientRpc(RpcParams rpcParams){
-        Debug.Log("Loading Augments for Client " + NetworkManager.Singleton.LocalClientId); // Log the client ID for debugging
-        augmentUI.SetActive(true); // Show the augment UI
-
+    public List<Augment> augmentSelector(){
         List<Augment> augOptions = new List<Augment>(); // List to hold augment choices
 
-        //Loads augments to the UI
         for (int i = 0; i < augmentUIList.Count; i++)
         {
             int randomIndex = Random.Range(0, 100); //random number to choose augment rarity
@@ -148,20 +103,65 @@ public class AugmentManager : MonoBehaviour
             }
 
             augOptions.Add(chosenAugment); // Add the chosen augment to the list
+        }
 
+        return augOptions; // Return the list of chosen augments
+    }
+
+    public void augmentUISetup(List<Augment> augOptions){
+        for (int i = 0; i < augmentUIList.Count; i++)
+        {
             //Access augment name and description from the chosen augment
             TextMeshProUGUI augmentName = augmentUIList[i].transform.Find("AugName").GetComponent<TextMeshProUGUI>();
             TextMeshProUGUI augmentDescription = augmentUIList[i].transform.Find("AugDesc").GetComponent<TextMeshProUGUI>();
 
+            Augment chosenAugment = augOptions[i]; // Get the chosen augment for this UI element
             augmentName.text = chosenAugment.name; // Set the name text
             augmentDescription.text = chosenAugment.description; // Set the description text
         }
-        
+    }
+
+    private Augment augmentFromID (int ID){
+        foreach (Augment augment in allAugments) {
+            if (augment.id == ID){
+                Debug.Log($"Augment found: {augment.name}");
+                return augment;
+            }
+        }
+        return null; // Return null if no augment is found with the given ID
+    }
+
+    private void PrintAugments()
+    {
+        Debug.Log("Silver Augments:");
+        foreach (var augment in silverAugments)
+        {
+            Debug.Log($"- {augment.name}: {augment.description}");
+        }
+
+        Debug.Log("Gold Augments:");
+        foreach (var augment in goldAugments)
+        {
+            Debug.Log($"- {augment.name}: {augment.description}");
+        }
+
+        Debug.Log("Prismatic Augments:");
+        foreach (var augment in prismaticAugments)
+        {
+            Debug.Log($"- {augment.name}: {augment.description}");
+        }
+    }
+
+    // Wrapper class to handle JSON arrays
+    [System.Serializable]
+    private class AugmentListWrapper
+    {
+        public List<Augment> augments;
     }
 
     // Send to server
     [Rpc(SendTo.Server)]
-    public void sendAugmentChoiceServerRpc(int augmentID, RpcParams rpcParam = default){
+    public void sendAugmentChoiceRpc(int augmentID, RpcParams rpcParam = default){
         ulong SenderClientID = rpcParam.Receive.SenderClientId; // Get the client ID of the sender
         // Aug choice for player1
         if (GM.player1ID == SenderClientID){
@@ -188,7 +188,7 @@ public class AugmentManager : MonoBehaviour
     // Function for button click
 
     public void augmentSelection(int augID){
-        sendAugmentChoiceServerRpc(augID); // Send the augment choice to the server
+        sendAugmentChoiceRpc(augID); // Send the augment choice to the server
         Debug.Log($"Augment {augID} selected!"); // Log the selected augment ID
     }
 }

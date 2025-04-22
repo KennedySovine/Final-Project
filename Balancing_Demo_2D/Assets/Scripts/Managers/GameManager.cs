@@ -89,9 +89,6 @@ public class GameManager : NetworkBehaviour
     private void Start()
     {
         Debug.Log("Game Manager Initialized");
-
-        var target = RpcTarget.Single(0, RpcTargetUse.Temp);
-        Debug.Log(target);
     }
 
     private void Update()
@@ -139,9 +136,9 @@ public class GameManager : NetworkBehaviour
                 else if (!augmentChoosing) // Ensure this block runs only once when augmentChoosing is false
                 {
                     Debug.Log("Loading Augments for Player 1: " + player1ID);
-                    AM.loadAugmentsClientRpc(RpcTarget.Single(player1ID, RpcTargetUse.Persistent));
+                    loadAugmentsRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
                     Debug.Log("Loading Augments for Player 2: " + player2ID);
-                    AM.loadAugmentsClientRpc(RpcTarget.Single(player2ID, RpcTargetUse.Persistent));
+                    loadAugmentsRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
 
                     augmentChoosing = true; // Start the augment choosing process
                     augmentBuffer = 20f; // Reset the augment buffer for the next cycle
@@ -264,5 +261,14 @@ public class GameManager : NetworkBehaviour
     {
         Debug.Log("Game Over!");
         // Add logic to handle end of the game (e.g., show results, restart, etc.)
+    }
+
+    //Add Augments to UI for Choosing
+    // Send to specified clients only
+    [Rpc(SendTo.SpecifiedInParams)]
+    public void loadAugmentsRpc(RpcParams rpcParams){
+        Debug.Log("Loading Augments for Client " + NetworkManager.Singleton.LocalClientId); // Log the client ID for debugging
+        AM.augmentUI.SetActive(true); // Show the augment UI
+        AM.augmentUISetup(AM.augmentSelector()); // Get the list of chosen augments
     }
 }
