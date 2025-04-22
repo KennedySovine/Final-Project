@@ -27,7 +27,29 @@ public class InGameManager : NetworkBehaviour
         GM.spawnPoints[1] = GameObject.Find("SpawnPoint2").transform;
 
         Debug.Log("Spawn points initialized.");
-         beginButton.GetComponent<Button>().interactable = false;
+        beginButton.GetComponent<Button>().interactable = false;
+
+        if (NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
+        {
+            GM.EnableServerObserverMode(); // Enable server observer mode
+            Debug.Log("Server observer mode enabled.");
+            ChampSelectUI.SetActive(false); // Do not show champ select UI to server
+        }
+
+        if (NetworkManager.Singleton.IsClient)
+        {
+            // Deactivate the MainCamera for clients
+            GameObject mainCamera = GameObject.FindWithTag("MainCamera");
+            if (mainCamera != null)
+            {
+                mainCamera.SetActive(false);
+                Debug.Log("MainCamera deactivated for client.");
+            }
+            else
+            {
+                Debug.LogWarning("MainCamera not found in the scene.");
+            }
+        }
     }
 
     // Update is called once per frame
