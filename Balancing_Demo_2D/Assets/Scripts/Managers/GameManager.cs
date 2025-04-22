@@ -17,12 +17,17 @@ public class GameManager : NetworkBehaviour
     public GameObject player1Controller; // Reference to the player controller for player 1
     public GameObject player2;
     public GameObject player2Controller; // Reference to the player controller for player 2
+    public List<int> player1Augments = new List<int>();
+    public List<int> player2Augments = new List<int>();
 
     [Header("Server Settings")]
     public Dictionary<ulong, GameObject> playerChampions = new Dictionary<ulong, GameObject>(); // Dictionary to store player prefabs and connect it to the client ID
     public List<ulong> playerIDsSpawned = new List<ulong>(); // List of player IDs that have spawned champions
     private bool playerSpawningStart = false;
     public ulong ServerID = 0; // ID of the server
+    public ulong player1ID = 0; // ID of player 1
+    public ulong player2ID = 0; // ID of player 2
+
     [Header("Game Settings")]
     public int playerCount = 0; // Number of players connected
     public int maxPlayers = 2;
@@ -36,6 +41,7 @@ public class GameManager : NetworkBehaviour
     public Transform[] spawnPoints; // Array of spawn points for champions
 
     private Camera serverCamera; // Reference to the server camera
+    public AugmentManager AM; // Reference to the AugmentManager
 
     private void Awake()
     {
@@ -112,6 +118,9 @@ public class GameManager : NetworkBehaviour
                 {
                     gamePaused = true; // Pause the game time while choosing an augment
                     // Augment logic
+                    AM.loadAugments(player1ID, Rpc.Target.Single(rpcParams.Recieve.SenderClientID, RpcTargetUse.Temp)); // Load augments for player 1
+                    AM.loadAugments(player2ID, Rpc.Target.Single(rpcParams.Recieve.SenderClientID, RpcTargetUse.Temp)); // Load augments for player 2
+
                 }
                 else if (gameTime > 0 && !gamePaused)
                 {
@@ -128,7 +137,7 @@ public class GameManager : NetworkBehaviour
                 }
                 else
                 {
-                    augmentLogic();
+                    augmentChosing = true; // Start the augment choosing process
                 }
             }
         }
@@ -151,6 +160,8 @@ public class GameManager : NetworkBehaviour
             Debug.LogError("NetworkManager.Singleton is null. Ensure the NetworkManager is active in the scene.");
         }
     }
+
+    
 
     public void spawnChampions()
     {
@@ -176,6 +187,7 @@ public class GameManager : NetworkBehaviour
                         findPlayerControllers(player1, ref player1Controller); // Find the PlayerController for player 1
                         player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                         playerIDsSpawned.Add(playerId);
+                        player1UD = playerId; // Store the ID of player 1
                         Debug.Log($"Spawned champion for Player 1 (Client {playerId}).");
                         break;
 
@@ -184,6 +196,7 @@ public class GameManager : NetworkBehaviour
                         findPlayerControllers(player2, ref player2Controller); // Find the PlayerController for player 2
                         player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                         playerIDsSpawned.Add(playerId);
+                        player2UD = playerId; // Store the ID of player 2
                         Debug.Log($"Spawned champion for Player 2 (Client {playerId}).");
                         break;
 

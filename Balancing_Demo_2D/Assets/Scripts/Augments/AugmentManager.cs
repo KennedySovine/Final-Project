@@ -2,20 +2,28 @@ using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
 using Unity.Netcode;
+using TMPro;
 
 public class AugmentManager : MonoBehaviour
 {
+    private GameManager GM;
+
+    [Header("Augment Lists")]
     public List<Augment> silverAugments = new List<Augment>();
     public List<Augment> goldAugments = new List<Augment>();
     public List<Augment> prismaticAugments = new List<Augment>();
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+
+    [Header("UI Elements")]
+    private List<GameObject> augmentUIList = new List<GameObject>(); // List to hold UI elements for augments
+    public GameObject augmentUI; // Reference to the UI element for displaying augments
+    public GameObject augment1; //Prefab for augment 1
+    public GameObject augment2; //Prefab for augment 2
+    public GameObject augment3; //Prefab for augment 3
     void Start()
     {
-    }
+        GM = GameManager.Instance; // Get the GameManager instance
 
-    // Update is called once per frame
-    void Update()
-    {
         if (NetworkManager.Singleton.IsServer && silverAugments.Count == 0) // Only load augments on server and if they haven't been loaded yet
         {
             Debug.Log("Loading augments...");
@@ -23,6 +31,18 @@ public class AugmentManager : MonoBehaviour
             LoadAugments();
             PrintAugments(); //Testing
         }
+
+        augmentUI.SetActive(false); // Hide the augment UI at the start
+        augmentUIList.Add(augment1); // Add augment UI elements to the list
+        augmentUIList.Add(augment2);
+        augmentUIList.Add(augment3);
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
     }
 
      private void LoadAugments()
@@ -89,4 +109,53 @@ public class AugmentManager : MonoBehaviour
     {
         public List<Augment> augments;
     }
+
+    //Add Augments to UI for Choosing
+    [Rpc(SendTo.SpecifiedInParams)]
+    public void loadAugments(ulong clientID, RpcParams rpcParams){
+        augmentUI.SetActive(true); // Show the augment UI
+
+        //Loads augments to the UI
+        for (int i = 0; i < augmentUIList.Count; i++)
+        {
+            int randomIndex = Random.Range(0, 100); //random number to choose augment rarity
+            Augment chosenAugment = null;
+            switch (randomIndex){
+                case < 50:
+                    chosenAugment = silverAugments[Random.Range(0, silverAugments.Count)];
+                    break;
+                case < 80:
+                    chosenAugment = goldAugments[Random.Range(0, goldAugments.Count)];
+                    break;
+                case < 100:
+                    chosenAugment = prismaticAugments[Random.Range(0, prismaticAugments.Count)];
+                    break;
+            }
+
+            //Access augment name and description from the chosen augment
+            TextMeshProUGUI augmentName = augmentUIList[i].transform.Find("AugName").GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI augmentDescription = augmentUIList[i].transform.Find("AugDesc").GetComponent<TextMeshProUGUI>();
+
+            augmentName.text = chosenAugment.name; // Set the name text
+            augmentDescription.text = chosenAugment.description; // Set the description text
+        }
+        
+    }
+
+    [Rpc(SendTo.Server)]
+    public void sendAugmentChoice(ulong clientID, int augmentIndex, RpcParams rpcParams){
+        // Handle the augment choice made by the client
+        if (GM.playerChampions.ContainsKey(clientID))
+        {
+            Augment chosenAugment = GM.playerChampions[clientID].GetComponent<AugmentManager>().silverAugments[augmentIndex]; // Get the chosen augment
+            Debug.Log($"Client {clientID} chose augment: {chosenAugment.name}");
+            // Apply the augment to the player's champion or perform any other necessary actions
+        }
+        else
+        {
+            Debug.LogWarning($"Client {clientID} not found in player champions.");
+        }
+    }
+
+    // Function to send augment choices based on clientID to GM
 }
