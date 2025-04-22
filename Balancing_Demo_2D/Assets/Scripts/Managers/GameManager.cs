@@ -174,7 +174,6 @@ public class GameManager : NetworkBehaviour
                     case 0:
                         player1 = Instantiate(playerClass, spawnPoints[0].position, Quaternion.identity);
                         findPlayerControllers(player1, ref player1Controller); // Find the PlayerController for player 1
-                        player1Controller.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
                         player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                         playerIDsSpawned.Add(playerId);
                         Debug.Log($"Spawned champion for Player 1 (Client {playerId}).");
@@ -183,7 +182,6 @@ public class GameManager : NetworkBehaviour
                     case 1:
                         player2 = Instantiate(playerClass, spawnPoints[1].position, Quaternion.identity);
                         findPlayerControllers(player2, ref player2Controller); // Find the PlayerController for player 2
-                        player2Controller.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // Set the linear velocity to 0 for the second player
                         player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                         playerIDsSpawned.Add(playerId);
                         Debug.Log($"Spawned champion for Player 2 (Client {playerId}).");

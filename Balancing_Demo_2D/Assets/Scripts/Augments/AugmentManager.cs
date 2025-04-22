@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
+using Unity.Netcode;
 
 public class AugmentManager : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class AugmentManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (NetworkManager.Singleton.IsServer && silverAugments.count == 0) // Only load augments on server and if they haven't been loaded yet
+        if (NetworkManager.Singleton.IsServer && silverAugments.Count == 0) // Only load augments on server and if they haven't been loaded yet
         {
             Debug.Log("Loading augments...");
             // Load augments from JSON file

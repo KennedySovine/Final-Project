@@ -9,7 +9,6 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
-
         personalCamera = GetComponent<Camera>();
 
         if (target != null && target.GetComponent<NetworkBehaviour>().IsOwner)
@@ -18,6 +17,9 @@ public class CameraController : MonoBehaviour
             {
                 personalCamera.enabled = true;
                 Debug.Log($"Camera enabled for local player: {personalCamera.name}");
+
+                // Make the camera face toward Y = 0
+                FaceTowardsYZero();
             }
             else
             {
@@ -43,6 +45,19 @@ public class CameraController : MonoBehaviour
 
             // Lock the camera's rotation
             transform.rotation = Quaternion.Euler(0f, 0f, 180f);
+        }
+    }
+
+    private void FaceTowardsYZero()
+    {
+        // Calculate the direction from the camera's position to Y = 0
+        Vector3 directionToYZero = new Vector3(transform.position.x, 0f, transform.position.z) - transform.position;
+
+        // Set the camera's rotation to face Y = 0
+        if (directionToYZero != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(directionToYZero, Vector3.up);
+            transform.rotation = targetRotation;
         }
     }
 }
