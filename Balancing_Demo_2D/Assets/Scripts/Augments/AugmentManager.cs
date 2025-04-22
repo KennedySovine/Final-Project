@@ -10,14 +10,18 @@ public class AugmentManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        LoadAugments();
-        PrintAugments(); //Testing
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (NetworkManager.Singleton.IsServer && silverAugments.count == 0) // Only load augments on server and if they haven't been loaded yet
+        {
+            Debug.Log("Loading augments...");
+            // Load augments from JSON file
+            LoadAugments();
+            PrintAugments(); //Testing
+        }
     }
 
      private void LoadAugments()
