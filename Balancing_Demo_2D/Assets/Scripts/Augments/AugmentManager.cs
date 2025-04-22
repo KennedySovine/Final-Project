@@ -25,11 +25,12 @@ public class AugmentManager : MonoBehaviour
     {
         GM = GameManager.Instance; // Get the GameManager instance
 
+        LoadAugments();
+
         if (NetworkManager.Singleton.IsServer && silverAugments.Count == 0) // Only load augments on server and if they haven't been loaded yet
         {
             Debug.Log("Loading augments...");
             // Load augments from JSON file
-            LoadAugments();
             PrintAugments(); //Testing
         }
 
@@ -115,9 +116,8 @@ public class AugmentManager : MonoBehaviour
             TextMeshProUGUI augmentName = augmentUIList[i].transform.Find("AugName").GetComponent<TextMeshProUGUI>();
             TextMeshProUGUI augmentDescription = augmentUIList[i].transform.Find("AugDesc").GetComponent<TextMeshProUGUI>();
 
-            Augment chosenAugment = augOptions[i]; // Get the chosen augment for this UI element
-            augmentName.text = chosenAugment.name; // Set the name text
-            augmentDescription.text = chosenAugment.description; // Set the description text
+            augmentName.text = augOptions[i].name; // Set the name text
+            augmentDescription.text = augOptions[i].description; // Set the description text
         }
     }
 
