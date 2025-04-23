@@ -202,10 +202,8 @@ public class AugmentManager : NetworkBehaviour
         }
 
         if (GM.player1Augments.Count == GM.player2Augments.Count){
-            GM.AM.augmentUI.SetActive(false); // Hide the augment UI after both players have made their choices
             Debug.Log("Both players have selected their augments!");
-            GM.augmentBuffer = 40f;
-            GM.augmentChoosing = false; // Set the augment choosing flag to false
+            GM.gamePaused = false; // Unpause the game
         }
         else{
             Debug.Log($"Player {SenderClientID} selected augment {augmentID}");
@@ -218,6 +216,7 @@ public class AugmentManager : NetworkBehaviour
 
     public void augmentSelection(int augID){
         sendAugmentChoiceRpc(augID); // Send the augment choice to the server
+        augmentUI.SetActive(false); // Hide the augment UI after selection
         Debug.Log($"Augment {augID} selected!"); // Log the selected augment ID
     }
 }

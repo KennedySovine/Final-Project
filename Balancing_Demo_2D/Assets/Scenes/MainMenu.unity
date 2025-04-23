@@ -938,8 +938,8 @@ MonoBehaviour:
   maxPlayers: 2
   gamePaused: 0
   gameTime: 120
-  augmentBuffer: 40
-  augmentChosing: 0
+  augmentBuffer: 20
+  augmentChoosing: 0
   championPrefab: {fileID: 0}
   spawnPoints:
   - {fileID: 0}

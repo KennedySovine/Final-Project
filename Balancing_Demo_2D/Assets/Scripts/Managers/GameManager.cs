@@ -114,33 +114,33 @@ public class GameManager : NetworkBehaviour
                 {
                     //Debug.Log("Champions already spawned. Waiting for game time to end.");
                 }
+
+                if (augmentBuffer <=0){
+                    augmentChoosing = true;
+                }
                 
                 if (augmentChoosing)
                 {
                     gamePaused = true; // Pause the game time while choosing an augment
 
                 }
-                else if (gameTime > 0 && !gamePaused)
+                if (gameTime > 0 && !gamePaused)
                 {
                     gameTime -= Time.deltaTime;
-                }
-                else
-                {
-                    EndGame();
                 }
 
                 if (augmentBuffer > 0 && !augmentChoosing && !gamePaused) // If Augment buffer is greater than 0, players are not choosing augments, and the game isn't paused.
                 {
                     augmentBuffer -= Time.deltaTime;
                 }
-                else if (!augmentChoosing) // Ensure this block runs only once when augmentChoosing is false
+                else if (augmentChoosing) // Ensure this block runs only once when augmentChoosing is false
                 {
                     Debug.Log("Loading Augments for Player 1: " + player1ID);
                     loadAugmentsRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
                     Debug.Log("Loading Augments for Player 2: " + player2ID);
                     loadAugmentsRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
 
-                    augmentChoosing = true; // Start the augment choosing process
+                    augmentChoosing = false;
                     augmentBuffer = 20f; // Reset the augment buffer for the next cycle
                 }
             }
@@ -211,7 +211,6 @@ public class GameManager : NetworkBehaviour
             }
         }
     }
-
     public void EnableServerObserverMode()
     {
         if (NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
@@ -233,7 +232,6 @@ public class GameManager : NetworkBehaviour
             }
         }
     }
-
     private void findPlayerControllers(GameObject parent, ref GameObject controller)
     {
         Transform childTransform = parent.transform.Find("PlayerController");
