@@ -278,7 +278,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 349277511}
         m_TargetAssemblyTypeName: AugmentManager, Assembly-CSharp
         m_MethodName: augmentSelection
         m_Mode: 3
@@ -412,7 +412,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 349277511}
         m_TargetAssemblyTypeName: AugmentManager, Assembly-CSharp
         m_MethodName: augmentSelection
         m_Mode: 3
@@ -1014,6 +1014,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccd1579abd1f5fc4ea29eb9a8882aba3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   silverAugments: []
   goldAugments: []
   prismaticAugments: []
@@ -3150,7 +3151,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 349277511}
         m_TargetAssemblyTypeName: AugmentManager, Assembly-CSharp
         m_MethodName: augmentSelection
         m_Mode: 3
