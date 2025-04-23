@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using TMPro;
 
-public class AugmentManager : MonoBehaviour
+public class AugmentManager : NetworkBehaviour
 {
     private GameManager GM;
 

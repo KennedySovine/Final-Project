@@ -46,7 +46,7 @@ public class PlayerNetwork : NetworkBehaviour
 
         if (Input.GetMouseButtonDown(1)) // Check if the right mouse button is pressed
         {
-            Debug.Log("Right mouse button clicked.");
+            //Debug.Log("Right mouse button clicked.");
             mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition); // Get the mouse position in world space
             mousePosition.z = 0; // Set the z coordinate to 0
             targetPosition.x = mousePosition.x; // Set the target position's x coordinate
