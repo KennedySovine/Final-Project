@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Unity.Netcode;
 using TMPro;
+using System.Linq;
 
 public class GameManager : NetworkBehaviour
 {
@@ -165,8 +166,6 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-
-
     public void spawnChampions()
     {
         if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost) // Ensure only the server can execute this
@@ -250,6 +249,116 @@ public class GameManager : NetworkBehaviour
     {
         Debug.Log("Game Over!");
         // Add logic to handle end of the game (e.g., show results, restart, etc.)
+    }
+
+    //Function to update player stats on the client side
+
+
+    public void applyAugments(ulong playerID){
+
+        if (playerID == player1ID) // Check if the player ID matches player 1
+        {
+            Augment newAugment = AM.augmentFromID(player1Augments.Last()); // Get the last augment chosen by player 1
+            float randomAdjustment = newAugment.max; // Default adjustment value
+    
+            if (newAugment.min != newAugment.max)
+            {
+                randomAdjustment = Random.Range(newAugment.min, newAugment.max); // Get a random adjustment value between min and max
+            }
+    
+            switch (newAugment.type)
+            {
+                case "AbilityHaste":
+                    player1Controller.GetComponent<BaseChampion>().updateAbilityHaste(randomAdjustment); // Increase ability haste for player 1
+                    break;
+                case "Armor":
+                    player1Controller.GetComponent<BaseChampion>().updateArmor(randomAdjustment); // Increase armor for player 1
+                    break;
+                case "AttackDamage":
+                    player1Controller.GetComponent<BaseChampion>().updateAD(randomAdjustment); // Increase AD for player 1
+                    break;
+                case "AbilityPower":
+                    player1Controller.GetComponent<BaseChampion>().updateAP(randomAdjustment); // Increase AP for player 1
+                    break;
+                case "Health":
+                    player1Controller.GetComponent<BaseChampion>().updateMaxHeath(randomAdjustment); // Increase max health for player 1
+                    break;
+                case "AttackSpeed":
+                    player1Controller.GetComponent<BaseChampion>().updateAttackSpeed(randomAdjustment); // Increase attack speed for player 1
+                    break;
+                case "CriticalStrike": // crit chance
+                    player1Controller.GetComponent<BaseChampion>().updateCritChance(randomAdjustment); // Increase crit chance for player 1
+                    break;
+                case "CriticalDamage": // crit damage
+                    player1Controller.GetComponent<BaseChampion>().updateCritDamage(randomAdjustment); // Increase crit damage for player 1
+                    break;
+                case "ArmorPenitration":
+                    player1Controller.GetComponent<BaseChampion>().updateArmorPen(randomAdjustment); // Increase armor pen for player 1
+                    break;
+                case "MagicPenitration":
+                    player1Controller.GetComponent<BaseChampion>().updateMagicPen(randomAdjustment); // Increase magic pen for player 1
+                    break;
+                case "MagicResist":
+                    player1Controller.GetComponent<BaseChampion>().updateMagicResist(randomAdjustment); // Increase MR for player 1
+                    break;
+                default:
+                    Debug.LogWarning("Unknown augment type: " + newAugment.type); // Log a warning for unknown augment types
+                    break;
+            }
+        }
+        else if (playerID == player2ID){
+            Augment newAugment = AM.augmentFromID(player2Augments.Last()); // Get the last augment chosen by player 1
+            float randomAdjustment = newAugment.max; // Default adjustment value
+    
+            if (newAugment.min != newAugment.max)
+            {
+                randomAdjustment = Random.Range(newAugment.min, newAugment.max); // Get a random adjustment value between min and max
+            }
+    
+            switch (newAugment.type)
+            {
+                case "AbilityHaste":
+                    player2Controller.GetComponent<BaseChampion>().updateAbilityHaste(randomAdjustment); // Increase ability haste for player 1
+                    break;
+                case "Armor":
+                    player2Controller.GetComponent<BaseChampion>().updateArmor(randomAdjustment); // Increase armor for player 1
+                    break;
+                case "AttackDamage":
+                    player2Controller.GetComponent<BaseChampion>().updateAD(randomAdjustment); // Increase AD for player 1
+                    break;
+                case "AbilityPower":
+                    player2Controller.GetComponent<BaseChampion>().updateAP(randomAdjustment); // Increase AP for player 1
+                    break;
+                case "Health":
+                    player2Controller.GetComponent<BaseChampion>().updateMaxHeath(randomAdjustment); // Increase max health for player 1
+                    break;
+                case "AttackSpeed":
+                    player2Controller.GetComponent<BaseChampion>().updateAttackSpeed(randomAdjustment); // Increase attack speed for player 1
+                    break;
+                case "CriticalStrike": // crit chance
+                    player2Controller.GetComponent<BaseChampion>().updateCritChance(randomAdjustment); // Increase crit chance for player 1
+                    break;
+                case "CriticalDamage": // crit damage
+                    player2Controller.GetComponent<BaseChampion>().updateCritDamage(randomAdjustment); // Increase crit damage for player 1
+                    break;
+                case "ArmorPenitration":
+                    player2Controller.GetComponent<BaseChampion>().updateArmorPen(randomAdjustment); // Increase armor pen for player 1
+                    break;
+                case "MagicPenitration":
+                    player2Controller.GetComponent<BaseChampion>().updateMagicPen(randomAdjustment); // Increase magic pen for player 1
+                    break;
+                case "MagicResist":
+                    player2Controller.GetComponent<BaseChampion>().updateMagicResist(randomAdjustment); // Increase MR for player 1
+                    break;
+                default:
+                    Debug.LogWarning("Unknown augment type: " + newAugment.type); // Log a warning for unknown augment types
+                    break;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Player ID not found in the game. Cannot apply augments.");
+        }
     }
 
     //Add Augments to UI for Choosing

@@ -150,9 +150,11 @@ public class AugmentManager : NetworkBehaviour
         }
     }
 
-    private Augment augmentFromID (int ID){
+    public Augment augmentFromID (int ID){
+        Debug.Log($"Searching for augment with ID: {ID}"); // Log the ID being searched for
         foreach (Augment augment in allAugments) {
             if (augment.id == ID){
+                Debug.Log($"Augment ID: {ID}"); // Log the ID of the found augment
                 Debug.Log($"Augment found: {augment.name}");
                 return augment;
             }
@@ -199,7 +201,7 @@ public class AugmentManager : NetworkBehaviour
     }
 
     // Send to server
-    [Rpc(SendTo.Server)]
+    [Rpc(SendTo.Everyone)]
     public void sendAugmentChoiceRpc(int augmentID, RpcParams rpcParam = default){
         ulong SenderClientID = rpcParam.Receive.SenderClientId; // Get the client ID of the sender
         // Aug choice for player1
@@ -210,17 +212,22 @@ public class AugmentManager : NetworkBehaviour
         else if (GM.player2ID == SenderClientID){
             GM.player2Augments.Add(augmentID); // Add the chosen augment to player2's list
         }
+        else{
+            Debug.LogError($"Unknown player ID: {SenderClientID}"); // Log an error if the player ID is unknown
+            return; // Exit the function if the player ID is not recognized
+        }
+
+        Debug.Log($"Player {SenderClientID} selected augment {augmentID} and it is being applied"); // Log the selected augment ID
+        GM.applyAugments(SenderClientID); // Apply the selected augment to player stats
 
         if (GM.player1Augments.Count == GM.player2Augments.Count){
             Debug.Log("Both players have selected their augments!");
             GM.gamePaused = false; // Unpause the game
-            GM.applyAugments(); // Apply the selected augments to the players
         }
         else{
-            Debug.Log($"Player {SenderClientID} selected augment {augmentID}");
+    
         }
 
- 
     }
 
     // Function for button click

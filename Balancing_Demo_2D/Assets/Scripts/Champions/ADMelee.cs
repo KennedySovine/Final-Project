@@ -8,6 +8,9 @@ public class ADMelee : BaseChampion
         base.Start();
         UpdateStats();
         AddAbilities();
+
+        health = maxHealth; // Initialize health to max health
+        mana = maxMana; // Initialize mana to max mana
     }
 
     //Based on Vayne from LOL

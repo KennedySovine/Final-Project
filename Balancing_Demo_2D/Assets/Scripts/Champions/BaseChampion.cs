@@ -240,4 +240,26 @@ public class BaseChampion : MonoBehaviour
             this.critDamage += critDamage;
         }
     }
+    public void updateArmorPen(float armorPen){
+        if (armorPen < 0 && armorPen > -1) //If the armor pen change is due to augment that will add %
+        {
+            float tempAP = this.armor * armorPen;
+            this.armor += tempAP;
+        }
+        else
+        {
+            this.armor += armorPen;
+        }
+    }
+    public void updateMagicPen(float magicPen){
+        if (magicPen < 0 && magicPen > -1) //If the magic pen change is due to augment that will add %
+        {
+            float tempMP = this.magicResist * magicPen;
+            this.magicResist += tempMP;
+        }
+        else
+        {
+            this.magicResist += magicPen;
+        }
+    }
 }

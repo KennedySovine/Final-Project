@@ -11,6 +11,8 @@ public class APMelee : BaseChampion
         base.Start();
         UpdateStats();
         AddAbilities();
+        health = maxHealth; // Initialize health to max health
+        mana = maxMana; // Initialize mana to max mana
     }
 
     //Based on Gwen from LOL
