@@ -160,6 +160,16 @@ public class AugmentManager : NetworkBehaviour
         return null; // Return null if no augment is found with the given ID
     }
 
+    private Augment augmentFromName (string name){
+        foreach (Augment augment in allAugments) {
+            if (augment.name == name){
+                Debug.Log($"Augment found: {augment.name}");
+                return augment;
+            }
+        }
+        return null; // Return null if no augment is found with the given name
+    }
+
     private void PrintAugments()
     {
         Debug.Log("Silver Augments:");
@@ -204,6 +214,7 @@ public class AugmentManager : NetworkBehaviour
         if (GM.player1Augments.Count == GM.player2Augments.Count){
             Debug.Log("Both players have selected their augments!");
             GM.gamePaused = false; // Unpause the game
+            GM.applyAugments(); // Apply the selected augments to the players
         }
         else{
             Debug.Log($"Player {SenderClientID} selected augment {augmentID}");
@@ -215,8 +226,10 @@ public class AugmentManager : NetworkBehaviour
     // Function for button click
 
     public void augmentSelection(int augID){
-        sendAugmentChoiceRpc(augID); // Send the augment choice to the server
+        int augmenID = augmentFromName(augmentUIList[augID].transform.Find("AugName").GetComponent<TextMeshProUGUI>().text).id; // Get the augment ID from the selected UI element
+        Debug.Log($"Augment ID: {augID}"); // Log the augment ID for debugging
+        sendAugmentChoiceRpc(augmenID); // Send the augment choice to the server
         augmentUI.SetActive(false); // Hide the augment UI after selection
-        Debug.Log($"Augment {augID} selected!"); // Log the selected augment ID
+        //Debug.Log($"Augment {augID} selected!"); // Log the selected augment ID
     }
 }
