@@ -41,9 +41,23 @@ public class Bullet : NetworkBehaviour
             // Move the bullet towards the target position
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * 10f); // Adjust speed as needed
         }
-        else
+
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log("Bullet collided with: " + collision.gameObject.name);
+        // Check if the bullet hit a champion
+        BaseChampion champion = collision.GetComponent<BaseChampion>();
+        if (champion != null)
         {
-            // Destroy the bullet if it reaches the target position
+            // Call onHitByBullet on the server
+            if (NetworkManager.Singleton.IsServer)
+            {
+                champion.onHitByBullet(this);
+            }
+
+            // Destroy the bullet after it hits
             Destroy(gameObject);
         }
     }

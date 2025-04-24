@@ -109,7 +109,6 @@ public class BaseChampion : NetworkBehaviour
                 float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
                 if (distance <= autoAttack.range)
                 {
-                    Debug.Log("Basic Attack hit!");
 
                     // Check if the cooldown has passed
                     if (Time.time >= lastAutoAttackTime + autoAttack.cooldown)
@@ -171,11 +170,36 @@ public class BaseChampion : NetworkBehaviour
         }
     }
 
-    public void critLogic(){}
+    public void critLogic(){
+
+    }
 
     // Function to deal with being hit by projectiles (bullets)
     // Check the ownerID vs the playerID of the bullet
     // If they are the same, do not take damage
+
+    public void onHitByBullet(Bullet bullet)
+    {
+        // Calculate physical damage reduction based on armor
+        float physicalDamage = bullet.ADDamage * (1 - armor.Value / (armor.Value + 100));
+
+        // Calculate magic damage reduction based on magic resist
+        float magicDamage = bullet.APDamage * (1 - magicResist.Value / (magicResist.Value + 100));
+
+        // Apply armor penetration and magic penetration
+        physicalDamage *= (1 + bullet.armorPenetration);
+        magicDamage *= (1 + bullet.magicPenetration);
+
+        // Total damage
+        float totalDamage = physicalDamage + magicDamage;
+
+        // Apply damage to health
+        updateHealth(-totalDamage);
+
+        // Log the damage taken
+        Debug.Log($"Hit by enemy bullet! Physical Damage: {physicalDamage}, Magic Damage: {magicDamage}, Total Damage: {totalDamage}");
+        
+    }
 
     public void updateMaxHealth(float healthChange)
     {
