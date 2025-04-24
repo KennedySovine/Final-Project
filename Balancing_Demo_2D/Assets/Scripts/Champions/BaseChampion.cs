@@ -49,7 +49,7 @@ public class BaseChampion : NetworkBehaviour
         // Example: Sync health regeneration logic
         if (IsServer) // Only the server should modify NetworkVariables
         {
-            HealthandManaRegen();
+            //HealthandManaRegen();
         }
     }
 
