@@ -200,38 +200,8 @@ public class AugmentManager : NetworkBehaviour
         public List<Augment> augments;
     }
 
-    // Send to server
-    [Rpc(SendTo.Everyone)]
-    public void sendAugmentChoiceRpc(int augmentID, RpcParams rpcParam = default){
-        ulong SenderClientID = rpcParam.Receive.SenderClientId; // Get the client ID of the sender
-        // Aug choice for player1
-        if (GM.player1ID == SenderClientID){
-            GM.player1Augments.Add(augmentID); // Add the chosen augment to player1's list
-        }
-        // Aug choice for player2
-        else if (GM.player2ID == SenderClientID){
-            GM.player2Augments.Add(augmentID); // Add the chosen augment to player2's list
-        }
-        else{
-            Debug.LogError($"Unknown player ID: {SenderClientID}"); // Log an error if the player ID is unknown
-            return; // Exit the function if the player ID is not recognized
-        }
-
-        Debug.Log($"Player {SenderClientID} selected augment {augmentID} and it is being applied"); // Log the selected augment ID
-        GM.applyAugments(SenderClientID); // Apply the selected augment to player stats
-
-        if (GM.player1Augments.Count == GM.player2Augments.Count){
-            Debug.Log("Both players have selected their augments!");
-            GM.gamePaused = false; // Unpause the game
-        }
-        else{
-    
-        }
-
-    }
-
     [Rpc(SendTo.Server)]
-    public void sendAugmentChoiceServerRpc(int augmentID, ServerRpcParams rpcParams = default)
+    public void sendAugmentChoiceRpc(int augmentID, RpcParams rpcParams = default)
     {
         ulong senderClientID = rpcParams.Receive.SenderClientId; // Get the client ID of the sender
 
@@ -259,7 +229,7 @@ public class AugmentManager : NetworkBehaviour
         if (GM.player1Augments.Count == GM.player2Augments.Count)
         {
             Debug.Log("Both players have selected their augments!");
-            GM.gamePaused = false; // Unpause the game
+            GM.gamePaused.Value = false; // Unpause the game
         }
     }
 

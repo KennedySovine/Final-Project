@@ -276,7 +276,9 @@ public class GameManager : NetworkBehaviour
         }
 
         // Get the last augment chosen by the player
-        int augmentID = (playerID == player1ID) ? player1Augments.Last() : player2Augments.Last();
+        int augmentID = (playerID == player1ID) 
+            ? player1Augments[player1Augments.Count - 1] 
+            : player2Augments[player2Augments.Count - 1];
         Augment newAugment = AM.augmentFromID(augmentID);
 
         if (newAugment == null)
@@ -324,7 +326,7 @@ public class GameManager : NetworkBehaviour
                 targetChampion.armorPen.Value += randomAdjustment;
                 break;
             case "MagicPenitration":
-                targetChampion.magicPen.Value; // Assuming this method modifies a network variable
+                targetChampion.magicPen.Value += randomAdjustment; // Assuming this method modifies a network variable
                 break;
             case "MagicResist":
                 targetChampion.magicResist.Value += randomAdjustment;

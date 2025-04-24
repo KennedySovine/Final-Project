@@ -43,7 +43,7 @@ public class PlayerNetwork : NetworkBehaviour
         //If game paused, disable input
 
         if (!IsOwner) return; // Only the owner can control the player
-        if (GM.gamePaused) return; // If the game is paused, disable input
+        if (GM.gamePaused.Value) return; // If the game is paused, disable input
 
         if (Input.GetMouseButtonDown(1)) // Check if the right mouse button is pressed
         {

@@ -76,16 +76,16 @@ public class BaseChampion : NetworkBehaviour
 
     public void updateMaxHealth(float healthChange)
     {
-        if (IsServer) // Only the server should modify NetworkVariables
+        if (IsServer)
         {
             if (healthChange < 0 && healthChange > -1) // If the health change is due to augment that will add %
             {
-                float tempH = health.Value * healthChange;
-                health.Value += tempH;
+                float tempH = maxHealth.Value * healthChange;
+                maxHealth.Value += tempH;
             }
             else
             {
-                health.Value += healthChange;
+                maxHealth.Value += healthChange;
             }
         }
     }
@@ -288,7 +288,7 @@ public class BaseChampion : NetworkBehaviour
         {
             if (armorPenChange < 0 && armorPenChange > -1) // If the armor pen change is due to augment that will add %
             {
-                float tempAP = armorPen * armorPenChange;
+                float tempAP = armorPen.Value * armorPenChange;
                 armorPen.Value += tempAP;
             }
             else
@@ -304,7 +304,7 @@ public class BaseChampion : NetworkBehaviour
         {
             if (magicPenChange < 0 && magicPenChange > -1) // If the magic pen change is due to augment that will add %
             {
-                float tempMP = magicPen * magicPenChange;
+                float tempMP = magicPen.Value * magicPenChange;
                 magicPen.Value += tempMP;
             }
             else

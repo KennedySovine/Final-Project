@@ -2,34 +2,33 @@ using UnityEngine;
 
 public class ADMelee : BaseChampion
 {
-
     void Start()
     {
         base.Start();
         UpdateStats();
         AddAbilities();
 
-        health = maxHealth; // Initialize health to max health
-        mana = maxMana; // Initialize mana to max mana
+        health.Value = maxHealth.Value; // Initialize health to max health
+        mana.Value = maxMana.Value; // Initialize mana to max mana
     }
 
-    //Based on Vayne from LOL
+    // Based on Vayne from LOL
     private void UpdateStats()
     {
         championType = "AD Melee";
-        maxHealth = 550f;
-        healthRegen = 0.7f;
-        AD = 60f;
-        AP = 0f;
-        armor = 23f;
-        magicResist = 30f;
-        attackSpeed = 0.685f;
-        movementSpeed = 330f;
-        maxMana = 232f;
-        manaRegen = 8f; 
-        abilityHaste = 0f; 
-        critChance = 0f;
-        critDamage = 1.75f; // 175% damage on crit
+        maxHealth.Value = 550f;
+        healthRegen.Value = 0.7f;
+        AD.Value = 60f;
+        AP.Value = 0f;
+        armor.Value = 23f;
+        magicResist.Value = 30f;
+        attackSpeed.Value = 0.685f;
+        movementSpeed.Value = 330f;
+        maxMana.Value = 232f;
+        manaRegen.Value = 8f;
+        abilityHaste.Value = 0f;
+        critChance.Value = 0f;
+        critDamage.Value = 1.75f; // 175% damage on crit
     }
 
     private void AddAbilities()
@@ -51,7 +50,6 @@ public class ADMelee : BaseChampion
         );
 
         ability2 = new Ability(
-            //Passive
             "Silver Bolts",
             "Basic attacks apply a stack and at 3 stacks, deal bonus true damage",
             0f, // Cooldown in seconds
@@ -80,7 +78,8 @@ public class ADMelee : BaseChampion
         // Alter bullet prefab with a 'damage dealt' variable to be used in the bullet script that will be increased for the empowered dmg
     }
 
-    public void UseAbility2(){
+    public void UseAbility2()
+    {
         // No cooldown
         // No mana cost
         // In game manager, perhaps add a variable that can track these stacks and how many times it has been applied before dealing the true damage
@@ -89,7 +88,8 @@ public class ADMelee : BaseChampion
         // Make Game Manager bulky if need be
     }
 
-    public void UseAbility3(){
+    public void UseAbility3()
+    {
         // Check if ability is off cooldown and if theres enough mana
         // Modify the bullet prefab to deal extra physical damage
         // Add a knockback effect to the target if they are hit by the bolt
