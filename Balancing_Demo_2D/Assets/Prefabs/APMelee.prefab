@@ -245,6 +245,8 @@ MonoBehaviour:
     m_InternalValue: 0
   magicPen:
     m_InternalValue: 0
+  currentPosition:
+    m_InternalValue: {x: 0, y: 0, z: 0}
   health:
     m_InternalValue: 600
   mana:
@@ -289,8 +291,10 @@ MonoBehaviour:
     range: 0
     duration: 0
     cooldownTimer: 0
+  lastAutoAttackTime: 0
   attackConsecutive: 0
   regenTimer: 0
+  enemyChampion: {fileID: 0}
   bulletPrefab: {fileID: 0}
   PN: {fileID: 6396152837990209168}
   attackStacks: 0
@@ -526,7 +530,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6453171085482971729}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 

@@ -240,6 +240,7 @@ public class GameManager : NetworkBehaviour
             {
                 Debug.LogWarning("No camera found for the server.");
             }
+            hostReady.Value = true;
         }
     }
     private void findPlayerControllers(GameObject parent, ref GameObject controller)

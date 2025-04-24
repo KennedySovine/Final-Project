@@ -65,7 +65,7 @@ public class PlayerNetwork : NetworkBehaviour
             // Perform the attack action here
             // Basic Attack
             //champion.UseAbility1(); // Call the UseAbility1 method from the champion script
-            champion.basicAttackRpc(); // Call the basic attack method from the champion script
+            PerformRaycastAndSendToServer(); // Perform raycast and send to server
 
         }
 
@@ -77,5 +77,41 @@ public class PlayerNetwork : NetworkBehaviour
             champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // Set the linear velocity to 0 when the player reaches the target position
         }
 
+    }
+    private void PerformRaycastAndSendToServer()
+    {
+        // Perform a 2D raycast from the mouse position
+        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+
+        if (hit.collider != null)
+        {
+            Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
+
+            // Check if the raycast hit the enemy champion
+            if (hit.collider.gameObject == champion.enemyChampion)
+            {
+                Debug.Log("Raycast hit the enemy champion!");
+
+                // Send the raycast result to the server
+                SendAttackToServerRpc(mousePosition);
+            }
+            else
+            {
+                Debug.Log("Raycast hit something else: " + hit.collider.gameObject.name);
+            }
+        }
+        else
+        {
+            Debug.Log("Raycast did not hit anything!");
+        }
+    }
+
+    [Rpc(SendTo.Server)]
+    private void SendAttackToServerRpc(Vector3 targetPosition)
+    {
+        if (!IsServer) return;
+
+        // Forward the attack to the server for validation and execution
+        champion.HandleAttackOnServer( targetPosition);
     }
 }

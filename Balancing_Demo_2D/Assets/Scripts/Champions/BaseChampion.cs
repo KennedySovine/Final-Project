@@ -35,7 +35,7 @@ public class BaseChampion : NetworkBehaviour
     public Ability ability2;
     public Ability ability3;
 
-    private float lastAutoAttackTime = 0f; // Tracks the last time an auto-attack was fired
+    public float lastAutoAttackTime = 0f; // Tracks the last time an auto-attack was fired
 
     [Header("Champion Settings")]
     public int attackConsecutive = 0; // Number of consecutive attacks against oneself
@@ -83,93 +83,6 @@ public class BaseChampion : NetworkBehaviour
         }
     }*/
 
-    [Rpc(SendTo.Server)]
-    public void basicAttackRpc()
-    {
-        if (!IsServer) return; // Ensure this logic runs only on the server
-
-        // Check if the enemy champion exists
-        if (enemyChampion == null)
-        {
-            Debug.LogWarning("No enemy champion assigned.");
-            return;
-        }
-
-        // Perform a 2D raycast from the mouse position
-        Vector2 mousePosition = PN.personalCamera.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
-
-        if (hit.collider != null)
-        {
-            // Check if the raycast hit the enemy champion
-            Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
-            if (hit.collider.gameObject == enemyChampion)
-            {
-                // Check if the player is within range of the enemy champion
-                float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
-                if (distance <= autoAttack.range)
-                {
-
-                    // Check if the cooldown has passed
-                    if (Time.time >= lastAutoAttackTime + autoAttack.cooldown)
-                    {
-                        // Instantiate and configure the bullet
-                        GameObject attackObj = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
-                        var networkObject = attackObj.GetComponent<NetworkObject>();
-                        var bulletComponent = attackObj.GetComponent<Bullet>();
-
-                        if (networkObject == null)
-                        {
-                            Debug.LogError("Bullet prefab is missing a NetworkObject component.");
-                            Destroy(attackObj);
-                            return;
-                        }
-
-                        if (bulletComponent == null)
-                        {
-                            Debug.LogError("Bullet prefab is missing a Bullet component.");
-                            Destroy(attackObj);
-                            return;
-                        }
-
-                        // Spawn the bullet object on the network
-                        networkObject.Spawn();
-
-                        // Configure the bullet
-                        bulletComponent.ADDamage = AD.Value;
-                        bulletComponent.armorPenetration = armorPen.Value;
-                        bulletComponent.magicPenetration = magicPen.Value;
-                        bulletComponent.targetPosition = enemyChampion.transform.position;
-                        bulletComponent.ownerId = OwnerClientId;
-                        bulletComponent.isAutoAttack = true;
-                        bulletComponent.targetPlayer = enemyChampion;
-
-                        Debug.Log("Basic Attack performed!");
-
-                        // Update the last auto-attack time
-                        lastAutoAttackTime = Time.time;
-                    }
-                    else
-                    {
-                        Debug.Log("Basic Attack is on cooldown!");
-                    }
-                }
-                else
-                {
-                    Debug.Log("Target out of range!");
-                }
-            }
-            else
-            {
-                Debug.Log("Raycast did not hit the enemy champion!");
-            }
-        }
-        else
-        {
-            Debug.Log("Raycast did not hit anything!");
-        }
-    }
-
     public void critLogic(){
 
     }
@@ -199,6 +112,54 @@ public class BaseChampion : NetworkBehaviour
         // Log the damage taken
         Debug.Log($"Hit by enemy bullet! Physical Damage: {physicalDamage}, Magic Damage: {magicDamage}, Total Damage: {totalDamage}");
         
+    }
+
+    public void HandleAttackOnServer(Vector3 targetPosition)
+    {
+        if (!IsServer) return;
+
+        // Check if the player is within range of the enemy champion
+        float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
+        if (distance > autoAttack.range)
+        {
+            Debug.Log("Target out of range!");
+            return;
+        }
+
+        // Check if the cooldown has passed
+        if (Time.time < lastAutoAttackTime + autoAttack.cooldown)
+        {
+            Debug.Log("Basic Attack is on cooldown!");
+            return;
+        }
+
+        // Instantiate and configure the bullet
+        GameObject attackObj = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+        var networkObject = attackObj.GetComponent<NetworkObject>();
+        var bulletComponent = attackObj.GetComponent<Bullet>();
+
+        if (networkObject == null || bulletComponent == null)
+        {
+            Debug.LogError("Bullet prefab is missing required components.");
+            Destroy(attackObj);
+            return;
+        }
+
+        // Spawn the bullet on the network
+        networkObject.Spawn();
+
+        // Configure the bullet
+        bulletComponent.ADDamage = AD.Value;
+        bulletComponent.armorPenetration = armorPen.Value;
+        bulletComponent.magicPenetration = magicPen.Value;
+        bulletComponent.targetPosition = targetPosition;
+        bulletComponent.isAutoAttack = true;
+        bulletComponent.targetPlayer = enemyChampion;
+
+        Debug.Log("Basic Attack performed!");
+
+        // Update the last auto-attack time
+        lastAutoAttackTime = Time.time;
     }
 
     public void updateMaxHealth(float healthChange)

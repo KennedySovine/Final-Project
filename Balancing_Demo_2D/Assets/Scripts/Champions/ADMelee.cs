@@ -9,9 +9,6 @@ public class ADMelee : BaseChampion
         base.Start();
         UpdateStats();
         AddAbilities();
-
-        health.Value = maxHealth.Value; // Initialize health to max health
-        mana.Value = maxMana.Value; // Initialize mana to max mana
     }
 
     // Based on Vayne from LOL
@@ -38,6 +35,8 @@ public class ADMelee : BaseChampion
         critDamage.Value = 1.75f; // 175% damage on crit
 
         autoAttack.setRange(50f); // Set the range of the auto attack ability
+        health.Value = maxHealth.Value; // Initialize health to max health
+        mana.Value = maxMana.Value; // Initialize mana to max mana
     }
 
     private void AddAbilities()
