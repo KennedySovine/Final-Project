@@ -298,38 +298,37 @@ public class GameManager : NetworkBehaviour
         switch (newAugment.type)
         {
             case "AbilityHaste":
-                targetChampion.abilityHaste.Value += randomAdjustment;
+                targetChampion.updateAbilityHaste(randomAdjustment);
                 break;
             case "Armor":
-                targetChampion.armor.Value += randomAdjustment;
+                targetChampion.updateArmor(randomAdjustment);
                 break;
             case "AttackDamage":
-                targetChampion.AD.Value += randomAdjustment;
+                targetChampion.updateAD(randomAdjustment);
                 break;
             case "AbilityPower":
-                targetChampion.AP.Value += randomAdjustment;
+                targetChampion.updateAP(randomAdjustment);
                 break;
             case "Health":
-                targetChampion.maxHealth.Value += randomAdjustment;
-                targetChampion.health.Value = Mathf.Min(targetChampion.health.Value, targetChampion.maxHealth.Value); // Ensure current health doesn't exceed max health
+                targetChampion.updateMaxHealth(randomAdjustment);
                 break;
             case "AttackSpeed":
-                targetChampion.attackSpeed.Value += randomAdjustment;
+                targetChampion.updateAttackSpeed(randomAdjustment);
                 break;
             case "CriticalStrike":
-                targetChampion.critChance.Value += randomAdjustment;
+                targetChampion.updateCritChance(randomAdjustment);
                 break;
             case "CriticalDamage":
-                targetChampion.critDamage.Value += randomAdjustment;
+                targetChampion.updateCritDamage(randomAdjustment);
                 break;
             case "ArmorPenitration":
-                targetChampion.armorPen.Value += randomAdjustment;
+                targetChampion.updateArmorPen(randomAdjustment); 
                 break;
             case "MagicPenitration":
-                targetChampion.magicPen.Value += randomAdjustment; // Assuming this method modifies a network variable
+                targetChampion.updateMagicPen(randomAdjustment);
                 break;
             case "MagicResist":
-                targetChampion.magicResist.Value += randomAdjustment;
+                targetChampion.updateMagicResist(randomAdjustment);
                 break;
             default:
                 Debug.LogWarning($"Unknown augment type: {newAugment.type}");

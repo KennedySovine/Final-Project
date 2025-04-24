@@ -97,7 +97,6 @@ public class BaseChampion : NetworkBehaviour
             health.Value += healthChange;
         }
     }
-
     public void updateAD(float adChange)
     {
         if (IsServer)
