@@ -4,10 +4,14 @@ using Unity.Netcode;
 public class Bullet : NetworkBehaviour
 {
 
-    public float damage = 0f;
-    public bool isEmpowered = false; // Flag to check if the bullet is empowered
+    public float ADDamage = 0f;
+    public float APDamage = 0f;
+    public float empoweredDamageBasedOnTargetHP = 0f; // Damage based on target's HP
 
+    public float armorPenetration = 0f; // Armor penetration value
+    public float magicPenetration = 0f; // Magic penetration value
     public Vector3 targetPosition; 
+    public float range = 0f; // Range of the bullet
     public ulong ownerId = 0;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -20,4 +24,6 @@ public class Bullet : NetworkBehaviour
     {
         
     }
+
+    // Function to destroy prefab if it goes outside of range
 }

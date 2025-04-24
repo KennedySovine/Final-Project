@@ -63,6 +63,7 @@ public class PlayerNetwork : NetworkBehaviour
             // Perform the attack action here
             // Basic Attack
             //champion.UseAbility1(); // Call the UseAbility1 method from the champion script
+            champion.basicAttackRpc(); // Call the basic attack method from the champion script
 
         }
 

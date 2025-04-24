@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: -5773027604529593968}
   m_Layer: 0
   m_Name: Bullet
-  m_TagString: Untagged
+  m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -219,3 +219,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2741630f4231c94d9db5ea7df79acae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  ADDamage: 0
+  APDamage: 0
+  empoweredDamageBasedOnTargetHP: 0
+  armorPenetration: 0
+  magicPenetration: 0
+  targetPosition: {x: 0, y: 0, z: 0}
+  range: 0
+  ownerId: 0

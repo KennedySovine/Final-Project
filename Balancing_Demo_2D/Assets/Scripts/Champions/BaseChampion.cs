@@ -78,13 +78,20 @@ public class BaseChampion : NetworkBehaviour
         }
     }*/
 
-    public void basicAttack(){ // Auto attack
+    [Rpc(SendTo.Server)]
+    public void basicAttackRpc(){ // Auto attack
         if (IsServer)
         {
             // Check if the cooldown has passed
             if (Time.time >= lastAutoAttackTime + autoAttack.cooldown)
             {
-                // Perform the auto-attack logic here
+                GameObject attackObj = Instantiate(bulletPrefab, transform.position, Quaternion.identity); // Create the bullet object
+                attackObj.GetComponent<NetworkObject>().Spawn(); // Spawn the bullet object on the network
+                attackObj.GetComponent<Bullet>().ADDamage = AD.Value;
+                attackObj.GetComponent<Bullet>().armorPenetration = armorPen.Value;
+                attackObj.GetComponent<Bullet>().magicPenetration = magicPen.Value;
+                attackObj.GetComponent<Bullet>().targetPosition = PN.personalCamera.ScreenToWorldPoint(Input.mousePosition); // Set the champion type for the bullet
+                attackObj.GetComponent<Bullet>().ownerId = OwnerClientId; // Set the owner ID for the bullet
                 Debug.Log("Basic Attack performed!");
 
                 // Update the last auto-attack time
@@ -96,6 +103,12 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
+
+    public void critLogic(){}
+
+    // Function to deal with being hit by projectiles (bullets)
+    // Check the ownerID vs the playerID of the bullet
+    // If they are the same, do not take damage
 
     public void updateMaxHealth(float healthChange)
     {
