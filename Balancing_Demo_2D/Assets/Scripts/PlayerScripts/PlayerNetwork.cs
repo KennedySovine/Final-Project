@@ -11,8 +11,11 @@ public class PlayerNetwork : NetworkBehaviour
 
     public BaseChampion champion; // Reference to the champion script
 
+    private GameManager GM; // Reference to the GameManager
+
     void Start()
     {
+        GM = GameManager.Instance; // Get the GameManager instance
         if (IsOwner)
         {
             Debug.Log("Local player spawned.");
@@ -36,11 +39,15 @@ public class PlayerNetwork : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        //If game paused, disable input
+
         if (!IsOwner) return; // Only the owner can control the player
+        if (GM.gamePaused.Value) return; // If the game is paused, disable input
 
         if (Input.GetMouseButtonDown(1)) // Check if the right mouse button is pressed
         {
-            Debug.Log("Right mouse button clicked.");
+            //Debug.Log("Right mouse button clicked.");
             mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition); // Get the mouse position in world space
             mousePosition.z = 0; // Set the z coordinate to 0
             targetPosition.x = mousePosition.x; // Set the target position's x coordinate

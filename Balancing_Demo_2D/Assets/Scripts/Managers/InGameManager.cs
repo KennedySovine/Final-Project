@@ -12,6 +12,7 @@ public class InGameManager : NetworkBehaviour
     [SerializeField] private GameObject beginButton;
     [SerializeField] private TMP_Dropdown champSelectDropdown;
     [SerializeField] private GameObject ChampSelectUI;
+    [SerializeField] private AugmentManager AM; // Reference to the AugmentManager
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -21,6 +22,8 @@ public class InGameManager : NetworkBehaviour
         {
             Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
         }
+        
+        GM.IGM = this; // Set the InGameManager instance in GameManager
 
         // Initialize spawn points
         GM.spawnPoints[0] = GameObject.Find("SpawnPoint1").transform;
@@ -50,6 +53,8 @@ public class InGameManager : NetworkBehaviour
                 Debug.LogWarning("MainCamera not found in the scene.");
             }
         }
+
+        GM.AM = AM; // Get the AugmentManager instance
     }
 
     // Update is called once per frame

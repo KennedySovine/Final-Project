@@ -901,7 +901,6 @@ GameObject:
   - component: {fileID: 566942286}
   - component: {fileID: 566942287}
   - component: {fileID: 566942285}
-  - component: {fileID: 566942284}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -909,21 +908,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &566942284
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 566942283}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ccd1579abd1f5fc4ea29eb9a8882aba3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  silverAugments: []
-  goldAugments: []
-  prismaticAugments: []
 --- !u!114 &566942285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -944,20 +928,24 @@ MonoBehaviour:
   player1Controller: {fileID: 0}
   player2: {fileID: 0}
   player2Controller: {fileID: 0}
+  player1Augments: 
+  player2Augments: 
   playerIDsSpawned: 
   ServerID: 0
-  serverPrefab: {fileID: 1912352092672361297, guid: 73e98ac9f4d6f4b4896d568e78444ba9, type: 3}
-  serverObject: {fileID: 1912352092672361297, guid: 73e98ac9f4d6f4b4896d568e78444ba9, type: 3}
+  player1ID: 0
+  player2ID: 0
   playerCount: 0
   maxPlayers: 2
   gamePaused: 0
   gameTime: 120
-  augmentBuffer: 40
-  augmentChosing: 0
+  augmentBuffer: 20
+  augmentChoosing: 0
   championPrefab: {fileID: 0}
   spawnPoints:
   - {fileID: 0}
   - {fileID: 0}
+  AM: {fileID: 0}
+  IGM: {fileID: 0}
 --- !u!4 &566942286
 Transform:
   m_ObjectHideFlags: 0
