@@ -211,6 +211,14 @@ public class GameManager : NetworkBehaviour
                         break;
                 }
             }
+
+            if (player1 != null && player2 != null) // Check if both players have been spawned
+            {
+                Debug.Log("Both players have been spawned. Starting the game.");
+                // Add any additional logic to start the game here
+                player1Controller.GetComponent<BaseChampion>().enemyChampion = player2;
+                player2Controller.GetComponent<BaseChampion>().enemyChampion = player1; // Set the enemy champion reference for both players
+            }
         }
     }
     public void EnableServerObserverMode()
