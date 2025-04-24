@@ -82,6 +82,16 @@ public class BaseChampion : NetworkBehaviour
     public void basicAttackRpc(){ // Auto attack
         if (IsServer)
         {
+            // Check if mouse is aimed at enemy champion
+            if (PN.mousePosition != null && )
+            {
+                // Check if the target is a valid enemy champion
+                if (PN.targetPosition != null && PN.targetPosition.CompareTag("EnemyChampion"))
+                {
+                    Debug.Log("Basic Attack on enemy champion!");
+                    PerformBasicAttack(); // Call the function to perform the basic attack
+                }
+            }
             // Check if the cooldown has passed
             if (Time.time >= lastAutoAttackTime + autoAttack.cooldown)
             {
@@ -95,6 +105,7 @@ public class BaseChampion : NetworkBehaviour
                 Debug.Log("Basic Attack performed!");
 
                 // Update the last auto-attack time
+                attackObj.
                 lastAutoAttackTime = Time.time;
             }
             else
