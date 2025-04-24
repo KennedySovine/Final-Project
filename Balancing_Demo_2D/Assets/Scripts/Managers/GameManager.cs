@@ -24,6 +24,7 @@ public class GameManager : NetworkBehaviour
     [Header("Server Settings")]
     public Dictionary<ulong, GameObject> playerChampions = new Dictionary<ulong, GameObject>(); // Dictionary to store player prefabs and connect it to the client ID
     public List<ulong> playerIDsSpawned = new List<ulong>(); // List of player IDs that have spawned champions
+    public NetworkVariable<bool> hostReady = new NetworkVariable<bool>(false);
     private bool playerSpawningStart = false;
     public ulong ServerID = 3; // ID of the server
     public ulong player1ID = 0; // ID of player 1

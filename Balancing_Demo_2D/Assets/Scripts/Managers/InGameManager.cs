@@ -61,6 +61,22 @@ public class InGameManager : NetworkBehaviour
     void Update()
     {
         // Optional: Add any logic that needs to run every frame
+        checkHostReady(); // Check if the host is ready
+    }
+
+    public void checkHostReady(){
+        if (NetworkManager.Singleton.IsHost){
+            return;
+        }
+        else if (!GM.hostReady.Value){
+            champSelectDropdown.interactable = false; // Enable dropdown for client
+        }
+        else if (GM.hostReady.Value){
+            champSelectDropdown.interactable = true; // Disable dropdown for client
+        }
+        else{
+            Debug.LogWarning("I dont know how we got here.");
+        }
     }
 
     public void dropDownSelectLogic()
@@ -68,7 +84,7 @@ public class InGameManager : NetworkBehaviour
         // Enable the begin button only if a valid connection type and champion are selected
         if ((champSelectDropdown.value != 0 ))
         {
-            beginButton.GetComponent<Button>().interactable = true;
+            beginButton.GetComponent<Button>().interactable = true; // Enable the begin button
         }
         else
         {
@@ -78,23 +94,31 @@ public class InGameManager : NetworkBehaviour
 
     public void beginButtonLogic()
     {
-        if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost)
+        if (NetworkManager.Singleton.IsHost)
         {
+            // Host is ready to start the game
+            GM.hostReady.Value = true;
+            Debug.Log("Host is ready to start the game.");
+        }
+        if (NetworkManager.Singleton.IsClient)
+        {
+            //Stop the client from joining if the host hasnt attempted to join.
+            if (!GM.hostReady.Value)
+            {
+                Debug.LogWarning("Host is not ready yet. Please wait.");
+                return; // Prevent the client from proceeding
+            }
+
             Debug.Log("Client requesting to join the game.");
             ChampSelectUI.SetActive(false);
 
-            // Debug before calling the RPC
             ulong clientId = NetworkManager.Singleton.LocalClientId;
             int selectedChampion = champSelectDropdown.value - 1; // Adjust index to match prefab list
-            Debug.Log($"Calling AddClientToGameRpc with ClientID: {clientId}, ChampionIndex: {selectedChampion}");
-
             AddClientToGameRpc(clientId, selectedChampion); // Call the RPC
         }
         else if (NetworkManager.Singleton.IsServer)
         {
             Debug.Log("Server starting the game.");
-            // Start the game logic here
-            // GM.StartGame();
         }
     }
 

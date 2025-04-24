@@ -18,6 +18,11 @@ public class APMelee : BaseChampion
     //Based on Gwen from LOL
     private void UpdateStats()
     {
+        if (!IsServer){
+            Debug.LogWarning("UpdateStats can only be called on the server.");
+            return;
+        }
+        
         championType = "AP Melee";
         maxHealth.Value = 620f;
         healthRegen.Value = 1.8f;

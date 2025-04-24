@@ -15,6 +15,11 @@ public class ADMelee : BaseChampion
     // Based on Vayne from LOL
     private void UpdateStats()
     {
+        if (!IsServer){
+            Debug.LogWarning("UpdateStats can only be called on the server.");
+            return;
+        }
+        
         championType = "AD Melee";
         maxHealth.Value = 550f;
         healthRegen.Value = 0.7f;
