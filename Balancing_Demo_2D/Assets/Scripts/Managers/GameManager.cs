@@ -289,7 +289,7 @@ public class GameManager : NetworkBehaviour
         if (newAugment.min != newAugment.max)
         {
             randomAdjustment = Random.Range(newAugment.min, newAugment.max + 1); // Inclusive range
-            if (!randomAdjustment < 1){ // Ignore % based adjustment from being rounded
+            if (randomAdjustment >= 1){ // Ignore % based adjustment from being rounded
                 randomAdjustment = Mathf.Round(randomAdjustment); // Round to the nearest whole number
             }
 
