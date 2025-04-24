@@ -18,8 +18,8 @@ public class GameManager : NetworkBehaviour
     public GameObject player1Controller; // Reference to the player controller for player 1
     public GameObject player2;
     public GameObject player2Controller; // Reference to the player controller for player 2
-    public List<int> player1Augments = new List<int>();
-    public List<int> player2Augments = new List<int>();
+    public NetworkList<int> player1Augments = new NetworkList<int>();
+    public NetworkList<int> player2Augments = new NetworkList<int>();
 
     [Header("Server Settings")]
     public Dictionary<ulong, GameObject> playerChampions = new Dictionary<ulong, GameObject>(); // Dictionary to store player prefabs and connect it to the client ID
@@ -32,10 +32,10 @@ public class GameManager : NetworkBehaviour
     [Header("Game Settings")]
     public int playerCount = 0; // Number of players connected
     public int maxPlayers = 2;
-    public bool gamePaused = false; // Flag to pause the game time
+    public NetworkVariable<bool> gamePaused = new NetworkVariable<bool>(false); // Flag to pause the game time
     public float gameTime = 120f; // Game duration in seconds
     public float augmentBuffer = 20f; //Choose aug every 40 seconds
-    public bool augmentChoosing = false; //If the player is choosing an augment, dont countdown the game time
+    public NetworkVariable<bool> augmentChoosing = new NetworkVariable<bool>(false); //If the player is choosing an augment, dont countdown the game time
 
     [Header("Champion Management")]
     public GameObject championPrefab; // Prefab for spawning champions
@@ -116,32 +116,33 @@ public class GameManager : NetworkBehaviour
                     //Debug.Log("Champions already spawned. Waiting for game time to end.");
                 }
 
-                if (augmentBuffer <=0){
-                    augmentChoosing = true;
-                }
-                
-                if (augmentChoosing)
+                if (augmentBuffer <= 0)
                 {
-                    gamePaused = true; // Pause the game time while choosing an augment
-
+                    augmentChoosing.Value = true;
                 }
-                if (gameTime > 0 && !gamePaused)
+
+                if (augmentChoosing.Value)
+                {
+                    gamePaused.Value = true;
+                }
+
+                if (gameTime > 0 && !gamePaused.Value)
                 {
                     gameTime -= Time.deltaTime;
                 }
 
-                if (augmentBuffer > 0 && !augmentChoosing && !gamePaused) // If Augment buffer is greater than 0, players are not choosing augments, and the game isn't paused.
+                if (augmentBuffer > 0 && !augmentChoosing.Value && !gamePaused.Value) // If Augment buffer is greater than 0, players are not choosing augments, and the game isn't paused.
                 {
                     augmentBuffer -= Time.deltaTime;
                 }
-                else if (augmentChoosing) // Ensure this block runs only once when augmentChoosing is false
+                else if (augmentChoosing.Value) // Ensure this block runs only once when augmentChoosing is false
                 {
                     Debug.Log("Loading Augments for Player 1: " + player1ID);
                     loadAugmentsRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
                     Debug.Log("Loading Augments for Player 2: " + player2ID);
                     loadAugmentsRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
 
-                    augmentChoosing = false;
+                    augmentChoosing.Value = false;
                     augmentBuffer = 20f; // Reset the augment buffer for the next cycle
                 }
             }
@@ -253,112 +254,92 @@ public class GameManager : NetworkBehaviour
 
     //Function to update player stats on the client side
 
+    public void applyAugments(ulong playerID)
+    {
+        BaseChampion targetChampion = null;
 
-    public void applyAugments(ulong playerID){
-
-        if (playerID == player1ID) // Check if the player ID matches player 1
+        // Determine which player's champion to update
+        if (playerID == player1ID)
         {
-            Augment newAugment = AM.augmentFromID(player1Augments.Last()); // Get the last augment chosen by player 1
-            float randomAdjustment = newAugment.max; // Default adjustment value
-    
-            if (newAugment.min != newAugment.max)
-            {
-                randomAdjustment = Random.Range(newAugment.min, newAugment.max); // Get a random adjustment value between min and max
-            }
-    
-            switch (newAugment.type)
-            {
-                case "AbilityHaste":
-                    player1Controller.GetComponent<BaseChampion>().updateAbilityHaste(randomAdjustment); // Increase ability haste for player 1
-                    break;
-                case "Armor":
-                    player1Controller.GetComponent<BaseChampion>().updateArmor(randomAdjustment); // Increase armor for player 1
-                    break;
-                case "AttackDamage":
-                    player1Controller.GetComponent<BaseChampion>().updateAD(randomAdjustment); // Increase AD for player 1
-                    break;
-                case "AbilityPower":
-                    player1Controller.GetComponent<BaseChampion>().updateAP(randomAdjustment); // Increase AP for player 1
-                    break;
-                case "Health":
-                    player1Controller.GetComponent<BaseChampion>().updateMaxHeath(randomAdjustment); // Increase max health for player 1
-                    break;
-                case "AttackSpeed":
-                    player1Controller.GetComponent<BaseChampion>().updateAttackSpeed(randomAdjustment); // Increase attack speed for player 1
-                    break;
-                case "CriticalStrike": // crit chance
-                    player1Controller.GetComponent<BaseChampion>().updateCritChance(randomAdjustment); // Increase crit chance for player 1
-                    break;
-                case "CriticalDamage": // crit damage
-                    player1Controller.GetComponent<BaseChampion>().updateCritDamage(randomAdjustment); // Increase crit damage for player 1
-                    break;
-                case "ArmorPenitration":
-                    player1Controller.GetComponent<BaseChampion>().updateArmorPen(randomAdjustment); // Increase armor pen for player 1
-                    break;
-                case "MagicPenitration":
-                    player1Controller.GetComponent<BaseChampion>().updateMagicPen(randomAdjustment); // Increase magic pen for player 1
-                    break;
-                case "MagicResist":
-                    player1Controller.GetComponent<BaseChampion>().updateMagicResist(randomAdjustment); // Increase MR for player 1
-                    break;
-                default:
-                    Debug.LogWarning("Unknown augment type: " + newAugment.type); // Log a warning for unknown augment types
-                    break;
-            }
+            targetChampion = player1Controller.GetComponent<BaseChampion>();
+            if (player1Augments.Count == 0) return; // Ensure there are augments to apply
         }
-        else if (playerID == player2ID){
-            Augment newAugment = AM.augmentFromID(player2Augments.Last()); // Get the last augment chosen by player 1
-            float randomAdjustment = newAugment.max; // Default adjustment value
-    
-            if (newAugment.min != newAugment.max)
-            {
-                randomAdjustment = Random.Range(newAugment.min, newAugment.max); // Get a random adjustment value between min and max
-            }
-    
-            switch (newAugment.type)
-            {
-                case "AbilityHaste":
-                    player2Controller.GetComponent<BaseChampion>().updateAbilityHaste(randomAdjustment); // Increase ability haste for player 1
-                    break;
-                case "Armor":
-                    player2Controller.GetComponent<BaseChampion>().updateArmor(randomAdjustment); // Increase armor for player 1
-                    break;
-                case "AttackDamage":
-                    player2Controller.GetComponent<BaseChampion>().updateAD(randomAdjustment); // Increase AD for player 1
-                    break;
-                case "AbilityPower":
-                    player2Controller.GetComponent<BaseChampion>().updateAP(randomAdjustment); // Increase AP for player 1
-                    break;
-                case "Health":
-                    player2Controller.GetComponent<BaseChampion>().updateMaxHeath(randomAdjustment); // Increase max health for player 1
-                    break;
-                case "AttackSpeed":
-                    player2Controller.GetComponent<BaseChampion>().updateAttackSpeed(randomAdjustment); // Increase attack speed for player 1
-                    break;
-                case "CriticalStrike": // crit chance
-                    player2Controller.GetComponent<BaseChampion>().updateCritChance(randomAdjustment); // Increase crit chance for player 1
-                    break;
-                case "CriticalDamage": // crit damage
-                    player2Controller.GetComponent<BaseChampion>().updateCritDamage(randomAdjustment); // Increase crit damage for player 1
-                    break;
-                case "ArmorPenitration":
-                    player2Controller.GetComponent<BaseChampion>().updateArmorPen(randomAdjustment); // Increase armor pen for player 1
-                    break;
-                case "MagicPenitration":
-                    player2Controller.GetComponent<BaseChampion>().updateMagicPen(randomAdjustment); // Increase magic pen for player 1
-                    break;
-                case "MagicResist":
-                    player2Controller.GetComponent<BaseChampion>().updateMagicResist(randomAdjustment); // Increase MR for player 1
-                    break;
-                default:
-                    Debug.LogWarning("Unknown augment type: " + newAugment.type); // Log a warning for unknown augment types
-                    break;
-            }
+        else if (playerID == player2ID)
+        {
+            targetChampion = player2Controller.GetComponent<BaseChampion>();
+            if (player2Augments.Count == 0) return; // Ensure there are augments to apply
         }
         else
         {
-            Debug.LogWarning("Player ID not found in the game. Cannot apply augments.");
+            Debug.LogWarning($"Player ID {playerID} not found. Cannot apply augments.");
+            return;
         }
+
+        // Get the last augment chosen by the player
+        int augmentID = (playerID == player1ID) 
+            ? player1Augments[player1Augments.Count - 1] 
+            : player2Augments[player2Augments.Count - 1];
+        Augment newAugment = AM.augmentFromID(augmentID);
+
+        if (newAugment == null)
+        {
+            Debug.LogWarning($"Augment with ID {augmentID} not found.");
+            return;
+        }
+
+        // Calculate the random adjustment value
+        float randomAdjustment = newAugment.max;
+        if (newAugment.min != newAugment.max)
+        {
+            randomAdjustment = Random.Range(newAugment.min, newAugment.max + 1); // Inclusive range
+
+        }
+
+        randomAdjustment = Mathf.Round(randomAdjustment); // Round to the nearest integer
+        if (randomAdjustment == 0) randomAdjustment = 1; // Ensure the adjustment is at least 1
+
+        // Apply the augment effect based on its type
+        switch (newAugment.type)
+        {
+            case "AbilityHaste":
+                targetChampion.updateAbilityHaste(randomAdjustment);
+                break;
+            case "Armor":
+                targetChampion.updateArmor(randomAdjustment);
+                break;
+            case "AttackDamage":
+                targetChampion.updateAD(randomAdjustment);
+                break;
+            case "AbilityPower":
+                targetChampion.updateAP(randomAdjustment);
+                break;
+            case "Health":
+                targetChampion.updateMaxHealth(randomAdjustment);
+                break;
+            case "AttackSpeed":
+                targetChampion.updateAttackSpeed(randomAdjustment);
+                break;
+            case "CriticalStrike":
+                targetChampion.updateCritChance(randomAdjustment);
+                break;
+            case "CriticalDamage":
+                targetChampion.updateCritDamage(randomAdjustment);
+                break;
+            case "ArmorPenitration":
+                targetChampion.updateArmorPen(randomAdjustment); 
+                break;
+            case "MagicPenitration":
+                targetChampion.updateMagicPen(randomAdjustment);
+                break;
+            case "MagicResist":
+                targetChampion.updateMagicResist(randomAdjustment);
+                break;
+            default:
+                Debug.LogWarning($"Unknown augment type: {newAugment.type}");
+                break;
+        }
+
+        Debug.Log($"Applied augment {newAugment.name} to player {playerID} with adjustment {randomAdjustment}.");
     }
 
     //Add Augments to UI for Choosing

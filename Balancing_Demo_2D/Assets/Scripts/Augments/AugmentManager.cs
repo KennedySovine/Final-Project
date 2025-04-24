@@ -200,34 +200,37 @@ public class AugmentManager : NetworkBehaviour
         public List<Augment> augments;
     }
 
-    // Send to server
-    [Rpc(SendTo.Everyone)]
-    public void sendAugmentChoiceRpc(int augmentID, RpcParams rpcParam = default){
-        ulong SenderClientID = rpcParam.Receive.SenderClientId; // Get the client ID of the sender
-        // Aug choice for player1
-        if (GM.player1ID == SenderClientID){
+    [Rpc(SendTo.Server)]
+    public void sendAugmentChoiceRpc(int augmentID, RpcParams rpcParams = default)
+    {
+        ulong senderClientID = rpcParams.Receive.SenderClientId; // Get the client ID of the sender
+
+        // Determine which player's augment list to update
+        if (GM.player1ID == senderClientID)
+        {
             GM.player1Augments.Add(augmentID); // Add the chosen augment to player1's list
         }
-        // Aug choice for player2
-        else if (GM.player2ID == SenderClientID){
+        else if (GM.player2ID == senderClientID)
+        {
             GM.player2Augments.Add(augmentID); // Add the chosen augment to player2's list
         }
-        else{
-            Debug.LogError($"Unknown player ID: {SenderClientID}"); // Log an error if the player ID is unknown
+        else
+        {
+            Debug.LogError($"Unknown player ID: {senderClientID}"); // Log an error if the player ID is unknown
             return; // Exit the function if the player ID is not recognized
         }
 
-        Debug.Log($"Player {SenderClientID} selected augment {augmentID} and it is being applied"); // Log the selected augment ID
-        GM.applyAugments(SenderClientID); // Apply the selected augment to player stats
+        Debug.Log($"Player {senderClientID} selected augment {augmentID} and it is being applied."); // Log the selected augment ID
 
-        if (GM.player1Augments.Count == GM.player2Augments.Count){
+        // Apply the selected augment to the player's stats
+        GM.applyAugments(senderClientID);
+
+        // Check if both players have selected their augments
+        if (GM.player1Augments.Count == GM.player2Augments.Count)
+        {
             Debug.Log("Both players have selected their augments!");
-            GM.gamePaused = false; // Unpause the game
+            GM.gamePaused.Value = false; // Unpause the game
         }
-        else{
-    
-        }
-
     }
 
     // Function for button click

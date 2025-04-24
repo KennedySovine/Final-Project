@@ -11,34 +11,27 @@ public class APMelee : BaseChampion
         base.Start();
         UpdateStats();
         AddAbilities();
-        health = maxHealth; // Initialize health to max health
-        mana = maxMana; // Initialize mana to max mana
+        health.Value = maxHealth.Value; // Initialize health to max health
+        mana.Value = maxMana.Value; // Initialize mana to max mana
     }
 
     //Based on Gwen from LOL
     private void UpdateStats()
     {
         championType = "AP Melee";
-        maxHealth = 620f;
-        healthRegen = 1.8f;
-        AD = 53f;
-        AP = 10f;
-        armor = 39f;
-        magicResist = 32f;
-        attackSpeed = 0.69f;
-        movementSpeed = 340f;
-        maxMana = 330f;
-        manaRegen = 1.5f; 
-        abilityHaste = 0f; 
-        critChance = 0f;
-        critDamage = 1.75f; // 175% damage on crit
-    }
-
-    protected override void OnSuccessfulAutoAttack()
-    {
-        base.OnSuccessfulAutoAttack(); // Optional: Call the base implementation
-        attackStacks++; // Increase attack stacks
-        Debug.Log($"{championType} now has {attackStacks} attack stacks.");
+        maxHealth.Value = 620f;
+        healthRegen.Value = 1.8f;
+        AD.Value = 53f;
+        AP.Value = 10f;
+        armor.Value = 39f;
+        magicResist.Value = 32f;
+        attackSpeed.Value = 0.69f;
+        movementSpeed.Value = 340f;
+        maxMana.Value = 330f;
+        manaRegen.Value = 1.5f; 
+        abilityHaste.Value = 0f; 
+        critChance.Value = 0f;
+        critDamage.Value = 1.75f; // 175% damage on crit
     }
 
     private void AddAbilities()

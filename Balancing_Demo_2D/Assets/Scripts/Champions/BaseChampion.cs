@@ -1,26 +1,30 @@
 using UnityEngine;
+using Unity.Netcode;
 
-public class BaseChampion : MonoBehaviour
+public class BaseChampion : NetworkBehaviour
 {
     [Header("Champion Stats")]
     public string championType = "";
-    public float maxHealth = 600f;
-    public float healthRegen = 5f;
-    public float AD = 60f;
-    public float AP = 0f;
-    public float armor = 25f;
-    public float magicResist = 30f;
-    public float attackSpeed = 0.65f;
-    public float movementSpeed = 300f;
-    public float maxMana = 300f;
-    public float manaRegen = 7f;
-    public float abilityHaste = 0f;
-    public float critChance = 0f;
-    public float critDamage = 1.75f; // 175% damage on crit
+
+    public NetworkVariable<float> maxHealth = new NetworkVariable<float>(600f);
+    public NetworkVariable<float> healthRegen = new NetworkVariable<float>(5f);
+    public NetworkVariable<float> AD = new NetworkVariable<float>(60f);
+    public NetworkVariable<float> AP = new NetworkVariable<float>(0f);
+    public NetworkVariable<float> armor = new NetworkVariable<float>(25f);
+    public NetworkVariable<float> magicResist = new NetworkVariable<float>(30f);
+    public NetworkVariable<float> attackSpeed = new NetworkVariable<float>(0.65f);
+    public NetworkVariable<float> movementSpeed = new NetworkVariable<float>(300f);
+    public NetworkVariable<float> maxMana = new NetworkVariable<float>(300f);
+    public NetworkVariable<float> manaRegen = new NetworkVariable<float>(7f);
+    public NetworkVariable<float> abilityHaste = new NetworkVariable<float>(0f);
+    public NetworkVariable<float> critChance = new NetworkVariable<float>(0f);
+    public NetworkVariable<float> critDamage = new NetworkVariable<float>(1.75f); // 175% damage on crit
+    public NetworkVariable<float> armorPen = new NetworkVariable<float>(0f);
+    public NetworkVariable<float> magicPen = new NetworkVariable<float>(0f);
 
     [Header("Champion Resources")]
-    public float health;
-    public float mana;
+    public NetworkVariable<float> health = new NetworkVariable<float>(600f);
+    public NetworkVariable<float> mana = new NetworkVariable<float>(300f);
 
     [Header("Champion Abilities")]
     public Ability autoAttack = new Ability("Auto Attack", "Basic attack", 0f, 0f, 0f);
@@ -35,231 +39,277 @@ public class BaseChampion : MonoBehaviour
     public int attackConsecutive = 0; // Number of consecutive attacks against oneself
     public float regenTimer = 0f;
 
-    //[Header("Other Player Stats")]
-
     public void Start()
     {
         // Initialization logic if needed
     }
 
-    void Update(){
-
-        //Regen Logic
-        //HealthandManaRegen();
-        // Check if the champion is alive
-
-        //Debug.Log($"Current velocity: {velocity}");
-    }
-
-    private void FireAutoAttack(){
-        // Check if the auto-attack is off cooldown
-        // Cooldown based on attack speed
-        if (Time.time - lastAutoAttackTime >= attackSpeed){
-            Debug.Log($"{championType} fires an auto-attack!");
-            lastAutoAttackTime = Time.time;
-
-            // Add logic to deal damage to the target here
-            PerformAutoAttack();
-        }
-        else{
-            Debug.Log("Auto-attack is on cooldown.");
+    void Update()
+    {
+        // Example: Sync health regeneration logic
+        if (IsServer) // Only the server should modify NetworkVariables
+        {
+            //HealthandManaRegen();
         }
     }
 
-    private void PerformAutoAttack(){
-        // Example logic for dealing damage
-        // Bullet prefab
-        // Calculate damage based on AD, crit chance, etc.
-        // Check to see if it actually hits. Perhaps something in the bullet script can have it? Checks to see if it hits a champion.
-
-        Debug.Log($"Dealing {AD} physical damage to the target.");
-        // Add logic to find and damage the target here
-        OnSuccessfulAutoAttack(); // Call this only when the auto attack successfully hits a target.
-    }
-
-    protected virtual void OnSuccessfulAutoAttack(){
-        // Base implementation (if needed)
-        Debug.Log($"{championType} successfully auto-attacked!");
-    }
-
-    // Add logic to handle champion attacks
-
-    private void HealthandManaRegen(){
+    /*private void HealthandManaRegen()
+    {
         // Health and mana regen logic
         regenTimer += Time.deltaTime;
-        if (regenTimer >= 1f){
+        if (regenTimer >= 1f)
+        {
             regenTimer = 0f; // Reset the timer
             // Regenerate health and mana
-            if (health < maxHealth){
-                health = Mathf.Min(health + healthRegen, maxHealth); // Ensure health does not exceed maxHealth
-                Debug.Log ($"Regenerating health: {healthRegen}");
+            if (health.Value < maxHealth.Value)
+            {
+                health.Value = Mathf.Min(health.Value + healthRegen.Value, maxHealth.Value); // Ensure health does not exceed maxHealth
+                Debug.Log($"Regenerating health: {healthRegen.Value}");
             }
-            if (mana < maxMana){
-                mana = Mathf.Min(mana + manaRegen, maxMana); // Ensure mana does not exceed maxMana
-                Debug.Log ($"Regenerating mana: {manaRegen}");
+            if (mana.Value < maxMana.Value)
+            {
+                mana.Value = Mathf.Min(mana.Value + manaRegen.Value, maxMana.Value); // Ensure mana does not exceed maxMana
+                Debug.Log($"Regenerating mana: {manaRegen.Value}");
+            }
+        }
+    }*/
+
+    public void updateMaxHealth(float healthChange)
+    {
+        if (IsServer)
+        {
+            if (healthChange < 0 && healthChange > -1) // If the health change is due to augment that will add %
+            {
+                float tempH = maxHealth.Value * healthChange;
+                maxHealth.Value += tempH;
+            }
+            else
+            {
+                maxHealth.Value += healthChange;
             }
         }
     }
-    public void updateMaxHeath(float health){
-        if (health < 0 && health > -1) //If the health change is due to augment that will add %
+
+    public void updateHealth(float healthChange)
+    {
+        if (IsServer)
         {
-            float tempH = this.health * health;
-            this.health += tempH;
-        }
-        else
-        {
-            this.health += health;
+            health.Value += healthChange;
         }
     }
-    public void updateHealth(float health){
-        this.health += health;
-        // Update health due to dmg dealt or healing
-    }
-    public void updateAD(float ad){
-        if (ad < 0 && ad > -1) //If the AD change is due to augment that will add %
+    public void updateAD(float adChange)
+    {
+        if (IsServer)
         {
-            float tempAD = this.AD * ad;
-            this.AD += tempAD;
-        }
-        else
-        {
-            this.AD += ad;
-        }
-    }
-    public void updateAP(float ap){
-        if (ap < 0 && ap > -1) //If the AP change is due to augment that will add %
-        {
-            float tempAP = this.AP * ap;
-            this.AP += tempAP;
-        }
-        else
-        {
-            this.AP += ap;
+            if (adChange < 0 && adChange > -1) // If the AD change is due to augment that will add %
+            {
+                float tempAD = AD.Value * adChange;
+                AD.Value += tempAD;
+            }
+            else
+            {
+                AD.Value += adChange;
+            }
         }
     }
-    public void updateArmor(float armor){
-        if (armor < 0 && armor > -1) //If the armor change is due to augment that will add %
+
+    public void updateAP(float apChange)
+    {
+        if (IsServer)
         {
-            float tempA = this.armor * armor;
-            this.armor += tempA;
-        }
-        else
-        {
-            this.armor += armor;
-        }
-    }
-    public void updateMagicResist(float magicResist){
-        if (magicResist < 0 && magicResist > -1) //If the magic resist change is due to augment that will add %
-        {
-            float tempMR = this.magicResist * magicResist;
-            this.magicResist += tempMR;
-        }
-        else
-        {
-            this.magicResist += magicResist;
+            if (apChange < 0 && apChange > -1) // If the AP change is due to augment that will add %
+            {
+                float tempAP = AP.Value * apChange;
+                AP.Value += tempAP;
+            }
+            else
+            {
+                AP.Value += apChange;
+            }
         }
     }
-    public void updateAttackSpeed(float attackSpeed){
-        if (attackSpeed < 0 && attackSpeed > -1) //If the attack speed change is due to augment that will add %
+
+    public void updateArmor(float armorChange)
+    {
+        if (IsServer)
         {
-            float tempAS = this.attackSpeed * attackSpeed;
-            this.attackSpeed += tempAS;
-        }
-        else
-        {
-            this.attackSpeed += attackSpeed;
-        }
-    }
-    public void updateMovementSpeed(float movementSpeed){
-        if (movementSpeed < 0 && movementSpeed > -1) //If the movement speed change is due to augment that will add %
-        {
-            float tempMS = this.movementSpeed * movementSpeed;
-            this.movementSpeed += tempMS;
-        }
-        else
-        {
-            this.movementSpeed += movementSpeed;
+            if (armorChange < 0 && armorChange > -1) // If the armor change is due to augment that will add %
+            {
+                float tempA = armor.Value * armorChange;
+                armor.Value += tempA;
+            }
+            else
+            {
+                armor.Value += armorChange;
+            }
         }
     }
-    public void updateMaxMana(float mana){
-        if (mana < 0 && mana > -1) //If the mana change is due to augment that will add %
+
+    public void updateMagicResist(float magicResistChange)
+    {
+        if (IsServer)
         {
-            float tempM = this.mana * mana;
-            this.mana += tempM;
-        }
-        else
-        {
-            this.mana += mana;
-        }
-    }
-    public void updateMana(float mana){
-        this.mana += mana;
-        // Update mana due to mana spent or regen
-    }
-    public void updateManaRegen(float manaRegen){
-        if (manaRegen < 0 && manaRegen > -1) //If the mana regen change is due to augment that will add %
-        {
-            float tempMR = this.manaRegen * manaRegen;
-            this.manaRegen += tempMR;
-        }
-        else
-        {
-            this.manaRegen += manaRegen;
+            if (magicResistChange < 0 && magicResistChange > -1) // If the magic resist change is due to augment that will add %
+            {
+                float tempMR = magicResist.Value * magicResistChange;
+                magicResist.Value += tempMR;
+            }
+            else
+            {
+                magicResist.Value += magicResistChange;
+            }
         }
     }
-    public void updateAbilityHaste(float abilityHaste){
-        if (abilityHaste < 0 && abilityHaste > -1) //If the ability haste change is due to augment that will add %
+
+    public void updateAttackSpeed(float attackSpeedChange)
+    {
+        if (IsServer)
         {
-            float tempAH = this.abilityHaste * abilityHaste;
-            this.abilityHaste += tempAH;
-        }
-        else
-        {
-            this.abilityHaste += abilityHaste;
-        }
-    }
-    public void updateCritChance(float critChance){
-        if (critChance < 0 && critChance > -1) //If the crit chance change is due to augment that will add %
-        {
-            float tempCC = this.critChance * critChance;
-            this.critChance += tempCC;
-        }
-        else
-        {
-            this.critChance += critChance;
+            if (attackSpeedChange < 0 && attackSpeedChange > -1) // If the attack speed change is due to augment that will add %
+            {
+                float tempAS = attackSpeed.Value * attackSpeedChange;
+                attackSpeed.Value += tempAS;
+            }
+            else
+            {
+                attackSpeed.Value += attackSpeedChange;
+            }
         }
     }
-    public void updateCritDamage(float critDamage){
-        if (critDamage < 0 && critDamage > -1) //If the crit damage change is due to augment that will add %
+
+    public void updateMovementSpeed(float movementSpeedChange)
+    {
+        if (IsServer)
         {
-            float tempCD = this.critDamage * critDamage;
-            this.critDamage += tempCD;
-        }
-        else
-        {
-            this.critDamage += critDamage;
-        }
-    }
-    public void updateArmorPen(float armorPen){
-        if (armorPen < 0 && armorPen > -1) //If the armor pen change is due to augment that will add %
-        {
-            float tempAP = this.armor * armorPen;
-            this.armor += tempAP;
-        }
-        else
-        {
-            this.armor += armorPen;
+            if (movementSpeedChange < 0 && movementSpeedChange > -1) // If the movement speed change is due to augment that will add %
+            {
+                float tempMS = movementSpeed.Value * movementSpeedChange;
+                movementSpeed.Value += tempMS;
+            }
+            else
+            {
+                movementSpeed.Value += movementSpeedChange;
+            }
         }
     }
-    public void updateMagicPen(float magicPen){
-        if (magicPen < 0 && magicPen > -1) //If the magic pen change is due to augment that will add %
+
+    public void updateMaxMana(float manaChange)
+    {
+        if (IsServer)
         {
-            float tempMP = this.magicResist * magicPen;
-            this.magicResist += tempMP;
+            if (manaChange < 0 && manaChange > -1) // If the mana change is due to augment that will add %
+            {
+                float tempM = maxMana.Value * manaChange;
+                maxMana.Value += tempM;
+            }
+            else
+            {
+                maxMana.Value += manaChange;
+            }
         }
-        else
+    }
+
+    public void updateMana(float manaChange)
+    {
+        if (IsServer)
         {
-            this.magicResist += magicPen;
+            mana.Value += manaChange;
+        }
+    }
+
+    public void updateManaRegen(float manaRegenChange)
+    {
+        if (IsServer)
+        {
+            if (manaRegenChange < 0 && manaRegenChange > -1) // If the mana regen change is due to augment that will add %
+            {
+                float tempMR = manaRegen.Value * manaRegenChange;
+                manaRegen.Value += tempMR;
+            }
+            else
+            {
+                manaRegen.Value += manaRegenChange;
+            }
+        }
+    }
+
+    public void updateAbilityHaste(float abilityHasteChange)
+    {
+        if (IsServer)
+        {
+            if (abilityHasteChange < 0 && abilityHasteChange > -1) // If the ability haste change is due to augment that will add %
+            {
+                float tempAH = abilityHaste.Value * abilityHasteChange;
+                abilityHaste.Value += tempAH;
+            }
+            else
+            {
+                abilityHaste.Value += abilityHasteChange;
+            }
+        }
+    }
+
+    public void updateCritChance(float critChanceChange)
+    {
+        if (IsServer)
+        {
+            if (critChanceChange < 0 && critChanceChange > -1) // If the crit chance change is due to augment that will add %
+            {
+                float tempCC = critChance.Value * critChanceChange;
+                critChance.Value += tempCC;
+            }
+            else
+            {
+                critChance.Value += critChanceChange;
+            }
+        }
+    }
+
+    public void updateCritDamage(float critDamageChange)
+    {
+        if (IsServer)
+        {
+            if (critDamageChange < 0 && critDamageChange > -1) // If the crit damage change is due to augment that will add %
+            {
+                float tempCD = critDamage.Value * critDamageChange;
+                critDamage.Value += tempCD;
+            }
+            else
+            {
+                critDamage.Value += critDamageChange;
+            }
+        }
+    }
+
+    public void updateArmorPen(float armorPenChange)
+    {
+        if (IsServer)
+        {
+            if (armorPenChange < 0 && armorPenChange > -1) // If the armor pen change is due to augment that will add %
+            {
+                float tempAP = armorPen.Value * armorPenChange;
+                armorPen.Value += tempAP;
+            }
+            else
+            {
+                armorPen.Value += armorPenChange;
+            }
+        }
+    }
+
+    public void updateMagicPen(float magicPenChange)
+    {
+        if (IsServer)
+        {
+            if (magicPenChange < 0 && magicPenChange > -1) // If the magic pen change is due to augment that will add %
+            {
+                float tempMP = magicPen.Value * magicPenChange;
+                magicPen.Value += tempMP;
+            }
+            else
+            {
+                magicPen.Value += magicPenChange;
+            }
         }
     }
 }
