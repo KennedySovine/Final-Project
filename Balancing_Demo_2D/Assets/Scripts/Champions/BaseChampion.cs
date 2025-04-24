@@ -53,7 +53,7 @@ public class BaseChampion : NetworkBehaviour
         }
     }
 
-    private void HealthandManaRegen()
+    /*private void HealthandManaRegen()
     {
         // Health and mana regen logic
         regenTimer += Time.deltaTime;
@@ -72,7 +72,7 @@ public class BaseChampion : NetworkBehaviour
                 Debug.Log($"Regenerating mana: {manaRegen.Value}");
             }
         }
-    }
+    }*/
 
     public void updateMaxHealth(float healthChange)
     {

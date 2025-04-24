@@ -292,7 +292,11 @@ public class GameManager : NetworkBehaviour
         if (newAugment.min != newAugment.max)
         {
             randomAdjustment = Random.Range(newAugment.min, newAugment.max + 1); // Inclusive range
+
         }
+
+        randomAdjustment = Mathf.Round(randomAdjustment); // Round to the nearest integer
+        if (randomAdjustment == 0) randomAdjustment = 1; // Ensure the adjustment is at least 1
 
         // Apply the augment effect based on its type
         switch (newAugment.type)
