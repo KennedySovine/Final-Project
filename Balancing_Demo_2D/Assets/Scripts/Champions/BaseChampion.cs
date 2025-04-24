@@ -95,18 +95,18 @@ public class BaseChampion : NetworkBehaviour
             return;
         }
 
-        // Perform a raycast from the mouse position
-        Ray ray = PN.personalCamera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
+        // Perform a 2D raycast from the mouse position
+        Vector2 mousePosition = PN.personalCamera.ScreenToWorldPoint(Input.mousePosition);
+        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
 
-        if (Physics.Raycast(ray, out hit))
+        if (hit.collider != null)
         {
             // Check if the raycast hit the enemy champion
             Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
             if (hit.collider.gameObject == enemyChampion)
             {
                 // Check if the player is within range of the enemy champion
-                float distance = Vector3.Distance(transform.position, enemyChampion.transform.position);
+                float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
                 if (distance <= autoAttack.range)
                 {
                     Debug.Log("Basic Attack hit!");
@@ -116,14 +116,34 @@ public class BaseChampion : NetworkBehaviour
                     {
                         // Instantiate and configure the bullet
                         GameObject attackObj = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
-                        attackObj.GetComponent<NetworkObject>().Spawn(); // Spawn the bullet object on the network
-                        attackObj.GetComponent<Bullet>().ADDamage = AD.Value;
-                        attackObj.GetComponent<Bullet>().armorPenetration = armorPen.Value;
-                        attackObj.GetComponent<Bullet>().magicPenetration = magicPen.Value;
-                        attackObj.GetComponent<Bullet>().targetPosition = enemyChampion.transform.position; // Set the target position
-                        attackObj.GetComponent<Bullet>().ownerId = OwnerClientId; // Set the owner ID for the bullet
-                        attackObj.GetComponent<Bullet>().isAutoAttack = true; // Mark the bullet as an auto attack
-                        attackObj.GetComponent<Bullet>().targetPlayer = enemyChampion; // Set the target player
+                        var networkObject = attackObj.GetComponent<NetworkObject>();
+                        var bulletComponent = attackObj.GetComponent<Bullet>();
+
+                        if (networkObject == null)
+                        {
+                            Debug.LogError("Bullet prefab is missing a NetworkObject component.");
+                            Destroy(attackObj);
+                            return;
+                        }
+
+                        if (bulletComponent == null)
+                        {
+                            Debug.LogError("Bullet prefab is missing a Bullet component.");
+                            Destroy(attackObj);
+                            return;
+                        }
+
+                        // Spawn the bullet object on the network
+                        networkObject.Spawn();
+
+                        // Configure the bullet
+                        bulletComponent.ADDamage = AD.Value;
+                        bulletComponent.armorPenetration = armorPen.Value;
+                        bulletComponent.magicPenetration = magicPen.Value;
+                        bulletComponent.targetPosition = enemyChampion.transform.position;
+                        bulletComponent.ownerId = OwnerClientId;
+                        bulletComponent.isAutoAttack = true;
+                        bulletComponent.targetPlayer = enemyChampion;
 
                         Debug.Log("Basic Attack performed!");
 
