@@ -36,6 +36,8 @@ public class ADMelee : BaseChampion
         abilityHaste.Value = 0f;
         critChance.Value = 0f;
         critDamage.Value = 1.75f; // 175% damage on crit
+
+        autoAttack.setRange(50f); // Set the range of the auto attack ability
     }
 
     private void AddAbilities()

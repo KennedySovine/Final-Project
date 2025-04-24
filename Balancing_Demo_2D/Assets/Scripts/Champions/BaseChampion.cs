@@ -39,6 +39,8 @@ public class BaseChampion : NetworkBehaviour
     public int attackConsecutive = 0; // Number of consecutive attacks against oneself
     public float regenTimer = 0f;
 
+    public GameObject enemyChampion; // Reference to the enemy champion prefab
+
     public GameObject bulletPrefab; // Prefab for the bullet to be fired
 
     public PlayerNetwork PN; // Reference to the PlayerNetwork script
@@ -46,6 +48,7 @@ public class BaseChampion : NetworkBehaviour
     public void Start()
     {
         // Initialization logic if needed
+
     }
 
     void Update()
@@ -83,14 +86,27 @@ public class BaseChampion : NetworkBehaviour
         if (IsServer)
         {
             // Check if mouse is aimed at enemy champion
-            if (PN.mousePosition != null && )
+            if (PN.mousePosition == enemyChampion.transform.position)
             {
-                // Check if the target is a valid enemy champion
-                if (PN.targetPosition != null && PN.targetPosition.CompareTag("EnemyChampion"))
+                // Check if the player is within range of the enemy champion
+                float distance = Vector3.Distance(transform.position, enemyChampion.transform.position);
+                if (distance <= autoAttack.range)
                 {
-                    Debug.Log("Basic Attack on enemy champion!");
-                    PerformBasicAttack(); // Call the function to perform the basic attack
+                    Debug.Log("Basic Attack hit!");
+                    // Perform the attack logic here
+                    // Example: Deal damage to the enemy champion
+                    // enemyChampion.GetComponent<EnemyChampion>().TakeDamage(AD.Value); // Assuming EnemyChampion has a TakeDamage method
                 }
+                else
+                {
+                    Debug.Log("Target out of range!");
+                }
+            }
+            else
+            {
+                Debug.Log("Target not in line of sight!");
+                return;
+
             }
             // Check if the cooldown has passed
             if (Time.time >= lastAutoAttackTime + autoAttack.cooldown)
@@ -102,10 +118,11 @@ public class BaseChampion : NetworkBehaviour
                 attackObj.GetComponent<Bullet>().magicPenetration = magicPen.Value;
                 attackObj.GetComponent<Bullet>().targetPosition = PN.personalCamera.ScreenToWorldPoint(Input.mousePosition); // Set the champion type for the bullet
                 attackObj.GetComponent<Bullet>().ownerId = OwnerClientId; // Set the owner ID for the bullet
+                attackObj.GetComponent<Bullet>().isAutoAttack = true; // Set the bullet as an auto attack
+                attackObj.GetComponent<Bullet>().targetPlayer = enemyChampion; // Set the target ID for the bullet
                 Debug.Log("Basic Attack performed!");
 
                 // Update the last auto-attack time
-                attackObj.
                 lastAutoAttackTime = Time.time;
             }
             else
