@@ -251,9 +251,6 @@ public class GameManager : NetworkBehaviour
         Debug.Log("Game Over!");
         // Add logic to handle end of the game (e.g., show results, restart, etc.)
     }
-
-    //Function to update player stats on the client side
-
     public void applyAugments(ulong playerID)
     {
         BaseChampion targetChampion = null;
@@ -292,11 +289,11 @@ public class GameManager : NetworkBehaviour
         if (newAugment.min != newAugment.max)
         {
             randomAdjustment = Random.Range(newAugment.min, newAugment.max + 1); // Inclusive range
+            if (!randomAdjustment < 1){ // Ignore % based adjustment from being rounded
+                randomAdjustment = Mathf.Round(randomAdjustment); // Round to the nearest whole number
+            }
 
         }
-
-        randomAdjustment = Mathf.Round(randomAdjustment); // Round to the nearest integer
-        if (randomAdjustment == 0) randomAdjustment = 1; // Ensure the adjustment is at least 1
 
         // Apply the augment effect based on its type
         switch (newAugment.type)
