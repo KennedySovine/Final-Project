@@ -27,7 +27,7 @@ public class Ability
         // Update the cooldown timer if the ability is on cooldown
         if (cooldownTimer > 0)
         {
-            cooldownTimerStart -= Time.deltaTime;
+            cooldownTimer -= Time.deltaTime;
             if (cooldownTimer <= 0)
             {
                 cooldownTimer = 0; // Reset to 0 when cooldown is finished

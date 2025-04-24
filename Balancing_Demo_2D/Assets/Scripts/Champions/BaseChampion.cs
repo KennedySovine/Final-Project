@@ -39,6 +39,10 @@ public class BaseChampion : NetworkBehaviour
     public int attackConsecutive = 0; // Number of consecutive attacks against oneself
     public float regenTimer = 0f;
 
+    public GameObject bulletPrefab; // Prefab for the bullet to be fired
+
+    public PlayerNetwork PN; // Reference to the PlayerNetwork script
+
     public void Start()
     {
         // Initialization logic if needed
@@ -73,6 +77,25 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }*/
+
+    public void basicAttack(){ // Auto attack
+        if (IsServer)
+        {
+            // Check if the cooldown has passed
+            if (Time.time >= lastAutoAttackTime + autoAttack.cooldown)
+            {
+                // Perform the auto-attack logic here
+                Debug.Log("Basic Attack performed!");
+
+                // Update the last auto-attack time
+                lastAutoAttackTime = Time.time;
+            }
+            else
+            {
+                Debug.Log("Basic Attack is on cooldown!");
+            }
+        }
+    }
 
     public void updateMaxHealth(float healthChange)
     {

@@ -37,6 +37,7 @@ public class GameManager : NetworkBehaviour
     public float gameTime = 120f; // Game duration in seconds
     public float augmentBuffer = 20f; //Choose aug every 40 seconds
     public NetworkVariable<bool> augmentChoosing = new NetworkVariable<bool>(false); //If the player is choosing an augment, dont countdown the game time
+    
 
     [Header("Champion Management")]
     public GameObject championPrefab; // Prefab for spawning champions

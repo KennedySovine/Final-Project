@@ -122,22 +122,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4be52e2c32ba8246b58441123491aa2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   championType: 
-  maxHealth: 600
-  healthRegen: 5
-  AD: 60
-  AP: 0
-  armor: 25
-  magicResist: 30
-  attackSpeed: 0.65
-  movementSpeed: 300
-  maxMana: 300
-  manaRegen: 7
-  abilityHaste: 0
-  critChance: 0
-  critDamage: 1.75
-  health: 0
-  mana: 0
+  maxHealth:
+    m_InternalValue: 600
+  healthRegen:
+    m_InternalValue: 5
+  AD:
+    m_InternalValue: 60
+  AP:
+    m_InternalValue: 0
+  armor:
+    m_InternalValue: 25
+  magicResist:
+    m_InternalValue: 30
+  attackSpeed:
+    m_InternalValue: 0.65
+  movementSpeed:
+    m_InternalValue: 300
+  maxMana:
+    m_InternalValue: 300
+  manaRegen:
+    m_InternalValue: 7
+  abilityHaste:
+    m_InternalValue: 0
+  critChance:
+    m_InternalValue: 0
+  critDamage:
+    m_InternalValue: 1.75
+  armorPen:
+    m_InternalValue: 0
+  magicPen:
+    m_InternalValue: 0
+  health:
+    m_InternalValue: 600
+  mana:
+    m_InternalValue: 300
   autoAttack:
     name: Auto Attack
     description: Basic attack
@@ -145,6 +165,7 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    cooldownTimer: 0
   passive:
     name: 
     description: 
@@ -152,6 +173,7 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    cooldownTimer: 0
   ability1:
     name: 
     description: 
@@ -159,6 +181,7 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    cooldownTimer: 0
   ability2:
     name: 
     description: 
@@ -166,6 +189,7 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    cooldownTimer: 0
   ability3:
     name: 
     description: 
@@ -173,8 +197,12 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    cooldownTimer: 0
   attackConsecutive: 0
   regenTimer: 0
+  bulletPrefab: {fileID: 2169341123581716514, guid: 66c025e1f784eb2478380fa1d8dd1de2, type: 3}
+  PN: {fileID: 479571641050879420}
+  EmpowerNextAttack: 0
 --- !u!114 &5221310434119250730
 MonoBehaviour:
   m_ObjectHideFlags: 0

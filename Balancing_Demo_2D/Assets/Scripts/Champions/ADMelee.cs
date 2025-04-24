@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class ADMelee : BaseChampion
 {
+
+    public bool EmpowerNextAttack = false; // Flag to check if the next attack is empowered
     void Start()
     {
         base.Start();
@@ -80,11 +82,6 @@ public class ADMelee : BaseChampion
     public void UseAbility1()
     {
         // Check if the ability is off cooldown and if there is enough mana
-        // Put messages up on screen if the ability is on cooldown or not enough mana??? Maybe
-        // Dash forward a bit in the direction of movement
-        // Empower next attack for 3.5 seconds
-        // Add countdown timer for that empower attack time limit
-        // Alter bullet prefab with a 'damage dealt' variable to be used in the bullet script that will be increased for the empowered dmg
         if (ability1.cooldownTimer == 0 && mana.Value >= ability1.manaCost)
         {
             // Perform the Tumble action here
@@ -95,11 +92,25 @@ public class ADMelee : BaseChampion
         else if (ability1.cooldownTimer > 0)
         {
             Debug.Log("Ability is on cooldown!");
+            return;
         }
         else if (mana.Value < ability1.manaCost)
         {
             Debug.Log("Not enough mana!");
+            return;
         }
+
+        EmpowerNextAttack = true;
+        // Put messages up on screen if the ability is on cooldown or not enough mana??? Maybe
+        // Dash forward a bit in the direction of movement
+        Vector3 dashDirection = (PN.personalCamera.ScreenToWorldPoint(Input.mousePosition)) - transform.position;
+        float dashDistance = 5f; // Adjust this value as needed
+        transform.position += dashDirection.normalized * dashDistance; // Move the player in the direction of the mouse position
+
+        
+        // Empower next attack for 3.5 seconds
+        // Add countdown timer for that empower attack time limit
+        // Alter bullet prefab with a 'damage dealt' variable to be used in the bullet script that will be increased for the empowered dmg
     }
 
     public void UseAbility2()
@@ -109,6 +120,9 @@ public class ADMelee : BaseChampion
         // In game manager, perhaps add a variable that can track these stacks and how many times it has been applied before dealing the true damage
         // Maybe in base character class? Add a variable that counts and checks.
         // Stack duration is 3 seconds before the stack is removed.
+        // 6% of targets maximum health as bonus true damage on 3rd attack.
+
+        // INSTEAD, track how many attacks, third always does more damage
         // Make Game Manager bulky if need be
     }
 
