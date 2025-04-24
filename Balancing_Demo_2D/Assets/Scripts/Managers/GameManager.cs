@@ -216,8 +216,8 @@ public class GameManager : NetworkBehaviour
             {
                 Debug.Log("Both players have been spawned. Starting the game.");
                 // Add any additional logic to start the game here
-                player1Controller.GetComponent<BaseChampion>().enemyChampion = player2;
-                player2Controller.GetComponent<BaseChampion>().enemyChampion = player1; // Set the enemy champion reference for both players
+                player1Controller.GetComponent<BaseChampion>().enemyChampion = player2Controller;
+                player2Controller.GetComponent<BaseChampion>().enemyChampion = player1Controller; // Set the enemy champion reference for both players
             }
         }
     }

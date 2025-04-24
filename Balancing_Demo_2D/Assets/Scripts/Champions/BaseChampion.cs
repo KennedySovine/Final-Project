@@ -22,6 +22,8 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> armorPen = new NetworkVariable<float>(0f);
     public NetworkVariable<float> magicPen = new NetworkVariable<float>(0f);
 
+    public NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>(Vector3.zero);
+
     [Header("Champion Resources")]
     public NetworkVariable<float> health = new NetworkVariable<float>(600f);
     public NetworkVariable<float> mana = new NetworkVariable<float>(300f);
@@ -82,20 +84,56 @@ public class BaseChampion : NetworkBehaviour
     }*/
 
     [Rpc(SendTo.Server)]
-    public void basicAttackRpc(){ // Auto attack
-        if (IsServer)
+    public void basicAttackRpc()
+    {
+        if (!IsServer) return; // Ensure this logic runs only on the server
+
+        // Check if the enemy champion exists
+        if (enemyChampion == null)
         {
-            // Check if mouse is aimed at enemy champion
-            if (PN.mousePosition == enemyChampion.transform.position)
+            Debug.LogWarning("No enemy champion assigned.");
+            return;
+        }
+
+        // Perform a raycast from the mouse position
+        Ray ray = PN.personalCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            // Check if the raycast hit the enemy champion
+            Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
+            if (hit.collider.gameObject == enemyChampion)
             {
                 // Check if the player is within range of the enemy champion
                 float distance = Vector3.Distance(transform.position, enemyChampion.transform.position);
                 if (distance <= autoAttack.range)
                 {
                     Debug.Log("Basic Attack hit!");
-                    // Perform the attack logic here
-                    // Example: Deal damage to the enemy champion
-                    // enemyChampion.GetComponent<EnemyChampion>().TakeDamage(AD.Value); // Assuming EnemyChampion has a TakeDamage method
+
+                    // Check if the cooldown has passed
+                    if (Time.time >= lastAutoAttackTime + autoAttack.cooldown)
+                    {
+                        // Instantiate and configure the bullet
+                        GameObject attackObj = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+                        attackObj.GetComponent<NetworkObject>().Spawn(); // Spawn the bullet object on the network
+                        attackObj.GetComponent<Bullet>().ADDamage = AD.Value;
+                        attackObj.GetComponent<Bullet>().armorPenetration = armorPen.Value;
+                        attackObj.GetComponent<Bullet>().magicPenetration = magicPen.Value;
+                        attackObj.GetComponent<Bullet>().targetPosition = enemyChampion.transform.position; // Set the target position
+                        attackObj.GetComponent<Bullet>().ownerId = OwnerClientId; // Set the owner ID for the bullet
+                        attackObj.GetComponent<Bullet>().isAutoAttack = true; // Mark the bullet as an auto attack
+                        attackObj.GetComponent<Bullet>().targetPlayer = enemyChampion; // Set the target player
+
+                        Debug.Log("Basic Attack performed!");
+
+                        // Update the last auto-attack time
+                        lastAutoAttackTime = Time.time;
+                    }
+                    else
+                    {
+                        Debug.Log("Basic Attack is on cooldown!");
+                    }
                 }
                 else
                 {
@@ -104,31 +142,12 @@ public class BaseChampion : NetworkBehaviour
             }
             else
             {
-                Debug.Log("Target not in line of sight!");
-                return;
-
+                Debug.Log("Raycast did not hit the enemy champion!");
             }
-            // Check if the cooldown has passed
-            if (Time.time >= lastAutoAttackTime + autoAttack.cooldown)
-            {
-                GameObject attackObj = Instantiate(bulletPrefab, transform.position, Quaternion.identity); // Create the bullet object
-                attackObj.GetComponent<NetworkObject>().Spawn(); // Spawn the bullet object on the network
-                attackObj.GetComponent<Bullet>().ADDamage = AD.Value;
-                attackObj.GetComponent<Bullet>().armorPenetration = armorPen.Value;
-                attackObj.GetComponent<Bullet>().magicPenetration = magicPen.Value;
-                attackObj.GetComponent<Bullet>().targetPosition = PN.personalCamera.ScreenToWorldPoint(Input.mousePosition); // Set the champion type for the bullet
-                attackObj.GetComponent<Bullet>().ownerId = OwnerClientId; // Set the owner ID for the bullet
-                attackObj.GetComponent<Bullet>().isAutoAttack = true; // Set the bullet as an auto attack
-                attackObj.GetComponent<Bullet>().targetPlayer = enemyChampion; // Set the target ID for the bullet
-                Debug.Log("Basic Attack performed!");
-
-                // Update the last auto-attack time
-                lastAutoAttackTime = Time.time;
-            }
-            else
-            {
-                Debug.Log("Basic Attack is on cooldown!");
-            }
+        }
+        else
+        {
+            Debug.Log("Raycast did not hit anything!");
         }
     }
 

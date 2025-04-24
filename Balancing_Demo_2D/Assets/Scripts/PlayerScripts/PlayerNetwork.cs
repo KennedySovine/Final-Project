@@ -45,11 +45,13 @@ public class PlayerNetwork : NetworkBehaviour
         if (!IsOwner) return; // Only the owner can control the player
         if (GM.gamePaused.Value) return; // If the game is paused, disable input
 
+        //Constantly update mouse position
+        mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition); // Get the mouse position in world space
+        mousePosition.z = 0; // Set the z coordinate to 0
+
         if (Input.GetMouseButtonDown(1)) // Check if the right mouse button is pressed
         {
             //Debug.Log("Right mouse button clicked.");
-            mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition); // Get the mouse position in world space
-            mousePosition.z = 0; // Set the z coordinate to 0
             targetPosition.x = mousePosition.x; // Set the target position's x coordinate
             targetPosition.y = mousePosition.y; // Set the target position's y coordinate
             Vector3 direction = targetPosition - transform.position;
