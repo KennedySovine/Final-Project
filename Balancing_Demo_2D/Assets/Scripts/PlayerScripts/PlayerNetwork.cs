@@ -110,6 +110,7 @@ public class PlayerNetwork : NetworkBehaviour
     private void SendAttackToServerRpc(Vector3 targetPosition)
     {
         if (!IsServer) return;
+        Debug.Log("SendAttackToServerRpc called with target position: " + targetPosition);
 
         // Forward the attack to the server for validation and execution
         champion.HandleAttackOnServer( targetPosition);
