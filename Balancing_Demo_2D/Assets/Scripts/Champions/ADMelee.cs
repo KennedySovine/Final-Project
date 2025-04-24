@@ -19,7 +19,7 @@ public class ADMelee : BaseChampion
             Debug.LogWarning("UpdateStats can only be called on the server.");
             return;
         }
-        
+
         championType = "AD Melee";
         maxHealth.Value = 550f;
         healthRegen.Value = 0.7f;
@@ -73,6 +73,10 @@ public class ADMelee : BaseChampion
         ability3.setDuration(8f);
     }
 
+    public void passiveAbility(){
+        //Passive ability logic
+    }
+
     public void UseAbility1()
     {
         // Check if the ability is off cooldown and if there is enough mana
@@ -81,6 +85,21 @@ public class ADMelee : BaseChampion
         // Empower next attack for 3.5 seconds
         // Add countdown timer for that empower attack time limit
         // Alter bullet prefab with a 'damage dealt' variable to be used in the bullet script that will be increased for the empowered dmg
+        if (ability1.cooldownTimer == 0 && mana.Value >= ability1.manaCost)
+        {
+            // Perform the Tumble action here
+            // Set the cooldown timer for the ability
+            ability1.cooldownTimer = ability1.cooldown;
+            mana.Value -= ability1.manaCost; // Deduct mana cost
+        }
+        else if (ability1.cooldownTimer > 0)
+        {
+            Debug.Log("Ability is on cooldown!");
+        }
+        else if (mana.Value < ability1.manaCost)
+        {
+            Debug.Log("Not enough mana!");
+        }
     }
 
     public void UseAbility2()
@@ -96,6 +115,21 @@ public class ADMelee : BaseChampion
     public void UseAbility3()
     {
         // Check if ability is off cooldown and if theres enough mana
+        if (ability3.cooldownTimer == 0 && mana.Value >= ability3.manaCost)
+        {
+            // Perform the Tumble action here
+            // Set the cooldown timer for the ability
+            ability3.cooldownTimer = ability3.cooldown;
+            mana.Value -= ability3.manaCost; // Deduct mana cost
+        }
+        else if (ability3.cooldownTimer > 0)
+        {
+            Debug.Log("Ability is on cooldown!");
+        }
+        else if (mana.Value < ability3.manaCost)
+        {
+            Debug.Log("Not enough mana!");
+        }
         // Modify the bullet prefab to deal extra physical damage
         // Add a knockback effect to the target if they are hit by the bolt
     }
