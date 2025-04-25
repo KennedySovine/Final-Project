@@ -45,11 +45,26 @@ public class PlayerNetwork : NetworkBehaviour
         if (!IsOwner) return; // Only the owner can control the player
         if (GM.gamePaused.Value) return; // If the game is paused, disable input
 
-        if (Input.GetMouseButtonDown(1)) // Check if the right mouse button is pressed
+        //Constantly update mouse position
+        mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition); // Get the mouse position in world space
+        mousePosition.z = 0; // Set the z coordinate to 0
+
+        checkInputs(); // Check for player inputs
+
+        if (transform.position != targetPosition){
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * champion.movementSpeed.Value); // Move the player towards the mouse position
+        }
+        else
+        {
+            champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // Set the linear velocity to 0 when the player reaches the target position
+        }
+
+    }
+
+    private void checkInputs(){
+        if (Input.GetMouseButton(1)) // Check if the right mouse button is pressed
         {
             //Debug.Log("Right mouse button clicked.");
-            mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition); // Get the mouse position in world space
-            mousePosition.z = 0; // Set the z coordinate to 0
             targetPosition.x = mousePosition.x; // Set the target position's x coordinate
             targetPosition.y = mousePosition.y; // Set the target position's y coordinate
             Vector3 direction = targetPosition - transform.position;
@@ -57,13 +72,56 @@ public class PlayerNetwork : NetworkBehaviour
             champion.transform.rotation = Quaternion.Euler(0, 0, angle); // Rotate the player to face the mouse position
         }
 
-        if (transform.position != targetPosition){
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * 5f); // Move the player towards the mouse position
+        if (Input.GetMouseButtonDown(0)) // Check if the left mouse button is pressed
+        {
+            //Debug.Log("Left mouse button clicked.");
+            // Perform the attack action here
+            // Basic Attack
+            //champion.UseAbility1(); // Call the UseAbility1 method from the champion script
+            PerformAutoAttack(); // Call the PerformAutoAttack method to perform the auto attack
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q)) // Check if the Q key is pressed
+        {
+            Debug.Log("Ability 1 key pressed.");
+            champion.UseAbility1Rpc(); 
+        }
+
+        if (Input.GetKeyDown(KeyCode.W)) // Check if the W key is pressed
+        {
+            Debug.Log("Ability 2 key pressed.");
+            champion.UseAbility2Rpc(); 
+        }
+
+        if (Input.GetKeyDown(KeyCode.E)) // Check if the E key is pressed
+        {
+            Debug.Log("Ability 3 key pressed.");
+            champion.UseAbility3Rpc(); 
+        }
+    }
+    public void PerformAutoAttack()
+    {
+        // Perform a raycast to check if the enemy is hit
+        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+        if (hit.collider != null && hit.collider.gameObject == champion.enemyChampion)
+        {
+            Debug.Log("Raycast hit the enemy champion!");
+            //AD ability 2 logic for stacks
+            // Maxes at 3 and subsequent stacks refresh the timer
+            if (champion.stackCount.Value >= 3){
+                champion.stackStartTime.Value = Time.time; // Set the stack start time
+            }
+            else {
+                champion.stackCount.Value += 1; // Increment the stack count
+                champion.stackStartTime.Value = Time.time; // Set the stack start time
+            }
+
+
+            champion.PerformAutoAttackRpc(mousePosition);
         }
         else
         {
-            champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // Set the linear velocity to 0 when the player reaches the target position
+            Debug.Log("Raycast did not hit the enemy champion.");
         }
-
     }
 }

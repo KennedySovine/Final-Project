@@ -1,15 +1,14 @@
 using UnityEngine;
+using Unity.Netcode;
 
 public class ADMelee : BaseChampion
 {
+
     void Start()
     {
         base.Start();
         UpdateStats();
         AddAbilities();
-
-        health.Value = maxHealth.Value; // Initialize health to max health
-        mana.Value = maxMana.Value; // Initialize mana to max mana
     }
 
     // Based on Vayne from LOL
@@ -19,7 +18,7 @@ public class ADMelee : BaseChampion
             Debug.LogWarning("UpdateStats can only be called on the server.");
             return;
         }
-        
+
         championType = "AD Melee";
         maxHealth.Value = 550f;
         healthRegen.Value = 0.7f;
@@ -28,12 +27,25 @@ public class ADMelee : BaseChampion
         armor.Value = 23f;
         magicResist.Value = 30f;
         attackSpeed.Value = 0.685f;
-        movementSpeed.Value = 330f;
+        movementSpeed.Value = 11f;
         maxMana.Value = 232f;
         manaRegen.Value = 8f;
         abilityHaste.Value = 0f;
         critChance.Value = 0f;
         critDamage.Value = 1.75f; // 175% damage on crit
+
+        autoAttack.setRange(50f); // Set the range of the auto attack ability
+        health.Value = maxHealth.Value; // Initialize health to max health
+        mana.Value = maxMana.Value; // Initialize mana to max mana
+    }
+
+    public override void Update(){
+        base.Update(); // Call the base class Update method
+
+        if (stackCount.Value >= 3){
+            maxStacks.Value = true; // Set the max stacks flag to true
+            stackCount.Value = 3; // Reset the stack value
+        }
     }
 
     private void AddAbilities()
@@ -73,29 +85,166 @@ public class ADMelee : BaseChampion
         ability3.setDuration(8f);
     }
 
-    public void UseAbility1()
+    public override GameObject empowerLogic(GameObject bullet)
     {
-        // Check if the ability is off cooldown and if there is enough mana
-        // Put messages up on screen if the ability is on cooldown or not enough mana??? Maybe
-        // Dash forward a bit in the direction of movement
-        // Empower next attack for 3.5 seconds
-        // Add countdown timer for that empower attack time limit
-        // Alter bullet prefab with a 'damage dealt' variable to be used in the bullet script that will be increased for the empowered dmg
+        var bulletComponent = bullet.GetComponent<Bullet>();
+        if (bulletComponent != null)
+        {
+            bulletComponent.ADDamage += 75f + (AP.Value * 0.5f); // 50% more dmg based on AP, but dealt as AD
+        }
+        else
+        {
+            Debug.LogError("Bullet component is missing on the bullet prefab.");
+        }
+        return bullet;
     }
 
-    public void UseAbility2()
+    public override GameObject stackLogic(GameObject bullet)
+    {
+        var bulletComponent = bullet.GetComponent<Bullet>();
+        if (bulletComponent != null)
+        {
+            bulletComponent.ADDamage = Mathf.Max(50f, 0.06f * enemyChampion.GetComponent<BaseChampion>().maxHealth.Value); // Minimum damage is 50, max is 6% of target's max health
+        }
+        else
+        {
+            Debug.LogError("Bullet component is missing on the bullet prefab.");
+        }
+
+        return bullet;
+    }
+
+    public override GameObject ability3Logic(GameObject bullet)
+    {
+        var bulletComponent = bullet.GetComponent<Bullet>();
+        if (bulletComponent != null)
+        {
+            bulletComponent.ADDamage = 50f + (AD.Value * 0.5f);
+        }
+        else
+        {
+            Debug.LogError("Bullet component is missing on the bullet prefab.");
+        }
+        return bullet;
+    }
+
+    [Rpc(SendTo.Server)]
+    public override void passiveAbilityRpc(){
+        if (!IsServer) return; // Only the owner can use this ability
+        //Passive ability logic
+        if (enemyChampion == null){
+            Debug.LogWarning("No enemy champion assigned.");
+            return;
+        }
+
+        // Get the direction to the enemy
+        Vector3 directionToEnemy = (enemyChampion.transform.position - transform.position).normalized;
+
+        // Get the player's movement direction
+        Vector3 movementDirection = (PN.targetPosition - transform.position).normalized;
+
+        // Check if the player is moving towards the enemy
+        float dotProduct = Vector3.Dot(directionToEnemy, movementDirection);
+
+        if (dotProduct > 0.5f){
+            //Debug.Log("Player is moving towards the enemy. Passive ability activated!");
+            movementSpeed.Value = 12f;
+        }
+        else{
+            //Debug.Log("Player is not moving towards the enemy.");
+            // Reset movement speed or remove the passive effect
+            movementSpeed.Value = 11f; // Reset to default speed
+        }
+    }
+
+    [Rpc(SendTo.Server)]
+    public override void UseAbility1Rpc()
+    {
+        if (!IsServer) return; // Only the server can execute this logic
+    
+        if (ability1.cooldownTimer > 0)
+        {
+            Debug.Log("Ability is on cooldown!");
+            return;
+        }
+        else if (mana.Value < ability1.manaCost)
+        {
+            Debug.Log("Not enough mana!");
+            return;
+        }
+
+        // Calculate the dash direction
+        Vector2 dashDirection = (PN.mousePosition - transform.position).normalized; // Get the direction to the mouse position
+    
+        // Calculate the target position 3f away in the direction of the mouse
+        Vector2 targetPosition = (Vector2)transform.position + dashDirection * 3f;
+    
+
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, (17 + movementSpeed.Value) * Time.deltaTime);
+
+        // Set the cooldown timer for the ability
+        ability1.cooldownTimer = ability1.cooldown;
+        mana.Value -= ability1.manaCost; // Deduct mana cost
+        Debug.Log("Tumble ability used. Player dashed towards the target position.");
+    
+        // Empower the next attack
+        isEmpowered.Value = true;
+        empowerStartTime.Value = Time.time; // Record the time when the ability was used
+
+
+        ability1.Update(); // Update the cooldown timer for ability 1
+
+    
+
+        // Put messages up on screen if the ability is on cooldown or not enough mana??? Maybe
+
+        
+        // Empower next attack for 3.5 seconds
+        // Add countdown timer for that empower attack time limit --> Done in Base Champion Update
+        // Alter bullet prefab with a 'damage dealt' variable to be used in the bullet script that will be increased for the empowered dmg
+
+        
+    }
+
+    [Rpc(SendTo.Server)]
+    public override void UseAbility2Rpc()
     {
         // No cooldown
         // No mana cost
         // In game manager, perhaps add a variable that can track these stacks and how many times it has been applied before dealing the true damage
         // Maybe in base character class? Add a variable that counts and checks.
         // Stack duration is 3 seconds before the stack is removed.
+        // 6% of targets maximum health as bonus true damage on 3rd attack.
+
+        // INSTEAD, track how many attacks, third always does more damage
         // Make Game Manager bulky if need be
+        if (!IsServer) return; // Only the owner can use this ability
+
+        Debug.Log("This ability is a passive. No active use needed.");
     }
 
-    public void UseAbility3()
+    [Rpc(SendTo.Server)]
+    public override void UseAbility3Rpc()
     {
+        if (!IsServer) return; // Only the owner can use this ability
         // Check if ability is off cooldown and if theres enough mana
+        if (ability3.cooldownTimer > 0)
+        {
+            Debug.Log("Ability is on cooldown!");
+            return;
+        }
+        else if (mana.Value < ability3.manaCost)
+        {
+            Debug.Log("Not enough mana!");
+            return;
+        }
+
+        ability3.cooldownTimer = ability3.cooldown;
+        mana.Value -= ability3.manaCost; // Deduct mana cost
+
+        ability3.Update(); // Update the cooldown timer for ability 1
+
+        ability3Used.Value = true; // Set the ability used flag to true
         // Modify the bullet prefab to deal extra physical damage
         // Add a knockback effect to the target if they are hit by the bolt
     }

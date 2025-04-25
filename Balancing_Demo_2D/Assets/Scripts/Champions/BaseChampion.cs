@@ -13,7 +13,7 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> armor = new NetworkVariable<float>(25f);
     public NetworkVariable<float> magicResist = new NetworkVariable<float>(30f);
     public NetworkVariable<float> attackSpeed = new NetworkVariable<float>(0.65f);
-    public NetworkVariable<float> movementSpeed = new NetworkVariable<float>(300f);
+    public NetworkVariable<float> movementSpeed = new NetworkVariable<float>(10f); //300 originally (original, / 3 - extra 0 )
     public NetworkVariable<float> maxMana = new NetworkVariable<float>(300f);
     public NetworkVariable<float> manaRegen = new NetworkVariable<float>(7f);
     public NetworkVariable<float> abilityHaste = new NetworkVariable<float>(0f);
@@ -22,38 +22,77 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> armorPen = new NetworkVariable<float>(0f);
     public NetworkVariable<float> magicPen = new NetworkVariable<float>(0f);
 
+    public NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>(Vector3.zero);
+
+    [Header("Champion Ability Modifiers")]
+    public NetworkVariable<bool> isEmpowered = new NetworkVariable<bool>(false); // Flag to check if the next attack is empowered
+    public NetworkVariable<float> empowerStartTime = new NetworkVariable<float>(0f); // Time when the empowered state started
+    public NetworkVariable<float> empowerDuration = new NetworkVariable<float>(3.5f); // Duration for the empowered state
+    public NetworkVariable<int> stackCount = new NetworkVariable<int>(0); // Number of stacks for stacking abilities
+    public NetworkVariable<float> stackStartTime = new NetworkVariable<float>(0f); // Time when the stack started
+    public NetworkVariable<float> stackDuration = new NetworkVariable<float>(3.5f); // Duration for the stacks to last
+    public NetworkVariable<bool> maxStacks = new NetworkVariable<bool>(false); // Flag to check if max stacks are reached
+    public NetworkVariable<bool> ability3Used = new NetworkVariable<bool>(false); // Flag to check if ability 3 has been used
+
     [Header("Champion Resources")]
     public NetworkVariable<float> health = new NetworkVariable<float>(600f);
     public NetworkVariable<float> mana = new NetworkVariable<float>(300f);
 
     [Header("Champion Abilities")]
-    public Ability autoAttack = new Ability("Auto Attack", "Basic attack", 0f, 0f, 0f);
+    public Ability autoAttack = new Ability("Auto Attack", "Basic attack", 0f, 0f, 5f);
     public Ability passive;
     public Ability ability1;
     public Ability ability2;
     public Ability ability3;
 
-    private float lastAutoAttackTime = 0f; // Tracks the last time an auto-attack was fired
+    public float lastAutoAttackTime = 0f; // Tracks the last time an auto-attack was fired
 
     [Header("Champion Settings")]
-    public int attackConsecutive = 0; // Number of consecutive attacks against oneself
+    public int attackConsecutiveAD = 0; // Number of consecutive attacks against oneself
     public float regenTimer = 0f;
+
+    public GameObject enemyChampion; // Reference to the enemy champion prefab
+
+    public GameObject bulletPrefab; // Prefab for the bullet to be fired
+
+    public PlayerNetwork PN; // Reference to the PlayerNetwork script
 
     public void Start()
     {
-        // Initialization logic if needed
-    }
 
-    void Update()
+    }
+    
+    public virtual void Update()
     {
-        // Example: Sync health regeneration logic
         if (IsServer) // Only the server should modify NetworkVariables
         {
-            //HealthandManaRegen();
+            HealthandManaRegen();
         }
+
+        if (passive != null)
+        {
+            passiveAbilityRpc(); // Call the passive ability logic
+        }
+
+
+        //Timer for stacks
+        if (stackCount.Value > 0){
+            if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
+            {
+                stackCount.Value = 0; // Reset the stack count
+            }
+        }
+
+        if (isEmpowered.Value){
+            if (Time.time > empowerStartTime.Value + empowerDuration.Value)
+            {
+                isEmpowered.Value = false;
+            }
+        }
+
     }
 
-    /*private void HealthandManaRegen()
+    private void HealthandManaRegen()
     {
         // Health and mana regen logic
         regenTimer += Time.deltaTime;
@@ -64,16 +103,128 @@ public class BaseChampion : NetworkBehaviour
             if (health.Value < maxHealth.Value)
             {
                 health.Value = Mathf.Min(health.Value + healthRegen.Value, maxHealth.Value); // Ensure health does not exceed maxHealth
-                Debug.Log($"Regenerating health: {healthRegen.Value}");
+                //Debug.Log($"Regenerating health: {healthRegen.Value}");
             }
             if (mana.Value < maxMana.Value)
             {
                 mana.Value = Mathf.Min(mana.Value + manaRegen.Value, maxMana.Value); // Ensure mana does not exceed maxMana
-                Debug.Log($"Regenerating mana: {manaRegen.Value}");
+                //Debug.Log($"Regenerating mana: {manaRegen.Value}");
             }
         }
-    }*/
+    }
 
+    [Rpc(SendTo.Server)]
+    public virtual void passiveAbilityRpc(){ Debug.Log("No passive ability assigned");}
+    [Rpc(SendTo.Server)]
+    public virtual void UseAbility1Rpc(){ Debug.Log("No ability 1 assigned");}
+    [Rpc(SendTo.Server)]
+    public virtual void UseAbility2Rpc(){ Debug.Log("No ability 2 assigned");}
+    [Rpc(SendTo.Server)]
+    public virtual void UseAbility3Rpc(){ Debug.Log("No ability 3 assigned");}
+
+    public virtual GameObject empowerLogic(GameObject bullet){ Debug.Log("No empower logic assigned"); return null;}
+    public virtual GameObject stackLogic(GameObject bullet){ Debug.Log("No stack logic assigned"); return null;}
+    public virtual GameObject ability3Logic(GameObject bullet){ Debug.Log("No stack logic assigned"); return null;}
+
+    public void critLogic(){
+
+    }
+
+    [Rpc(SendTo.Server)]
+    public void PerformAutoAttackRpc(Vector3 targetPosition)
+    {
+        if (!IsServer) return;
+
+        // Validate the target
+        if (enemyChampion == null)
+        {
+            Debug.LogWarning("No enemy champion assigned.");
+            return;
+        }
+
+        // Check range
+        float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
+        if (distance > autoAttack.range)
+        {
+            Debug.Log("Target out of range!");
+            return;
+        }
+
+        // Check cooldown
+        if (Time.time < lastAutoAttackTime + (1f / attackSpeed.Value))
+        {
+            Debug.Log("Auto-attack is on cooldown!");
+            return;
+        }
+
+        // Instantiate and configure the bullet
+        GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity, transform); // Parent to the champion
+        bullet.SetActive(true); // Activate the bullet prefab
+        var networkObject = bullet.GetComponent<NetworkObject>();
+        var bulletComponent = bullet.GetComponent<Bullet>();
+
+        if (networkObject == null || bulletComponent == null)
+        {
+            Debug.LogError("Bullet prefab is missing required components.");
+            Destroy(bullet);
+            return;
+        }
+        // Configure the bullet
+        networkObject.SpawnWithOwnership(transform.parent.GetComponent<NetworkObject>().OwnerClientId);
+        bulletComponent.ADDamage = AD.Value;
+        bulletComponent.targetPosition = targetPosition;
+        bulletComponent.targetPlayer = enemyChampion;
+
+        if (isEmpowered.Value){
+            empowerLogic(bullet); // Call the empower logic if empowered
+            isEmpowered.Value = false; // Reset the empowered state
+        }
+
+        if (maxStacks.Value){
+            stackLogic(bullet); // Call the stack logic if max stacks are reached
+            maxStacks.Value = false; // Reset the max stacks flag
+        }
+
+        if (ability3Used.Value){
+            ability3Logic(bullet); // Call the ability 3 logic if used
+            ability3Used.Value = false; // Reset the ability 3 used flag
+        }
+        
+        Debug.Log("Bullet spawned on the server.");
+
+        Debug.Log("Auto-attack performed!");
+
+        // Update the last auto-attack time
+        lastAutoAttackTime = Time.time;
+    }
+
+    //Also will track consecutive attacks based if the dmg type is AD or AP
+    public void TakeDamage(float AD, float AP, float targetHPDmg){
+        if (IsServer)
+        {
+            // Calculate damage based on armor and magic resist
+            float damage = 0f;
+            if (AD > 0){
+                damage = AD / (1 + (armor.Value / 100)); // Physical damage calculation
+            }
+            if (AP > 0){
+                damage += AP / (1 + (magicResist.Value / 100)); // Magic damage calculation
+            }
+            //Extra dmg based on max hp
+            if (targetHPDmg > 0){
+                damage += targetHPDmg; // Extra damage based on target's max health
+            }
+            
+
+            updateHealth(-damage); // Update health with negative damage value
+
+            if (health.Value <= 0)
+            {
+                Debug.Log("Champion has died!");
+                //Die(); // Call the die function if health is 0 or less
+            }
+        }
+    }
     public void updateMaxHealth(float healthChange)
     {
         if (IsServer)

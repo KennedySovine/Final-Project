@@ -928,18 +928,20 @@ MonoBehaviour:
   player1Controller: {fileID: 0}
   player2: {fileID: 0}
   player2Controller: {fileID: 0}
-  player1Augments: 
-  player2Augments: 
   playerIDsSpawned: 
+  hostReady:
+    m_InternalValue: 0
   ServerID: 0
   player1ID: 0
   player2ID: 0
   playerCount: 0
   maxPlayers: 2
-  gamePaused: 0
+  gamePaused:
+    m_InternalValue: 0
   gameTime: 120
-  augmentBuffer: 20
-  augmentChoosing: 0
+  augmentBuffer: 100
+  augmentChoosing:
+    m_InternalValue: 0
   championPrefab: {fileID: 0}
   spawnPoints:
   - {fileID: 0}

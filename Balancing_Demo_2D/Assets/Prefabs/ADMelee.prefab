@@ -122,22 +122,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4be52e2c32ba8246b58441123491aa2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   championType: 
-  maxHealth: 600
-  healthRegen: 5
-  AD: 60
-  AP: 0
-  armor: 25
-  magicResist: 30
-  attackSpeed: 0.65
-  movementSpeed: 300
-  maxMana: 300
-  manaRegen: 7
-  abilityHaste: 0
-  critChance: 0
-  critDamage: 1.75
-  health: 0
-  mana: 0
+  maxHealth:
+    m_InternalValue: 600
+  healthRegen:
+    m_InternalValue: 5
+  AD:
+    m_InternalValue: 60
+  AP:
+    m_InternalValue: 0
+  armor:
+    m_InternalValue: 25
+  magicResist:
+    m_InternalValue: 30
+  attackSpeed:
+    m_InternalValue: 0.65
+  movementSpeed:
+    m_InternalValue: 300
+  maxMana:
+    m_InternalValue: 300
+  manaRegen:
+    m_InternalValue: 7
+  abilityHaste:
+    m_InternalValue: 0
+  critChance:
+    m_InternalValue: 0
+  critDamage:
+    m_InternalValue: 1.75
+  armorPen:
+    m_InternalValue: 0
+  magicPen:
+    m_InternalValue: 0
+  currentPosition:
+    m_InternalValue: {x: 0, y: 0, z: 0}
+  health:
+    m_InternalValue: 600
+  mana:
+    m_InternalValue: 300
   autoAttack:
     name: Auto Attack
     description: Basic attack
@@ -145,6 +167,7 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    cooldownTimer: 0
   passive:
     name: 
     description: 
@@ -152,6 +175,7 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    cooldownTimer: 0
   ability1:
     name: 
     description: 
@@ -159,6 +183,7 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    cooldownTimer: 0
   ability2:
     name: 
     description: 
@@ -166,6 +191,7 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    cooldownTimer: 0
   ability3:
     name: 
     description: 
@@ -173,8 +199,14 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    cooldownTimer: 0
+  lastAutoAttackTime: 0
   attackConsecutive: 0
   regenTimer: 0
+  enemyChampion: {fileID: 0}
+  bulletPrefab: {fileID: 2169341123581716514, guid: 66c025e1f784eb2478380fa1d8dd1de2, type: 3}
+  PN: {fileID: 479571641050879420}
+  EmpowerNextAttack: 0
 --- !u!114 &5221310434119250730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -322,6 +354,7 @@ GameObject:
   - component: {fileID: 1330155807776156165}
   - component: {fileID: 1115304479915891273}
   - component: {fileID: 7235667429038699871}
+  - component: {fileID: 8743134429531742974}
   m_Layer: 0
   m_Name: ADMelee
   m_TagString: Untagged
@@ -364,7 +397,7 @@ MonoBehaviour:
   Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
+  ActiveSceneSynchronization: 1
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
   DontDestroyWithOwner: 1
@@ -378,7 +411,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4431904003385403123}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
@@ -417,6 +450,52 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!61 &8743134429531742974
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4431904003385403123}
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
 --- !u!1 &6166729283015894883
 GameObject:
   m_ObjectHideFlags: 0

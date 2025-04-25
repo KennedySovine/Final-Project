@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode;
 
 public class APMelee : BaseChampion
 {
@@ -81,7 +82,8 @@ public class APMelee : BaseChampion
         // Healing is 50% of damage dealt after mitigation, capped at 10 + 6.5% AP
     }
 
-    public void UseAbility1(){
+    [Rpc(SendTo.Server)]
+    public void UseAbility1Rpc(){
         for (int i = 0; i < attackStacks; i++){
             // Perform the Snip Snip! action here
             attackStacks = 0; // Reset stacks after using the ability
@@ -91,14 +93,16 @@ public class APMelee : BaseChampion
         }
     }
 
-    public void UseAbility2(){
+    [Rpc(SendTo.Server)]
+    public void UseAbility2Rpc(){
         // Do a timedelta time thing to calculate the 5 seconds
         // Check mana and cooldown
         //  Armor and MR increase by 22 + 7% AP
         
     }
 
-    public void UseAbility3(){
+    [Rpc(SendTo.Server)]
+    public void UseAbility3Rpc(){
         // Check mana and cooldown
         // Dash to target location
         // Empower next basic attacks within the next 4 seconds to deal bonus magic damage and bonus attack range.
