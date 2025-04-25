@@ -3,7 +3,6 @@ using UnityEngine;
 public class ADMelee : BaseChampion
 {
 
-    public bool EmpowerNextAttack = false; // Flag to check if the next attack is empowered
     void Start()
     {
         base.Start();
@@ -106,12 +105,22 @@ public class ADMelee : BaseChampion
     public override void UseAbility1()
     {
         // Check if the ability is off cooldown and if there is enough mana
-        if (ability1.cooldownTimer == 0 && mana.Value >= ability1.manaCost)
-        {
+        if (ability1.cooldownTimer == 0 && mana.Value >= ability1.manaCost){
             // Perform the Tumble action here
+            Vector3 dashDirection = (PN.mousePosition - transform.position).normalized; // Get the direction to the mouse position
+            dashDirection.z = 0; // Ensure the z coordinate is 0
+
+            // Calculate the target position 3f away in the direction of the mouse
+            Vector3 targetPosition = transform.position + dashDirection * 3f;
+
+            // Move the player towards the target position
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, (17 + movementSpeed.Value) * Time.deltaTime);
+
             // Set the cooldown timer for the ability
             ability1.cooldownTimer = ability1.cooldown;
             mana.Value -= ability1.manaCost; // Deduct mana cost
+
+            Debug.Log("Tumble ability used. Player dashed towards the target position.");
         }
         else if (ability1.cooldownTimer > 0)
         {
@@ -124,17 +133,16 @@ public class ADMelee : BaseChampion
             return;
         }
 
-        EmpowerNextAttack = true;
+        isEmpowered.Value = true; // Set the empowered state to true
+        empowerStartTime = Time.time; // Record the time when the ability was used
         // Put messages up on screen if the ability is on cooldown or not enough mana??? Maybe
-        // Dash forward a bit in the direction of movement
-        Vector3 dashDirection = (PN.personalCamera.ScreenToWorldPoint(Input.mousePosition)) - transform.position;
-        float dashDistance = 5f; // Adjust this value as needed
-        transform.position += dashDirection.normalized * dashDistance; // Move the player in the direction of the mouse position
 
         
         // Empower next attack for 3.5 seconds
-        // Add countdown timer for that empower attack time limit
+        // Add countdown timer for that empower attack time limit --> Done in Base Champion Update
         // Alter bullet prefab with a 'damage dealt' variable to be used in the bullet script that will be increased for the empowered dmg
+
+        
     }
 
     public override void UseAbility2()

@@ -54,7 +54,7 @@ public class Bullet : NetworkBehaviour
             {
                 // NO CODE FOR SELF DAMAGE NEEDED
 
-                champion.TakeDamage(ADDamage, 0);
+                champion.TakeDamage(ADDamage, APDamage, empoweredDamageBasedOnTargetHP);
                 Destroy(gameObject);
             }
         }

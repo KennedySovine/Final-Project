@@ -13,7 +13,7 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> armor = new NetworkVariable<float>(25f);
     public NetworkVariable<float> magicResist = new NetworkVariable<float>(30f);
     public NetworkVariable<float> attackSpeed = new NetworkVariable<float>(0.65f);
-    public NetworkVariable<float> movementSpeed = new NetworkVariable<float>(10f); //300 originally (original, / 3 )
+    public NetworkVariable<float> movementSpeed = new NetworkVariable<float>(10f); //300 originally (original, / 3 - extra 0 )
     public NetworkVariable<float> maxMana = new NetworkVariable<float>(300f);
     public NetworkVariable<float> manaRegen = new NetworkVariable<float>(7f);
     public NetworkVariable<float> abilityHaste = new NetworkVariable<float>(0f);
@@ -23,6 +23,9 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> magicPen = new NetworkVariable<float>(0f);
 
     public NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>(Vector3.zero);
+
+    public NetworkVariable<bool> isEmpowered = new NetworkVariable<bool>(false); // Flag to check if the next attack is empowered
+    public float empowerStartTime = 0f; // Time when the empowered state started
 
     [Header("Champion Resources")]
     public NetworkVariable<float> health = new NetworkVariable<float>(600f);
@@ -47,9 +50,13 @@ public class BaseChampion : NetworkBehaviour
 
     public PlayerNetwork PN; // Reference to the PlayerNetwork script
 
+    private GameObject bullet;
+
     public void Start()
     {
         // Initialization logic if needed
+        bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity, transform); // Parent to the champion
+        bullet.SetActive(false); // Deactivate the bullet prefab initially
 
     }
 
@@ -58,7 +65,13 @@ public class BaseChampion : NetworkBehaviour
         // Example: Sync health regeneration logic
         if (IsServer) // Only the server should modify NetworkVariables
         {
-            //HealthandManaRegen();
+            HealthandManaRegen();
+        }
+
+        if (bullet == null)
+        {
+            bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity, transform); // Parent to the champion
+            bullet.SetActive(false); // Deactivate the bullet prefab initially
         }
 
         if (passive != null)
@@ -66,9 +79,19 @@ public class BaseChampion : NetworkBehaviour
             passiveAbility(); // Call the passive ability logic
         }
 
+        if (isEmpowered.Value)
+        {
+            // Logic for empowered state
+            // timer for 3 seconds until empowered is false
+            if (Time.time > empowerStartTime + 3.5f)
+            {
+                isEmpowered.Value = false;
+            }
+        }
+
     }
 
-    /*private void HealthandManaRegen()
+    private void HealthandManaRegen()
     {
         // Health and mana regen logic
         regenTimer += Time.deltaTime;
@@ -79,15 +102,15 @@ public class BaseChampion : NetworkBehaviour
             if (health.Value < maxHealth.Value)
             {
                 health.Value = Mathf.Min(health.Value + healthRegen.Value, maxHealth.Value); // Ensure health does not exceed maxHealth
-                Debug.Log($"Regenerating health: {healthRegen.Value}");
+                //Debug.Log($"Regenerating health: {healthRegen.Value}");
             }
             if (mana.Value < maxMana.Value)
             {
                 mana.Value = Mathf.Min(mana.Value + manaRegen.Value, maxMana.Value); // Ensure mana does not exceed maxMana
-                Debug.Log($"Regenerating mana: {manaRegen.Value}");
+                //Debug.Log($"Regenerating mana: {manaRegen.Value}");
             }
         }
-    }*/
+    }
 
     public virtual void passiveAbility(){ Debug.Log("No passive ability assigned");}
     public virtual void UseAbility1(){ Debug.Log("No ability 1 assigned");}
@@ -97,12 +120,6 @@ public class BaseChampion : NetworkBehaviour
     public void critLogic(){
 
     }
-
-    // Function to deal with being hit by projectiles (bullets)
-    // Check the ownerID vs the playerID of the bullet
-    // If they are the same, do not take damage
-
-
 
     [Rpc(SendTo.Server)]
     public void PerformAutoAttackRpc(Vector3 targetPosition)
@@ -132,7 +149,7 @@ public class BaseChampion : NetworkBehaviour
         }
 
         // Instantiate and configure the bullet
-        GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity, transform); // Parent to the champion
+        bullet.SetActive(true); // Activate the bullet prefab
         var networkObject = bullet.GetComponent<NetworkObject>();
         var bulletComponent = bullet.GetComponent<Bullet>();
 
@@ -150,6 +167,10 @@ public class BaseChampion : NetworkBehaviour
         bulletComponent.ADDamage = AD.Value;
         bulletComponent.targetPosition = targetPosition;
         bulletComponent.targetPlayer = enemyChampion;
+
+        if (isEmpowered.Value){
+            bulletComponent.ADDamage += 75f + (AP.Value * 0.5f); // 50% more dmg based on AP, but dealt as AD
+        }
         Debug.Log("Bullet spawned on the server.");
 
         Debug.Log("Auto-attack performed!");
@@ -158,14 +179,24 @@ public class BaseChampion : NetworkBehaviour
         lastAutoAttackTime = Time.time;
     }
 
-    public void TakeDamage(float AD, float AP){
+    public void TakeDamage(float AD, float AP, float targetHPDmg){
         if (IsServer)
         {
             // Calculate damage based on armor and magic resist
-            float damage = AD / (1 + (armor.Value / 100)); // Physical damage calculation
-            damage += AP / (1 + (magicResist.Value / 100)); // Magic damage calculation
+            float damage = 0f;
+            if (AD > 0){
+                damage = AD / (1 + (armor.Value / 100)); // Physical damage calculation
+            }
+            if (AP > 0){
+                damage += AP / (1 + (magicResist.Value / 100)); // Magic damage calculation
+            }
+            //Extra dmg based on max hp
+            if (targetHPDmg > 0){
+                damage += maxHealth.Value * targetHPDmg; // Extra damage based on max health
+            }
+            
 
-            health.Value -= damage; // Apply damage to health
+            updateHealth(-damage); // Update health with negative damage value
 
             if (health.Value <= 0)
             {
@@ -174,8 +205,6 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
-
-
     public void updateMaxHealth(float healthChange)
     {
         if (IsServer)

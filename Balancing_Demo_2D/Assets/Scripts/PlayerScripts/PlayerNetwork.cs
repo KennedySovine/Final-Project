@@ -49,7 +49,20 @@ public class PlayerNetwork : NetworkBehaviour
         mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition); // Get the mouse position in world space
         mousePosition.z = 0; // Set the z coordinate to 0
 
-        if (Input.GetMouseButtonDown(1)) // Check if the right mouse button is pressed
+        checkInputs(); // Check for player inputs
+
+        if (transform.position != targetPosition){
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * champion.movementSpeed.Value); // Move the player towards the mouse position
+        }
+        else
+        {
+            champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // Set the linear velocity to 0 when the player reaches the target position
+        }
+
+    }
+
+    private void checkInputs(){
+        if (Input.GetMouseButton(1)) // Check if the right mouse button is pressed
         {
             //Debug.Log("Right mouse button clicked.");
             targetPosition.x = mousePosition.x; // Set the target position's x coordinate
@@ -66,19 +79,27 @@ public class PlayerNetwork : NetworkBehaviour
             // Basic Attack
             //champion.UseAbility1(); // Call the UseAbility1 method from the champion script
             PerformAutoAttack(); // Call the PerformAutoAttack method to perform the auto attack
-
         }
 
-        if (transform.position != targetPosition){
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * champion.movementSpeed.Value); // Move the player towards the mouse position
-        }
-        else
+        if (Input.GetKeyDown(KeyCode.Q)) // Check if the Q key is pressed
         {
-            champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // Set the linear velocity to 0 when the player reaches the target position
+            Debug.Log("Ability 1 key pressed.");
+            champion.UseAbility1(); 
         }
 
+        if (Input.GetKeyDown(KeyCode.W)) // Check if the W key is pressed
+        {
+            Debug.Log("Ability 2 key pressed.");
+            champion.UseAbility2(); 
+        }
+
+        if (Input.GetKeyDown(KeyCode.E)) // Check if the E key is pressed
+        {
+            Debug.Log("Ability 3 key pressed.");
+            champion.UseAbility3(); 
+        }
     }
-    private void PerformAutoAttack()
+    public void PerformAutoAttack()
     {
         // Perform a raycast to check if the enemy is hit
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
