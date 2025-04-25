@@ -26,21 +26,18 @@ public class Bullet : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        //auto attack always hits player.
-        if (isAutoAttack){
-            // Check if the bullet is an auto attack and has a target
-            if (targetPlayer != null){
-                // Set the target position to the target object's position
-                targetPosition = targetPlayer.transform.position;
-            }
-            
+    if (!IsServer) return;
+
+        // Ensure the bullet has a valid target
+        if (targetPlayer == null)
+        {
+            Destroy(gameObject);
+            return;
         }
 
-        if (transform.position != targetPosition)
-        {
-            // Move the bullet towards the target position
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * 10f); // Adjust speed as needed
-        }
+        // Move the bullet towards the target's current position
+        Vector3 targetPosition = targetPlayer.transform.position;
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, 10f * Time.deltaTime);
 
     }
 
@@ -51,9 +48,12 @@ public class Bullet : NetworkBehaviour
         // Check if the bullet hit the target player
         if (collision.gameObject == targetPlayer)
         {
+            Debug.Log("Bullet hit the target player: " + targetPlayer.name);
             var champion = collision.GetComponent<BaseChampion>();
             if (champion != null)
             {
+                // NO CODE FOR SELF DAMAGE NEEDED
+
                 champion.TakeDamage(ADDamage, 0);
                 Destroy(gameObject);
             }

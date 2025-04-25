@@ -94,7 +94,7 @@ public class BaseChampion : NetworkBehaviour
 
 
     [Rpc(SendTo.Server)]
-    public void PerformAutoAttackServerRpc(Vector3 targetPosition)
+    public void PerformAutoAttackRpc(Vector3 targetPosition)
     {
         if (!IsServer) return;
 
@@ -133,12 +133,13 @@ public class BaseChampion : NetworkBehaviour
         }
 
         // Spawn the bullet on the network
-        networkObject.Spawn();
 
         // Configure the bullet
+        networkObject.SpawnWithOwnership(transform.parent.GetComponent<NetworkObject>().OwnerClientId);
         bulletComponent.ADDamage = AD.Value;
         bulletComponent.targetPosition = targetPosition;
         bulletComponent.targetPlayer = enemyChampion;
+        Debug.Log("Bullet spawned on the server.");
 
         Debug.Log("Auto-attack performed!");
 

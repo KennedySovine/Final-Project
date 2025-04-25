@@ -85,7 +85,7 @@ public class PlayerNetwork : NetworkBehaviour
         if (hit.collider != null && hit.collider.gameObject == champion.enemyChampion)
         {
             Debug.Log("Raycast hit the enemy champion!");
-            champion.PerformAutoAttackServerRpc(mousePosition);
+            champion.PerformAutoAttackRpc(mousePosition);
         }
         else
         {
