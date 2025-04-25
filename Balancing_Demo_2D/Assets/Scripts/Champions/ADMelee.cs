@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode;
 
 public class ADMelee : BaseChampion
 {
@@ -118,7 +119,9 @@ public class ADMelee : BaseChampion
         return bullet;
     }
 
-    public override void passiveAbility(){
+    [Rpc(SendTo.Server)]
+    public override void passiveAbilityRpc(){
+        if (!IsServer) return; // Only the owner can use this ability
         //Passive ability logic
         if (enemyChampion == null){
             Debug.LogWarning("No enemy champion assigned.");
@@ -135,18 +138,20 @@ public class ADMelee : BaseChampion
         float dotProduct = Vector3.Dot(directionToEnemy, movementDirection);
 
         if (dotProduct > 0.5f){
-            Debug.Log("Player is moving towards the enemy. Passive ability activated!");
+            //Debug.Log("Player is moving towards the enemy. Passive ability activated!");
             movementSpeed.Value = 12f;
         }
         else{
-            Debug.Log("Player is not moving towards the enemy.");
+            //Debug.Log("Player is not moving towards the enemy.");
             // Reset movement speed or remove the passive effect
             movementSpeed.Value = 11f; // Reset to default speed
         }
     }
 
-    public override void UseAbility1()
+    [Rpc(SendTo.Server)]
+    public override void UseAbility1Rpc()
     {
+        if (!IsServer) return; // Only the owner can use this ability
         // Check if the ability is off cooldown and if there is enough mana
         if (ability1.cooldownTimer == 0 && mana.Value >= ability1.manaCost){
             // Perform the Tumble action here
@@ -162,7 +167,6 @@ public class ADMelee : BaseChampion
             // Set the cooldown timer for the ability
             ability1.cooldownTimer = ability1.cooldown;
             mana.Value -= ability1.manaCost; // Deduct mana cost
-
             Debug.Log("Tumble ability used. Player dashed towards the target position.");
         }
         else if (ability1.cooldownTimer > 0)
@@ -176,8 +180,6 @@ public class ADMelee : BaseChampion
             return;
         }
 
-        isEmpowered.Value = true; // Set the empowered state to true
-        empowerStartTime = Time.time; // Record the time when the ability was used
         // Put messages up on screen if the ability is on cooldown or not enough mana??? Maybe
 
         
@@ -188,7 +190,8 @@ public class ADMelee : BaseChampion
         
     }
 
-    public override void UseAbility2()
+    [Rpc(SendTo.Server)]
+    public override void UseAbility2Rpc()
     {
         // No cooldown
         // No mana cost
@@ -199,15 +202,18 @@ public class ADMelee : BaseChampion
 
         // INSTEAD, track how many attacks, third always does more damage
         // Make Game Manager bulky if need be
+        if (!IsServer) return; // Only the owner can use this ability
 
-        if (stackCount == 3){
+        if (stackCount.Value == 3){
             //Minimum damage is 50, max is 6% of target's max health
-            maxStacks = true;
+            maxStacks.Value = true;
         }
     }
 
-    public override void UseAbility3()
+    [Rpc(SendTo.Server)]
+    public override void UseAbility3Rpc()
     {
+        if (!IsServer) return; // Only the owner can use this ability
         // Check if ability is off cooldown and if theres enough mana
         if (ability3.cooldownTimer == 0 && mana.Value >= ability3.manaCost)
         {
@@ -223,7 +229,7 @@ public class ADMelee : BaseChampion
             Debug.Log("Not enough mana!");
         }
 
-        ability3Used = true; // Set the ability used flag to true
+        ability3Used.Value = true; // Set the ability used flag to true
         // Modify the bullet prefab to deal extra physical damage
         // Add a knockback effect to the target if they are hit by the bolt
     }

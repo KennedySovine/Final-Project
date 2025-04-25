@@ -84,19 +84,19 @@ public class PlayerNetwork : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.Q)) // Check if the Q key is pressed
         {
             Debug.Log("Ability 1 key pressed.");
-            champion.UseAbility1(); 
+            champion.UseAbility1Rpc(); 
         }
 
         if (Input.GetKeyDown(KeyCode.W)) // Check if the W key is pressed
         {
             Debug.Log("Ability 2 key pressed.");
-            champion.UseAbility2(); 
+            champion.UseAbility2Rpc(); 
         }
 
         if (Input.GetKeyDown(KeyCode.E)) // Check if the E key is pressed
         {
             Debug.Log("Ability 3 key pressed.");
-            champion.UseAbility3(); 
+            champion.UseAbility3Rpc(); 
         }
     }
     public void PerformAutoAttack()
@@ -108,15 +108,15 @@ public class PlayerNetwork : NetworkBehaviour
             Debug.Log("Raycast hit the enemy champion!");
             //AD ability 2 logic for stacks
             // Maxes at 3 and subsequent stacks refresh the timer
-            if (champion.stackCount >= 3){
-                champion.stackStartTime = Time.time; // Set the stack start time
+            if (champion.stackCount.Value >= 3){
+                champion.stackStartTime.Value = Time.time; // Set the stack start time
             }
             else {
-                champion.stackCount++; // Increment the stack count
-                champion.stackStartTime = Time.time; // Set the stack start time
+                champion.stackCount.Value += 1; // Increment the stack count
+                champion.stackStartTime.Value = Time.time; // Set the stack start time
             }
 
-            
+
             champion.PerformAutoAttackRpc(mousePosition);
         }
         else

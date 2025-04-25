@@ -26,13 +26,13 @@ public class BaseChampion : NetworkBehaviour
 
     [Header("Champion Ability Modifiers")]
     public NetworkVariable<bool> isEmpowered = new NetworkVariable<bool>(false); // Flag to check if the next attack is empowered
-    public float empowerStartTime = 0f; // Time when the empowered state started
-    public float empowerDuration = 3.5f; // Duration for the empowered state
-    public int stackCount = 0; // Number of stacks for stacking abilities
-    public float stackStartTime = 0f; // Time when the stack started
-    public float stackDuration = 3.5f; // Duration for the stacks to last
-    public bool maxStacks = false; // Flag to check if max stacks are reached
-    public bool ability3Used = false; // Flag to check if ability 3 has been used
+    public NetworkVariable<float> empowerStartTime = new NetworkVariable<float>(0f); // Time when the empowered state started
+    public NetworkVariable<float> empowerDuration = new NetworkVariable<float>(3.5f); // Duration for the empowered state
+    public NetworkVariable<int> stackCount = new NetworkVariable<int>(0); // Number of stacks for stacking abilities
+    public NetworkVariable<float> stackStartTime = new NetworkVariable<float>(0f); // Time when the stack started
+    public NetworkVariable<float> stackDuration = new NetworkVariable<float>(3.5f); // Duration for the stacks to last
+    public NetworkVariable<bool> maxStacks = new NetworkVariable<bool>(false); // Flag to check if max stacks are reached
+    public NetworkVariable<bool> ability3Used = new NetworkVariable<bool>(false); // Flag to check if ability 3 has been used
 
     [Header("Champion Resources")]
     public NetworkVariable<float> health = new NetworkVariable<float>(600f);
@@ -71,20 +71,20 @@ public class BaseChampion : NetworkBehaviour
 
         if (passive != null)
         {
-            passiveAbility(); // Call the passive ability logic
+            passiveAbilityRpc(); // Call the passive ability logic
         }
 
 
         //Timer for stacks
-        if (stackCount > 0){
-            if (Time.time > stackStartTime + stackDuration) // If the stack timer is up
+        if (stackCount.Value > 0){
+            if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
             {
-                stackCount = 0; // Reset the stack count
+                stackCount.Value = 0; // Reset the stack count
             }
         }
 
         if (isEmpowered.Value){
-            if (Time.time > empowerStartTime + empowerDuration)
+            if (Time.time > empowerStartTime.Value + empowerDuration.Value)
             {
                 isEmpowered.Value = false;
             }
@@ -113,10 +113,14 @@ public class BaseChampion : NetworkBehaviour
         }
     }
 
-    public virtual void passiveAbility(){ Debug.Log("No passive ability assigned");}
-    public virtual void UseAbility1(){ Debug.Log("No ability 1 assigned");}
-    public virtual void UseAbility2(){ Debug.Log("No ability 2 assigned");}
-    public virtual void UseAbility3(){ Debug.Log("No ability 3 assigned");}
+    [Rpc(SendTo.Server)]
+    public virtual void passiveAbilityRpc(){ Debug.Log("No passive ability assigned");}
+    [Rpc(SendTo.Server)]
+    public virtual void UseAbility1Rpc(){ Debug.Log("No ability 1 assigned");}
+    [Rpc(SendTo.Server)]
+    public virtual void UseAbility2Rpc(){ Debug.Log("No ability 2 assigned");}
+    [Rpc(SendTo.Server)]
+    public virtual void UseAbility3Rpc(){ Debug.Log("No ability 3 assigned");}
 
     public virtual GameObject empowerLogic(GameObject bullet){ Debug.Log("No empower logic assigned"); return null;}
     public virtual GameObject stackLogic(GameObject bullet){ Debug.Log("No stack logic assigned"); return null;}
@@ -176,14 +180,14 @@ public class BaseChampion : NetworkBehaviour
             isEmpowered.Value = false; // Reset the empowered state
         }
 
-        if (maxStacks){
+        if (maxStacks.Value){
             stackLogic(bullet); // Call the stack logic if max stacks are reached
-            maxStacks = false; // Reset the max stacks flag
+            maxStacks.Value = false; // Reset the max stacks flag
         }
 
-        if (ability3Used){
+        if (ability3Used.Value){
             ability3Logic(bullet); // Call the ability 3 logic if used
-            ability3Used = false; // Reset the ability 3 used flag
+            ability3Used.Value = false; // Reset the ability 3 used flag
         }
         
         Debug.Log("Bullet spawned on the server.");
