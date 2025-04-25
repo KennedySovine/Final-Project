@@ -84,10 +84,7 @@ public class BaseChampion : NetworkBehaviour
             }
         }
 
-        if (isEmpowered.Value)
-        {
-            // Logic for empowered state
-            // timer for 3 seconds until empowered is false
+        if (isEmpowered.Value){
             if (Time.time > empowerStartTime + empowerDuration)
             {
                 isEmpowered.Value = false;
@@ -124,6 +121,7 @@ public class BaseChampion : NetworkBehaviour
 
     public virtual GameObject empowerLogic(GameObject bullet){ Debug.Log("No empower logic assigned"); return null;}
     public virtual GameObject stackLogic(GameObject bullet){ Debug.Log("No stack logic assigned"); return null;}
+    public virtual GameObject ability3Logic(GameObject bullet){ Debug.Log("No stack logic assigned"); return null;}
 
     public void critLogic(){
 

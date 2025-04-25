@@ -104,6 +104,20 @@ public class ADMelee : BaseChampion
 
     }
 
+    public override GameObject ability3Logic(GameObject bullet)
+    {
+        var bulletComponent = bullet.GetComponent<Bullet>();
+        if (bulletComponent != null)
+        {
+            bulletComponent.ADDamage = 50f + (AD.Value * 0.5f);
+        }
+        else
+        {
+            Debug.LogError("Bullet component is missing on the bullet prefab.");
+        }
+        return bullet;
+    }
+
     public override void passiveAbility(){
         //Passive ability logic
         if (enemyChampion == null){
@@ -197,8 +211,6 @@ public class ADMelee : BaseChampion
         // Check if ability is off cooldown and if theres enough mana
         if (ability3.cooldownTimer == 0 && mana.Value >= ability3.manaCost)
         {
-            // Perform the Tumble action here
-            // Set the cooldown timer for the ability
             ability3.cooldownTimer = ability3.cooldown;
             mana.Value -= ability3.manaCost; // Deduct mana cost
         }
