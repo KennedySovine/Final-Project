@@ -70,7 +70,7 @@ public class PlayerNetwork : NetworkBehaviour
         }
 
         if (transform.position != targetPosition){
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * 5f); // Move the player towards the mouse position
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * champion.movementSpeed.Value); // Move the player towards the mouse position
         }
         else
         {

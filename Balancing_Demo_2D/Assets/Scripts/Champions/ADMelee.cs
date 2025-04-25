@@ -27,7 +27,7 @@ public class ADMelee : BaseChampion
         armor.Value = 23f;
         magicResist.Value = 30f;
         attackSpeed.Value = 0.685f;
-        movementSpeed.Value = 330f;
+        movementSpeed.Value = 11f;
         maxMana.Value = 232f;
         manaRegen.Value = 8f;
         abilityHaste.Value = 0f;
@@ -76,11 +76,34 @@ public class ADMelee : BaseChampion
         ability3.setDuration(8f);
     }
 
-    public void passiveAbility(){
+    public override void passiveAbility(){
         //Passive ability logic
+        if (enemyChampion == null){
+            Debug.LogWarning("No enemy champion assigned.");
+            return;
+        }
+
+        // Get the direction to the enemy
+        Vector3 directionToEnemy = (enemyChampion.transform.position - transform.position).normalized;
+
+        // Get the player's movement direction
+        Vector3 movementDirection = (PN.targetPosition - transform.position).normalized;
+
+        // Check if the player is moving towards the enemy
+        float dotProduct = Vector3.Dot(directionToEnemy, movementDirection);
+
+        if (dotProduct > 0.5f){
+            Debug.Log("Player is moving towards the enemy. Passive ability activated!");
+            movementSpeed.Value = 12f;
+        }
+        else{
+            Debug.Log("Player is not moving towards the enemy.");
+            // Reset movement speed or remove the passive effect
+            movementSpeed.Value = 11f; // Reset to default speed
+        }
     }
 
-    public void UseAbility1()
+    public override void UseAbility1()
     {
         // Check if the ability is off cooldown and if there is enough mana
         if (ability1.cooldownTimer == 0 && mana.Value >= ability1.manaCost)
@@ -114,7 +137,7 @@ public class ADMelee : BaseChampion
         // Alter bullet prefab with a 'damage dealt' variable to be used in the bullet script that will be increased for the empowered dmg
     }
 
-    public void UseAbility2()
+    public override void UseAbility2()
     {
         // No cooldown
         // No mana cost
@@ -127,7 +150,7 @@ public class ADMelee : BaseChampion
         // Make Game Manager bulky if need be
     }
 
-    public void UseAbility3()
+    public override void UseAbility3()
     {
         // Check if ability is off cooldown and if theres enough mana
         if (ability3.cooldownTimer == 0 && mana.Value >= ability3.manaCost)

@@ -13,7 +13,7 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> armor = new NetworkVariable<float>(25f);
     public NetworkVariable<float> magicResist = new NetworkVariable<float>(30f);
     public NetworkVariable<float> attackSpeed = new NetworkVariable<float>(0.65f);
-    public NetworkVariable<float> movementSpeed = new NetworkVariable<float>(300f);
+    public NetworkVariable<float> movementSpeed = new NetworkVariable<float>(10f); //300 originally (original, / 3 )
     public NetworkVariable<float> maxMana = new NetworkVariable<float>(300f);
     public NetworkVariable<float> manaRegen = new NetworkVariable<float>(7f);
     public NetworkVariable<float> abilityHaste = new NetworkVariable<float>(0f);
@@ -60,6 +60,12 @@ public class BaseChampion : NetworkBehaviour
         {
             //HealthandManaRegen();
         }
+
+        if (passive != null)
+        {
+            passiveAbility(); // Call the passive ability logic
+        }
+
     }
 
     /*private void HealthandManaRegen()
@@ -82,6 +88,11 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }*/
+
+    public virtual void passiveAbility(){ Debug.Log("No passive ability assigned");}
+    public virtual void UseAbility1(){ Debug.Log("No ability 1 assigned");}
+    public virtual void UseAbility2(){ Debug.Log("No ability 2 assigned");}
+    public virtual void UseAbility3(){ Debug.Log("No ability 3 assigned");}
 
     public void critLogic(){
 
