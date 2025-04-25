@@ -65,7 +65,7 @@ public class PlayerNetwork : NetworkBehaviour
             // Perform the attack action here
             // Basic Attack
             //champion.UseAbility1(); // Call the UseAbility1 method from the champion script
-            PerformRaycastAndSendToServer(); // Perform raycast and send to server
+            PerformAutoAttack(); // Call the PerformAutoAttack method to perform the auto attack
 
         }
 
@@ -78,41 +78,18 @@ public class PlayerNetwork : NetworkBehaviour
         }
 
     }
-    private void PerformRaycastAndSendToServer()
+    private void PerformAutoAttack()
     {
-        // Perform a 2D raycast from the mouse position
+        // Perform a raycast to check if the enemy is hit
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
-
-        if (hit.collider != null)
+        if (hit.collider != null && hit.collider.gameObject == champion.enemyChampion)
         {
-            Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
-
-            // Check if the raycast hit the enemy champion
-            if (hit.collider.gameObject == champion.enemyChampion)
-            {
-                Debug.Log("Raycast hit the enemy champion!");
-
-                // Send the raycast result to the server
-                SendAttackToServerRpc(mousePosition);
-            }
-            else
-            {
-                Debug.Log("Raycast hit something else: " + hit.collider.gameObject.name);
-            }
+            Debug.Log("Raycast hit the enemy champion!");
+            champion.PerformAutoAttackServerRpc(mousePosition);
         }
         else
         {
-            Debug.Log("Raycast did not hit anything!");
+            Debug.Log("Raycast did not hit the enemy champion.");
         }
-    }
-
-    [Rpc(SendTo.Server)]
-    private void SendAttackToServerRpc(Vector3 targetPosition)
-    {
-        if (!IsServer) return;
-        Debug.Log("SendAttackToServerRpc called with target position: " + targetPosition);
-
-        // Forward the attack to the server for validation and execution
-        champion.HandleAttackOnServer( targetPosition);
     }
 }

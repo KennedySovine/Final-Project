@@ -46,19 +46,17 @@ public class Bullet : NetworkBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Bullet collided with: " + collision.gameObject.name);
-        // Check if the bullet hit a champion
-        BaseChampion champion = collision.GetComponent<BaseChampion>();
-        if (champion != null)
-        {
-            // Call onHitByBullet on the server
-            if (NetworkManager.Singleton.IsServer)
-            {
-                champion.onHitByBullet(this);
-            }
+        if (!IsServer) return;
 
-            // Destroy the bullet after it hits
-            Destroy(gameObject);
+        // Check if the bullet hit the target player
+        if (collision.gameObject == targetPlayer)
+        {
+            var champion = collision.GetComponent<BaseChampion>();
+            if (champion != null)
+            {
+                champion.TakeDamage(ADDamage, 0);
+                Destroy(gameObject);
+            }
         }
     }
 

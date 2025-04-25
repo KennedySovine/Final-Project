@@ -29,7 +29,7 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> mana = new NetworkVariable<float>(300f);
 
     [Header("Champion Abilities")]
-    public Ability autoAttack = new Ability("Auto Attack", "Basic attack", 0f, 0f, 0f);
+    public Ability autoAttack = new Ability("Auto Attack", "Basic attack", 0f, 0f, 5f);
     public Ability passive;
     public Ability ability1;
     public Ability ability2;
@@ -91,34 +91,21 @@ public class BaseChampion : NetworkBehaviour
     // Check the ownerID vs the playerID of the bullet
     // If they are the same, do not take damage
 
-    public void onHitByBullet(Bullet bullet)
-    {
-        // Calculate physical damage reduction based on armor
-        float physicalDamage = bullet.ADDamage * (1 - armor.Value / (armor.Value + 100));
 
-        // Calculate magic damage reduction based on magic resist
-        float magicDamage = bullet.APDamage * (1 - magicResist.Value / (magicResist.Value + 100));
 
-        // Apply armor penetration and magic penetration
-        physicalDamage *= (1 + bullet.armorPenetration);
-        magicDamage *= (1 + bullet.magicPenetration);
-
-        // Total damage
-        float totalDamage = physicalDamage + magicDamage;
-
-        // Apply damage to health
-        updateHealth(-totalDamage);
-
-        // Log the damage taken
-        Debug.Log($"Hit by enemy bullet! Physical Damage: {physicalDamage}, Magic Damage: {magicDamage}, Total Damage: {totalDamage}");
-        
-    }
-
-    public void HandleAttackOnServer(Vector3 targetPosition)
+    [Rpc(SendTo.Server)]
+    public void PerformAutoAttackServerRpc(Vector3 targetPosition)
     {
         if (!IsServer) return;
 
-        // Check if the player is within range of the enemy champion
+        // Validate the target
+        if (enemyChampion == null)
+        {
+            Debug.LogWarning("No enemy champion assigned.");
+            return;
+        }
+
+        // Check range
         float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
         if (distance > autoAttack.range)
         {
@@ -126,22 +113,22 @@ public class BaseChampion : NetworkBehaviour
             return;
         }
 
-        // Check if the cooldown has passed
-        if (Time.time < lastAutoAttackTime + autoAttack.cooldown)
+        // Check cooldown
+        if (Time.time < lastAutoAttackTime + (1f / attackSpeed.Value))
         {
-            Debug.Log("Basic Attack is on cooldown!");
+            Debug.Log("Auto-attack is on cooldown!");
             return;
         }
 
         // Instantiate and configure the bullet
-        GameObject attackObj = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
-        var networkObject = attackObj.GetComponent<NetworkObject>();
-        var bulletComponent = attackObj.GetComponent<Bullet>();
+        GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity, transform); // Parent to the champion
+        var networkObject = bullet.GetComponent<NetworkObject>();
+        var bulletComponent = bullet.GetComponent<Bullet>();
 
         if (networkObject == null || bulletComponent == null)
         {
             Debug.LogError("Bullet prefab is missing required components.");
-            Destroy(attackObj);
+            Destroy(bullet);
             return;
         }
 
@@ -150,17 +137,32 @@ public class BaseChampion : NetworkBehaviour
 
         // Configure the bullet
         bulletComponent.ADDamage = AD.Value;
-        bulletComponent.armorPenetration = armorPen.Value;
-        bulletComponent.magicPenetration = magicPen.Value;
         bulletComponent.targetPosition = targetPosition;
-        bulletComponent.isAutoAttack = true;
         bulletComponent.targetPlayer = enemyChampion;
 
-        Debug.Log("Basic Attack performed!");
+        Debug.Log("Auto-attack performed!");
 
         // Update the last auto-attack time
         lastAutoAttackTime = Time.time;
     }
+
+    public void TakeDamage(float AD, float AP){
+        if (IsServer)
+        {
+            // Calculate damage based on armor and magic resist
+            float damage = AD / (1 + (armor.Value / 100)); // Physical damage calculation
+            damage += AP / (1 + (magicResist.Value / 100)); // Magic damage calculation
+
+            health.Value -= damage; // Apply damage to health
+
+            if (health.Value <= 0)
+            {
+                Debug.Log("Champion has died!");
+                //Die(); // Call the die function if health is 0 or less
+            }
+        }
+    }
+
 
     public void updateMaxHealth(float healthChange)
     {
