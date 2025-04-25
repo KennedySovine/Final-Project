@@ -162,35 +162,38 @@ public class ADMelee : BaseChampion
     {
         if (!IsServer) return; // Only the server can execute this logic
     
-        // Check if the ability is off cooldown and if there is enough mana
-        if (ability1.cooldownTimer == 0 && mana.Value >= ability1.manaCost)
-        {
-            // Calculate the dash direction
-            Vector2 dashDirection = (PN.mousePosition - transform.position).normalized; // Get the direction to the mouse position
-    
-            // Calculate the target position 3f away in the direction of the mouse
-            Vector2 targetPosition = (Vector2)transform.position + dashDirection * 3f;
-    
-
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, (17 + movementSpeed.Value) * Time.deltaTime);
-
-            // Set the cooldown timer for the ability
-            ability1.cooldownTimer = ability1.cooldown;
-            mana.Value -= ability1.manaCost; // Deduct mana cost
-            Debug.Log("Tumble ability used. Player dashed towards the target position.");
-    
-            // Empower the next attack
-            isEmpowered.Value = true;
-            empowerStartTime.Value = Time.time; // Record the time when the ability was used
-        }
-        else if (ability1.cooldownTimer > 0)
+        if (ability1.cooldownTimer > 0)
         {
             Debug.Log("Ability is on cooldown!");
+            return;
         }
         else if (mana.Value < ability1.manaCost)
         {
             Debug.Log("Not enough mana!");
+            return;
         }
+
+        // Calculate the dash direction
+        Vector2 dashDirection = (PN.mousePosition - transform.position).normalized; // Get the direction to the mouse position
+    
+        // Calculate the target position 3f away in the direction of the mouse
+        Vector2 targetPosition = (Vector2)transform.position + dashDirection * 3f;
+    
+
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, (17 + movementSpeed.Value) * Time.deltaTime);
+
+        // Set the cooldown timer for the ability
+        ability1.cooldownTimer = ability1.cooldown;
+        mana.Value -= ability1.manaCost; // Deduct mana cost
+        Debug.Log("Tumble ability used. Player dashed towards the target position.");
+    
+        // Empower the next attack
+        isEmpowered.Value = true;
+        empowerStartTime.Value = Time.time; // Record the time when the ability was used
+
+
+        ability1.Update(); // Update the cooldown timer for ability 1
+
     
 
         // Put messages up on screen if the ability is on cooldown or not enough mana??? Maybe
@@ -225,19 +228,21 @@ public class ADMelee : BaseChampion
     {
         if (!IsServer) return; // Only the owner can use this ability
         // Check if ability is off cooldown and if theres enough mana
-        if (ability3.cooldownTimer == 0 && mana.Value >= ability3.manaCost)
-        {
-            ability3.cooldownTimer = ability3.cooldown;
-            mana.Value -= ability3.manaCost; // Deduct mana cost
-        }
-        else if (ability3.cooldownTimer > 0)
+        if (ability3.cooldownTimer > 0)
         {
             Debug.Log("Ability is on cooldown!");
+            return;
         }
         else if (mana.Value < ability3.manaCost)
         {
             Debug.Log("Not enough mana!");
+            return;
         }
+
+        ability3.cooldownTimer = ability3.cooldown;
+        mana.Value -= ability3.manaCost; // Deduct mana cost
+
+        ability3.Update(); // Update the cooldown timer for ability 1
 
         ability3Used.Value = true; // Set the ability used flag to true
         // Modify the bullet prefab to deal extra physical damage

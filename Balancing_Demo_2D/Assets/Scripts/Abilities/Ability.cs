@@ -22,7 +22,7 @@ public class Ability
         this.duration = 0f; // Default duration to 0, can be set later if needed
     }
 
-    void Update()
+    public void Update()
     {
         // Update the cooldown timer if the ability is on cooldown
         if (cooldownTimer > 0)
