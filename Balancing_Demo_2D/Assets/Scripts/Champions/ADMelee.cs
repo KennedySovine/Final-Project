@@ -75,6 +75,35 @@ public class ADMelee : BaseChampion
         ability3.setDuration(8f);
     }
 
+    public override GameObject empowerLogic(GameObject bullet)
+    {
+        var bulletComponent = bullet.GetComponent<Bullet>();
+        if (bulletComponent != null)
+        {
+            bulletComponent.ADDamage += 75f + (AP.Value * 0.5f); // 50% more dmg based on AP, but dealt as AD
+        }
+        else
+        {
+            Debug.LogError("Bullet component is missing on the bullet prefab.");
+        }
+        return bullet;
+    }
+
+    public override GameObject stackLogic(GameObject bullet)
+    {
+        var bulletComponent = bullet.GetComponent<Bullet>();
+        if (bulletComponent != null)
+        {
+            bulletComponent.ADDamage = Mathf.Max(50f, 0.06f * enemyChampion.GetComponent<BaseChampion>().maxHealth.Value); // Minimum damage is 50, max is 6% of target's max health
+        }
+        else
+        {
+            Debug.LogError("Bullet component is missing on the bullet prefab.");
+        }
+        return bullet;
+
+    }
+
     public override void passiveAbility(){
         //Passive ability logic
         if (enemyChampion == null){
@@ -156,6 +185,11 @@ public class ADMelee : BaseChampion
 
         // INSTEAD, track how many attacks, third always does more damage
         // Make Game Manager bulky if need be
+
+        if (stackCount == 3){
+            //Minimum damage is 50, max is 6% of target's max health
+            maxStacks = true;
+        }
     }
 
     public override void UseAbility3()

@@ -39,6 +39,12 @@ public class Bullet : NetworkBehaviour
         Vector3 targetPosition = targetPlayer.transform.position;
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, 10f * Time.deltaTime);
 
+        /*if (empoweredDamageBasedOnTargetHP != 0f){
+            // Calculate the damage based on the target's current HP
+            float targetHP = targetPlayer.GetComponent<BaseChampion>().maxHealth.Value;
+            empoweredDamageBasedOnTargetHP = targetHP * empoweredDamageBasedOnTargetHP; // Example: 10% of target's current HP as damage
+        }*/
+
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

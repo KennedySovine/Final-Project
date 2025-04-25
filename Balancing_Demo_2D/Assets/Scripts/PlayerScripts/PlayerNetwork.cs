@@ -106,6 +106,17 @@ public class PlayerNetwork : NetworkBehaviour
         if (hit.collider != null && hit.collider.gameObject == champion.enemyChampion)
         {
             Debug.Log("Raycast hit the enemy champion!");
+            //AD ability 2 logic for stacks
+            // Maxes at 3 and subsequent stacks refresh the timer
+            if (champion.stackCount >= 3){
+                champion.stackStartTime = Time.time; // Set the stack start time
+            }
+            else {
+                champion.stackCount++; // Increment the stack count
+                champion.stackStartTime = Time.time; // Set the stack start time
+            }
+
+            
             champion.PerformAutoAttackRpc(mousePosition);
         }
         else

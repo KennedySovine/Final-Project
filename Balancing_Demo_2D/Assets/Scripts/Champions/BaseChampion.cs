@@ -24,8 +24,14 @@ public class BaseChampion : NetworkBehaviour
 
     public NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>(Vector3.zero);
 
+    [Header("Champion Ability Modifiers")]
     public NetworkVariable<bool> isEmpowered = new NetworkVariable<bool>(false); // Flag to check if the next attack is empowered
     public float empowerStartTime = 0f; // Time when the empowered state started
+    public float empowerDuration = 3.5f; // Duration for the empowered state
+    public int stackCount = 0; // Number of stacks for stacking abilities
+    public float stackStartTime = 0f; // Time when the stack started
+    public float stackDuration = 3.5f; // Duration for the stacks to last
+    public bool maxStacks = false; // Flag to check if max stacks are reached
 
     [Header("Champion Resources")]
     public NetworkVariable<float> health = new NetworkVariable<float>(600f);
@@ -41,7 +47,7 @@ public class BaseChampion : NetworkBehaviour
     public float lastAutoAttackTime = 0f; // Tracks the last time an auto-attack was fired
 
     [Header("Champion Settings")]
-    public int attackConsecutive = 0; // Number of consecutive attacks against oneself
+    public int attackConsecutiveAD = 0; // Number of consecutive attacks against oneself
     public float regenTimer = 0f;
 
     public GameObject enemyChampion; // Reference to the enemy champion prefab
@@ -54,24 +60,14 @@ public class BaseChampion : NetworkBehaviour
 
     public void Start()
     {
-        // Initialization logic if needed
-        bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity, transform); // Parent to the champion
-        bullet.SetActive(false); // Deactivate the bullet prefab initially
 
     }
 
     void Update()
     {
-        // Example: Sync health regeneration logic
         if (IsServer) // Only the server should modify NetworkVariables
         {
             HealthandManaRegen();
-        }
-
-        if (bullet == null)
-        {
-            bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity, transform); // Parent to the champion
-            bullet.SetActive(false); // Deactivate the bullet prefab initially
         }
 
         if (passive != null)
@@ -79,11 +75,20 @@ public class BaseChampion : NetworkBehaviour
             passiveAbility(); // Call the passive ability logic
         }
 
+
+        //Timer for stacks
+        if (stackCount > 0){
+            if (Time.time > stackStartTime + stackDuration) // If the stack timer is up
+            {
+                stackCount = 0; // Reset the stack count
+            }
+        }
+
         if (isEmpowered.Value)
         {
             // Logic for empowered state
             // timer for 3 seconds until empowered is false
-            if (Time.time > empowerStartTime + 3.5f)
+            if (Time.time > empowerStartTime + empowerDuration)
             {
                 isEmpowered.Value = false;
             }
@@ -117,6 +122,9 @@ public class BaseChampion : NetworkBehaviour
     public virtual void UseAbility2(){ Debug.Log("No ability 2 assigned");}
     public virtual void UseAbility3(){ Debug.Log("No ability 3 assigned");}
 
+    public virtual GameObject empowerLogic(GameObject bullet){ Debug.Log("No empower logic assigned"); return null;}
+    public virtual GameObject stackLogic(GameObject bullet){ Debug.Log("No stack logic assigned"); return null;}
+
     public void critLogic(){
 
     }
@@ -149,6 +157,7 @@ public class BaseChampion : NetworkBehaviour
         }
 
         // Instantiate and configure the bullet
+        bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity, transform); // Parent to the champion
         bullet.SetActive(true); // Activate the bullet prefab
         var networkObject = bullet.GetComponent<NetworkObject>();
         var bulletComponent = bullet.GetComponent<Bullet>();
@@ -163,14 +172,22 @@ public class BaseChampion : NetworkBehaviour
         // Spawn the bullet on the network
 
         // Configure the bullet
+        
         networkObject.SpawnWithOwnership(transform.parent.GetComponent<NetworkObject>().OwnerClientId);
         bulletComponent.ADDamage = AD.Value;
         bulletComponent.targetPosition = targetPosition;
         bulletComponent.targetPlayer = enemyChampion;
 
         if (isEmpowered.Value){
-            bulletComponent.ADDamage += 75f + (AP.Value * 0.5f); // 50% more dmg based on AP, but dealt as AD
+            empowerLogic(bullet); // Call the empower logic if empowered
+            isEmpowered.Value = false; // Reset the empowered state
         }
+
+        if (maxStacks){
+            stackLogic(bullet); // Call the stack logic if max stacks are reached
+            maxStacks = false; // Reset the max stacks flag
+        }
+        
         Debug.Log("Bullet spawned on the server.");
 
         Debug.Log("Auto-attack performed!");
@@ -179,6 +196,7 @@ public class BaseChampion : NetworkBehaviour
         lastAutoAttackTime = Time.time;
     }
 
+    //Also will track consecutive attacks based if the dmg type is AD or AP
     public void TakeDamage(float AD, float AP, float targetHPDmg){
         if (IsServer)
         {
@@ -192,7 +210,7 @@ public class BaseChampion : NetworkBehaviour
             }
             //Extra dmg based on max hp
             if (targetHPDmg > 0){
-                damage += maxHealth.Value * targetHPDmg; // Extra damage based on max health
+                damage += targetHPDmg; // Extra damage based on target's max health
             }
             
 
