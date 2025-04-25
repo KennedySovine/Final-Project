@@ -32,6 +32,7 @@ public class BaseChampion : NetworkBehaviour
     public float stackStartTime = 0f; // Time when the stack started
     public float stackDuration = 3.5f; // Duration for the stacks to last
     public bool maxStacks = false; // Flag to check if max stacks are reached
+    public bool ability3Used = false; // Flag to check if ability 3 has been used
 
     [Header("Champion Resources")]
     public NetworkVariable<float> health = new NetworkVariable<float>(600f);
@@ -55,8 +56,6 @@ public class BaseChampion : NetworkBehaviour
     public GameObject bulletPrefab; // Prefab for the bullet to be fired
 
     public PlayerNetwork PN; // Reference to the PlayerNetwork script
-
-    private GameObject bullet;
 
     public void Start()
     {
@@ -155,7 +154,7 @@ public class BaseChampion : NetworkBehaviour
         }
 
         // Instantiate and configure the bullet
-        bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity, transform); // Parent to the champion
+        GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity, transform); // Parent to the champion
         bullet.SetActive(true); // Activate the bullet prefab
         var networkObject = bullet.GetComponent<NetworkObject>();
         var bulletComponent = bullet.GetComponent<Bullet>();
@@ -166,11 +165,7 @@ public class BaseChampion : NetworkBehaviour
             Destroy(bullet);
             return;
         }
-
-        // Spawn the bullet on the network
-
         // Configure the bullet
-        
         networkObject.SpawnWithOwnership(transform.parent.GetComponent<NetworkObject>().OwnerClientId);
         bulletComponent.ADDamage = AD.Value;
         bulletComponent.targetPosition = targetPosition;
@@ -184,6 +179,11 @@ public class BaseChampion : NetworkBehaviour
         if (maxStacks){
             stackLogic(bullet); // Call the stack logic if max stacks are reached
             maxStacks = false; // Reset the max stacks flag
+        }
+
+        if (ability3Used){
+            ability3Logic(bullet); // Call the ability 3 logic if used
+            ability3Used = false; // Reset the ability 3 used flag
         }
         
         Debug.Log("Bullet spawned on the server.");

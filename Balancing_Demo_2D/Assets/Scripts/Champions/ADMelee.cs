@@ -100,8 +100,8 @@ public class ADMelee : BaseChampion
         {
             Debug.LogError("Bullet component is missing on the bullet prefab.");
         }
-        return bullet;
 
+        return bullet;
     }
 
     public override GameObject ability3Logic(GameObject bullet)
@@ -222,6 +222,8 @@ public class ADMelee : BaseChampion
         {
             Debug.Log("Not enough mana!");
         }
+
+        ability3Used = true; // Set the ability used flag to true
         // Modify the bullet prefab to deal extra physical damage
         // Add a knockback effect to the target if they are hit by the bolt
     }
