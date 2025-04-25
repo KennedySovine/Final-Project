@@ -39,6 +39,15 @@ public class ADMelee : BaseChampion
         mana.Value = maxMana.Value; // Initialize mana to max mana
     }
 
+    public override void Update(){
+        base.Update(); // Call the base class Update method
+
+        if (stackCount.Value >= 3){
+            maxStacks.Value = true; // Set the max stacks flag to true
+            stackCount.Value = 3; // Reset the stack value
+        }
+    }
+
     private void AddAbilities()
     {
         passive = new Ability(
@@ -151,34 +160,38 @@ public class ADMelee : BaseChampion
     [Rpc(SendTo.Server)]
     public override void UseAbility1Rpc()
     {
-        if (!IsServer) return; // Only the owner can use this ability
+        if (!IsServer) return; // Only the server can execute this logic
+    
         // Check if the ability is off cooldown and if there is enough mana
-        if (ability1.cooldownTimer == 0 && mana.Value >= ability1.manaCost){
-            // Perform the Tumble action here
-            Vector3 dashDirection = (PN.mousePosition - transform.position).normalized; // Get the direction to the mouse position
-            dashDirection.z = 0; // Ensure the z coordinate is 0
-
+        if (ability1.cooldownTimer == 0 && mana.Value >= ability1.manaCost)
+        {
+            // Calculate the dash direction
+            Vector2 dashDirection = (PN.mousePosition - transform.position).normalized; // Get the direction to the mouse position
+    
             // Calculate the target position 3f away in the direction of the mouse
-            Vector3 targetPosition = transform.position + dashDirection * 3f;
+            Vector2 targetPosition = (Vector2)transform.position + dashDirection * 3f;
+    
 
-            // Move the player towards the target position
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, (17 + movementSpeed.Value) * Time.deltaTime);
 
             // Set the cooldown timer for the ability
             ability1.cooldownTimer = ability1.cooldown;
             mana.Value -= ability1.manaCost; // Deduct mana cost
             Debug.Log("Tumble ability used. Player dashed towards the target position.");
+    
+            // Empower the next attack
+            isEmpowered.Value = true;
+            empowerStartTime.Value = Time.time; // Record the time when the ability was used
         }
         else if (ability1.cooldownTimer > 0)
         {
             Debug.Log("Ability is on cooldown!");
-            return;
         }
         else if (mana.Value < ability1.manaCost)
         {
             Debug.Log("Not enough mana!");
-            return;
         }
+    
 
         // Put messages up on screen if the ability is on cooldown or not enough mana??? Maybe
 
@@ -204,10 +217,7 @@ public class ADMelee : BaseChampion
         // Make Game Manager bulky if need be
         if (!IsServer) return; // Only the owner can use this ability
 
-        if (stackCount.Value == 3){
-            //Minimum damage is 50, max is 6% of target's max health
-            maxStacks.Value = true;
-        }
+        Debug.Log("This ability is a passive. No active use needed.");
     }
 
     [Rpc(SendTo.Server)]

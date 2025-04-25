@@ -61,8 +61,8 @@ public class BaseChampion : NetworkBehaviour
     {
 
     }
-
-    void Update()
+    
+    public virtual void Update()
     {
         if (IsServer) // Only the server should modify NetworkVariables
         {
