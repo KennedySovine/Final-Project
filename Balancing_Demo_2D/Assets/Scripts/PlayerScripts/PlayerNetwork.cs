@@ -117,7 +117,7 @@ public class PlayerNetwork : NetworkBehaviour
                 champion.stackStartTime.Value = Time.time; // Set the stack start time
             }
 
-
+            champion.lastAutoAttackTime.Value = Time.time;
             PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId); // Call the PerformAutoAttackRpc method to perform the auto attack on the server
         }
         else
@@ -204,6 +204,5 @@ public class PlayerNetwork : NetworkBehaviour
         Debug.Log("Auto-attack performed!");
 
         // Update the last auto-attack time
-        champion.lastAutoAttackTime.Value = Time.time;
     }
 }
