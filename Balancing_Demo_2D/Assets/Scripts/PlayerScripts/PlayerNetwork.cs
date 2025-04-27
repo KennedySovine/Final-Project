@@ -69,7 +69,8 @@ public class PlayerNetwork : NetworkBehaviour
             targetPosition.y = mousePosition.y; // Set the target position's y coordinate
             Vector3 direction = targetPosition - transform.position;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            champion.transform.rotation = Quaternion.Euler(0, 0, angle); // Rotate the player to face the mouse position
+
+            UpdateRotationRpc(angle); // Server version of the rotation update
         }
 
         if (Input.GetMouseButtonDown(0)) // Check if the left mouse button is pressed
@@ -123,6 +124,12 @@ public class PlayerNetwork : NetworkBehaviour
         {
             Debug.Log("Raycast did not hit the enemy champion.");
         }
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void UpdateRotationRpc(float angle)
+    {
+        champion.transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
     [Rpc(SendTo.Server)]

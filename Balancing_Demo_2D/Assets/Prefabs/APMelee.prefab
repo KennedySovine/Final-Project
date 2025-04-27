@@ -247,6 +247,22 @@ MonoBehaviour:
     m_InternalValue: 0
   currentPosition:
     m_InternalValue: {x: 0, y: 0, z: 0}
+  isEmpowered:
+    m_InternalValue: 0
+  empowerStartTime:
+    m_InternalValue: 0
+  empowerDuration:
+    m_InternalValue: 3.5
+  stackCount:
+    m_InternalValue: 0
+  stackStartTime:
+    m_InternalValue: 0
+  stackDuration:
+    m_InternalValue: 3.5
+  maxStacks:
+    m_InternalValue: 0
+  ability3Used:
+    m_InternalValue: 0
   health:
     m_InternalValue: 600
   mana:
@@ -291,8 +307,9 @@ MonoBehaviour:
     range: 0
     duration: 0
     cooldownTimer: 0
-  lastAutoAttackTime: 0
-  attackConsecutive: 0
+  lastAutoAttackTime:
+    m_InternalValue: 0
+  attackConsecutiveAD: 0
   regenTimer: 0
   enemyChampion: {fileID: 0}
   bulletPrefab: {fileID: 0}
@@ -386,14 +403,14 @@ MonoBehaviour:
   SyncPositionZ: 0
   SyncRotAngleX: 1
   SyncRotAngleY: 1
-  SyncRotAngleZ: 0
+  SyncRotAngleZ: 1
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
+  UseQuaternionSynchronization: 1
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
@@ -563,7 +580,7 @@ MonoBehaviour:
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
+  UseQuaternionSynchronization: 1
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
