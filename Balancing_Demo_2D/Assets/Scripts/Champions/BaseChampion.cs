@@ -21,6 +21,7 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> critDamage = new NetworkVariable<float>(1.75f); // 175% damage on crit
     public NetworkVariable<float> armorPen = new NetworkVariable<float>(0f);
     public NetworkVariable<float> magicPen = new NetworkVariable<float>(0f);
+    public NetworkVariable<float> attackRange = new NetworkVariable<float>(100f); // Health percentage for abilities
 
     public NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>(Vector3.zero);
 
@@ -61,6 +62,19 @@ public class BaseChampion : NetworkBehaviour
     {
 
     }
+
+    [Rpc(SendTo.Server)]
+    public virtual void passiveAbilityRpc(){ Debug.Log("No passive ability assigned");}
+    [Rpc(SendTo.Server)]
+    public virtual void UseAbility1Rpc(){ Debug.Log("No ability 1 assigned");}
+    [Rpc(SendTo.Server)]
+    public virtual void UseAbility2Rpc(){ Debug.Log("No ability 2 assigned");}
+    [Rpc(SendTo.Server)]
+    public virtual void UseAbility3Rpc(){ Debug.Log("No ability 3 assigned");}
+
+    public virtual GameObject empowerLogic(GameObject bullet){ Debug.Log("No empower logic assigned"); return null;}
+    public virtual GameObject stackLogic(GameObject bullet){ Debug.Log("No stack logic assigned"); return null;}
+    public virtual GameObject ability3Logic(GameObject bullet){ Debug.Log("No stack logic assigned"); return null;}
     
     public virtual void Update()
     {
@@ -113,20 +127,18 @@ public class BaseChampion : NetworkBehaviour
         }
     }
 
-    [Rpc(SendTo.Server)]
-    public virtual void passiveAbilityRpc(){ Debug.Log("No passive ability assigned");}
-    [Rpc(SendTo.Server)]
-    public virtual void UseAbility1Rpc(){ Debug.Log("No ability 1 assigned");}
-    [Rpc(SendTo.Server)]
-    public virtual void UseAbility2Rpc(){ Debug.Log("No ability 2 assigned");}
-    [Rpc(SendTo.Server)]
-    public virtual void UseAbility3Rpc(){ Debug.Log("No ability 3 assigned");}
-
-    public virtual GameObject empowerLogic(GameObject bullet){ Debug.Log("No empower logic assigned"); return null;}
-    public virtual GameObject stackLogic(GameObject bullet){ Debug.Log("No stack logic assigned"); return null;}
-    public virtual GameObject ability3Logic(GameObject bullet){ Debug.Log("No stack logic assigned"); return null;}
-
-    public void critLogic(){
+    public float critLogic(){
+        float chance = Random.Range(0f, 1f);
+        if (chance <= critChance.Value) // If the random chance is less than or equal to critChance
+        {
+            Debug.Log("Critical hit! Damage multiplied by " + critDamage.Value);
+            return AD.Value * critDamage.Value; // Return the critical damage
+        }
+        else
+        {
+            Debug.Log("Normal hit. No critical damage.");
+            return AD.Value; // Return normal damage
+        }
 
     }
 

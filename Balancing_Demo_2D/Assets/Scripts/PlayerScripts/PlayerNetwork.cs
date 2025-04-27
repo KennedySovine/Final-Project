@@ -180,7 +180,7 @@ public class PlayerNetwork : NetworkBehaviour
         }
         // Configure the bullet
         networkObject.SpawnWithOwnership(transform.parent.GetComponent<NetworkObject>().OwnerClientId);
-        bulletComponent.ADDamage = champion.AD.Value;
+        bulletComponent.ADDamage = champion.critLogic();
         bulletComponent.targetPosition = targetPosition;
         bulletComponent.targetPlayer = enemyChampion;
 
