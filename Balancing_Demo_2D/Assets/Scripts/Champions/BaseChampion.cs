@@ -45,7 +45,7 @@ public class BaseChampion : NetworkBehaviour
     public Ability ability2;
     public Ability ability3;
 
-    public float lastAutoAttackTime = 0f; // Tracks the last time an auto-attack was fired
+    public NetworkVariable<float> lastAutoAttackTime = new NetworkVariable<float>(0f); // Time of the last auto-attack
 
     [Header("Champion Settings")]
     public int attackConsecutiveAD = 0; // Number of consecutive attacks against oneself
@@ -128,74 +128,6 @@ public class BaseChampion : NetworkBehaviour
 
     public void critLogic(){
 
-    }
-
-    [Rpc(SendTo.Server)]
-    public void PerformAutoAttackRpc(Vector3 targetPosition)
-    {
-        if (!IsServer) return;
-
-        // Validate the target
-        if (enemyChampion == null)
-        {
-            Debug.LogWarning("No enemy champion assigned.");
-            return;
-        }
-
-        // Check range
-        float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
-        if (distance > autoAttack.range)
-        {
-            Debug.Log("Target out of range!");
-            return;
-        }
-
-        // Check cooldown
-        if (Time.time < lastAutoAttackTime + (1f / attackSpeed.Value))
-        {
-            Debug.Log("Auto-attack is on cooldown!");
-            return;
-        }
-
-        // Instantiate and configure the bullet
-        GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity, transform); // Parent to the champion
-        bullet.SetActive(true); // Activate the bullet prefab
-        var networkObject = bullet.GetComponent<NetworkObject>();
-        var bulletComponent = bullet.GetComponent<Bullet>();
-
-        if (networkObject == null || bulletComponent == null)
-        {
-            Debug.LogError("Bullet prefab is missing required components.");
-            Destroy(bullet);
-            return;
-        }
-        // Configure the bullet
-        networkObject.SpawnWithOwnership(transform.parent.GetComponent<NetworkObject>().OwnerClientId);
-        bulletComponent.ADDamage = AD.Value;
-        bulletComponent.targetPosition = targetPosition;
-        bulletComponent.targetPlayer = enemyChampion;
-
-        if (isEmpowered.Value){
-            empowerLogic(bullet); // Call the empower logic if empowered
-            isEmpowered.Value = false; // Reset the empowered state
-        }
-
-        if (maxStacks.Value){
-            stackLogic(bullet); // Call the stack logic if max stacks are reached
-            maxStacks.Value = false; // Reset the max stacks flag
-        }
-
-        if (ability3Used.Value){
-            ability3Logic(bullet); // Call the ability 3 logic if used
-            ability3Used.Value = false; // Reset the ability 3 used flag
-        }
-        
-        Debug.Log("Bullet spawned on the server.");
-
-        Debug.Log("Auto-attack performed!");
-
-        // Update the last auto-attack time
-        lastAutoAttackTime = Time.time;
     }
 
     //Also will track consecutive attacks based if the dmg type is AD or AP

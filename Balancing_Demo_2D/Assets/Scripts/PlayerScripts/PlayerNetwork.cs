@@ -103,7 +103,7 @@ public class PlayerNetwork : NetworkBehaviour
     {
         // Perform a raycast to check if the enemy is hit
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
-        if (hit.collider != null && hit.collider.gameObject == champion.enemyChampion)
+        if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null)
         {
             Debug.Log("Raycast hit the enemy champion!");
             //AD ability 2 logic for stacks
@@ -117,11 +117,86 @@ public class PlayerNetwork : NetworkBehaviour
             }
 
 
-            champion.PerformAutoAttackRpc(mousePosition);
+            PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId); // Call the PerformAutoAttackRpc method to perform the auto attack on the server
         }
         else
         {
             Debug.Log("Raycast did not hit the enemy champion.");
         }
+    }
+
+    [Rpc(SendTo.Server)]
+    public void PerformAutoAttackRpc(Vector3 targetPosition, ulong targetNetworkObjectId)
+    {
+        if (!IsServer) return; // Only the server can execute this logic
+
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetNetworkObjectId, out NetworkObject targetObj)){
+            Debug.LogWarning("Invalid target object id!");
+            return;
+        }
+
+        GameObject enemyChampion = champion.enemyChampion; // Get the enemy champion reference
+
+        // Validate the target
+        if (enemyChampion == null)
+        {
+            Debug.LogWarning("No enemy champion assigned.");
+            return;
+        }
+
+        // Check range
+        float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
+        if (distance > champion.autoAttack.range)
+        {
+            Debug.Log("Target out of range!");
+            return;
+        }
+
+        // Check cooldown
+        if (Time.time < champion.lastAutoAttackTime.Value + (1f /champion.attackSpeed.Value))
+        {
+            Debug.Log("Auto-attack is on cooldown!");
+            return;
+        }
+
+        // Instantiate and configure the bullet
+        GameObject bullet = Instantiate(champion.bulletPrefab, transform.position, Quaternion.identity, transform); // Parent to the champion
+        bullet.SetActive(true); // Activate the bullet prefab
+        var networkObject = bullet.GetComponent<NetworkObject>();
+        var bulletComponent = bullet.GetComponent<Bullet>();
+
+        if (networkObject == null || bulletComponent == null)
+        {
+            Debug.LogError("Bullet prefab is missing required components.");
+            Destroy(bullet);
+            return;
+        }
+        // Configure the bullet
+        networkObject.SpawnWithOwnership(transform.parent.GetComponent<NetworkObject>().OwnerClientId);
+        bulletComponent.ADDamage = champion.AD.Value;
+        bulletComponent.targetPosition = targetPosition;
+        bulletComponent.targetPlayer = enemyChampion;
+
+        if (champion.isEmpowered.Value){
+            champion.empowerLogic(bullet); // Call the empower logic if empowered
+            champion.isEmpowered.Value = false; // Reset the empowered state
+        }
+
+        if (champion.maxStacks.Value){
+            champion.stackLogic(bullet); // Call the stack logic if max stacks are reached
+            champion.maxStacks.Value = false; // Reset the max stacks flag
+        }
+
+        if (champion.ability3Used.Value){
+            champion.ability3Logic(bullet); // Call the ability 3 logic if used
+            champion.ability3Used.Value = false; // Reset the ability 3 used flag
+        }
+        
+        Debug.Log("Bullet spawned on the server.");
+
+        Debug.Log("Auto-attack performed!");
+
+        // Update the last auto-attack time
+        champion.lastAutoAttackTime.Value = Time.time;
     }
 }
