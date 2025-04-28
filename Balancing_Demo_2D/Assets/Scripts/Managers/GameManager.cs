@@ -194,6 +194,7 @@ public class GameManager : NetworkBehaviour
                         player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                         playerIDsSpawned.Add(playerId);
                         player1ID = playerId; // Store the ID of player 1
+                        player1Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[0].position; // Set the target position for player 1
                         Debug.Log($"Spawned champion for Player 1 (Client {playerId}).");
                         break;
 
@@ -203,6 +204,7 @@ public class GameManager : NetworkBehaviour
                         player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                         playerIDsSpawned.Add(playerId);
                         player2ID = playerId; // Store the ID of player 2
+                        player2Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[1].position; // Set the target position for player 2
                         Debug.Log($"Spawned champion for Player 2 (Client {playerId}).");
                         break;
 
