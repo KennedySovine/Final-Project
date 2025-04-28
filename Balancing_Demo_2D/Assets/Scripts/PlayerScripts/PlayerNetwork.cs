@@ -132,6 +132,44 @@ public class PlayerNetwork : NetworkBehaviour
         champion.transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
+    //For Vayne
+    [Rpc(SendTo.Everyone)]
+    public void championDashRpc(float maxDistance, float newMoveSpeed)
+    {
+
+        if (!IsServer) return; // Only the server can execute this logic
+
+        Vector2 dashDirection = (mousePosition - transform.position).normalized; // Calculate the dash direction
+
+        float actualDashDistance = Vector2.Distance(transform.position, mousePosition); // Calculate the actual dash distance
+
+        if (actualDashDistance > maxDistance)
+        {
+            actualDashDistance = maxDistance; // Limit the dash distance to the maximum range
+        }
+        Vector2 targetPosition = (Vector2)transform.position + dashDirection * actualDashDistance; // Calculate the target position for the dash
+
+        StartCoroutine(DashToTarget(targetPosition, newMoveSpeed)); // Start the dash coroutine
+    }
+    
+    private IEnumerator DashToTarget(Vector2 targetPosition, float moveSpeed)
+    {
+        while (Vector2.Distance(transform.position, targetPosition) > 0.1f)
+        {
+            if (champion.movementSpeed.Value != moveSpeed){
+                transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * moveSpeed);
+                yield return null;
+            }
+            else{
+                transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * champion.movementSpeed.Value);
+                yield return null;
+            }
+        }
+    
+        transform.position = targetPosition; // Snap to the target position
+        Debug.Log("Dash completed.");
+    }
+
     [Rpc(SendTo.Server)]
     public void PerformAutoAttackRpc(Vector3 targetPosition, ulong targetNetworkObjectId)
     {

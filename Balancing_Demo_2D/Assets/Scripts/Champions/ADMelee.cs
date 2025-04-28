@@ -63,7 +63,7 @@ public class ADMelee : BaseChampion
             "Dash forward and empower next attack",
             6f, // Cooldown in seconds
             30f, // Mana cost
-            300f  // Range
+            10f  // Range
         );
 
         ability2 = new Ability(
@@ -173,15 +173,9 @@ public class ADMelee : BaseChampion
             return;
         }
 
-        // Calculate the dash direction
-        Vector2 dashDirection = (PN.mousePosition - transform.position).normalized; // Get the direction to the mouse position
-    
-        // Calculate the target position 3f away in the direction of the mouse
-        Vector2 targetPosition = (Vector2)transform.position + dashDirection * 3f;
-    
+        float newMoveSpeed = movementSpeed.Value + 17f; // Increase movement speed by 1 unit
 
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, (17 + movementSpeed.Value) * Time.deltaTime);
-
+        PN.championDashRpc(ability1.range, newMoveSpeed); // Call the dash RPC to move the player
         // Set the cooldown timer for the ability
         ability1.cooldownTimer = ability1.cooldown;
         mana.Value -= ability1.manaCost; // Deduct mana cost
