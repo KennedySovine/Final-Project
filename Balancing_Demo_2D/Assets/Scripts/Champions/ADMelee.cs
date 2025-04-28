@@ -185,19 +185,7 @@ public class ADMelee : BaseChampion
         isEmpowered.Value = true;
         empowerStartTime.Value = Time.time; // Record the time when the ability was used
 
-
-        ability1.Update(); // Update the cooldown timer for ability 1
-
-    
-
         // Put messages up on screen if the ability is on cooldown or not enough mana??? Maybe
-
-        
-        // Empower next attack for 3.5 seconds
-        // Add countdown timer for that empower attack time limit --> Done in Base Champion Update
-        // Alter bullet prefab with a 'damage dealt' variable to be used in the bullet script that will be increased for the empowered dmg
-
-        
     }
 
     [Rpc(SendTo.Server)]

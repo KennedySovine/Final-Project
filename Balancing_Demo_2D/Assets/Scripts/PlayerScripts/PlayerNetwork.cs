@@ -137,8 +137,6 @@ public class PlayerNetwork : NetworkBehaviour
     public void championDashRpc(float maxDistance, float newMoveSpeed)
     {
 
-        if (!IsServer) return; // Only the server can execute this logic
-
         Vector2 dashDirection = (mousePosition - transform.position).normalized; // Calculate the dash direction
 
         float actualDashDistance = Vector2.Distance(transform.position, mousePosition); // Calculate the actual dash distance
