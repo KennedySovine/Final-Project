@@ -147,26 +147,28 @@ public class PlayerNetwork : NetworkBehaviour
         {
             actualDashDistance = maxDistance; // Limit the dash distance to the maximum range
         }
+
         Vector2 targetPosition = (Vector2)transform.position + dashDirection * actualDashDistance; // Calculate the target position for the dash
 
         StartCoroutine(DashToTarget(targetPosition, newMoveSpeed)); // Start the dash coroutine
     }
     
-    private IEnumerator DashToTarget(Vector2 targetPosition, float moveSpeed)
+    private IEnumerator DashToTarget(Vector2 endPosition, float moveSpeed)
     {
-        while (Vector2.Distance(transform.position, targetPosition) > 0.1f)
+        while (Vector2.Distance(transform.position, endPosition) > 0.1f)
         {
             if (champion.movementSpeed.Value != moveSpeed){
-                transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * moveSpeed);
+                transform.position = Vector3.MoveTowards(transform.position, endPosition, Time.deltaTime * moveSpeed);
                 yield return null;
             }
             else{
-                transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * champion.movementSpeed.Value);
+                transform.position = Vector3.MoveTowards(transform.position, endPosition, Time.deltaTime * champion.movementSpeed.Value);
                 yield return null;
             }
         }
     
-        transform.position = targetPosition; // Snap to the target position
+        transform.position = endPosition; // Snap to the target position
+        targetPosition = transform.position; // Update the target position to the current position
         Debug.Log("Dash completed.");
     }
 
