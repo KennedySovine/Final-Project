@@ -5,7 +5,6 @@ using Unity.Netcode;
 public class PlayerNetwork : NetworkBehaviour
 {
     public Vector2 mousePosition; // Mouse position in world space
-    public Vector3 targetPosition; // Target position for the player to move towards
     public float dashSpeed;
 
     public NetworkVariable<Vector3> targetPositionNet = new NetworkVariable<Vector3>(); // Network variable for target position
@@ -53,8 +52,6 @@ public class PlayerNetwork : NetworkBehaviour
         checkInputs(); // Check for player inputs
 
         MovePlayer(); // Move the player towards the target position
-        
-
     }
 
     private void checkInputs(){
@@ -122,27 +119,16 @@ public class PlayerNetwork : NetworkBehaviour
     }
 
     private void MovePlayer(){
-        if (isDashing.Value){
-            while (Vector2.Distance(transform.position, targetPositionNet.Value) > 0.1f)
-            {
-                transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * dashSpeed);
-            }
-    
-            transform.position = targetPositionNet.Value; // Set the player's position to the target position
-            Debug.Log("Dash completed.");
-            isDashing.Value = false; // Reset the dash state
-        }
-        else if (transform.position != targetPositionNet.Value) // Check if the player is not at the target position
+        float speed = isDashing.Value ? dashSpeed : champion.movementSpeed.Value; // Set the speed based on the dash state
+        if (transform.position != targetPositionNet.Value) // Check if the player is not at the target position
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * champion.movementSpeed.Value); // Move the player towards the mouse position
+            transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * speed); // Move the player towards the mouse position
+            isDashing.Value = false; // Reset the dash state
         }
         else
         {
             champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // Set the linear velocity to 0 when the player reaches the target position
         }
-
-        //float speed = isDashing.Value ? dashSpeed : champion.movementSpeed.Value; // Set the speed based on the dash state
-        //transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * dashSpeed);
     }
     
     [Rpc(SendTo.Server)]

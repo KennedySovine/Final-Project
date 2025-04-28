@@ -141,7 +141,7 @@ public class ADMelee : BaseChampion
         Vector3 directionToEnemy = (enemyChampion.transform.position - transform.position).normalized;
 
         // Get the player's movement direction
-        Vector3 movementDirection = (PN.targetPosition - transform.position).normalized;
+        Vector3 movementDirection = (PN.targetPositionNet.Value - transform.position).normalized;
 
         // Check if the player is moving towards the enemy
         float dotProduct = Vector3.Dot(directionToEnemy, movementDirection);
