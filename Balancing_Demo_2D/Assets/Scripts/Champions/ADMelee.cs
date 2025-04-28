@@ -175,7 +175,6 @@ public class ADMelee : BaseChampion
 
         float newMoveSpeed = movementSpeed.Value + 17f; // Increase movement speed by 1 unit
 
-        PN.championDashRpc(ability1.range, newMoveSpeed); // Call the dash RPC to move the player
         // Set the cooldown timer for the ability
         ability1.timeOfCast = Time.time; // Record the time when the ability was used
         mana.Value -= ability1.manaCost; // Deduct mana cost
@@ -184,6 +183,8 @@ public class ADMelee : BaseChampion
         // Empower the next attack
         isEmpowered.Value = true;
         empowerStartTime.Value = Time.time; // Record the time when the ability was used
+
+        PN.ChampionDashRpc(PN.mousePosition, ability1.range, newMoveSpeed); // Call the dash function on the player network object
 
         // Put messages up on screen if the ability is on cooldown or not enough mana??? Maybe
     }

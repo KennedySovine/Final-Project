@@ -6,13 +6,16 @@ public class PlayerNetwork : NetworkBehaviour
 {
     public Vector2 mousePosition; // Mouse position in world space
     public Vector3 targetPosition; // Target position for the player to move towards
+    public float dashSpeed;
 
     public NetworkVariable<Vector3> targetPositionNet = new NetworkVariable<Vector3>(); // Network variable for target position
+    public NetworkVariable<bool> isDashing = new NetworkVariable<bool>(false); // Network variable for dash state
 
     public Camera personalCamera;
 
     public BaseChampion champion; // Reference to the champion script
     private GameManager GM; // Reference to the GameManager
+
 
     void Start()
     {
@@ -35,6 +38,7 @@ public class PlayerNetwork : NetworkBehaviour
             mousePosition = transform.position;
             targetPosition = transform.position; // Set the target position to the player's starting position
             targetPosition.z = 0; // Set the z coordinate to 0
+            dashSpeed = champion.movementSpeed.Value; // Set the dash speed to the champion's movement speed
         }
     }
     // Update is called once per frame
@@ -122,7 +126,17 @@ public class PlayerNetwork : NetworkBehaviour
     }
 
     private void MovePlayer(){
-        if (transform.position != targetPositionNet.Value) // Check if the player is not at the target position
+        if (isDashing.Value){
+            while (Vector2.Distance(transform.position, targetPositionNet.Value) > 0.1f)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * dashSpeed);
+            }
+    
+            transform.position = targetPositionNet.Value; // Set the player's position to the target position
+            Debug.Log("Dash completed.");
+            isDashing.Value = false; // Reset the dash state
+        }
+        else if (transform.position != targetPositionNet.Value) // Check if the player is not at the target position
         {
             transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * champion.movementSpeed.Value); // Move the player towards the mouse position
         }
@@ -130,6 +144,9 @@ public class PlayerNetwork : NetworkBehaviour
         {
             champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // Set the linear velocity to 0 when the player reaches the target position
         }
+
+        float speed = isDashing.Value ? dashSpeed : champion.movementSpeed.Value; // Set the speed based on the dash state
+        transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * dashSpeed);
     }
     
     [Rpc(SendTo.Server)]
@@ -147,42 +164,18 @@ public class PlayerNetwork : NetworkBehaviour
         champion.transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
-    //For Vayne
     [Rpc(SendTo.Everyone)]
-    public void championDashRpc(float maxDistance, float newMoveSpeed)
+    public void ChampionDashRpc(Vector2 mousePos, float maxRange, float dashSpeed)
     {
+        Vector2 dashDirection = (mousePos - (Vector2)transform.position).normalized; // Calculate the dash direction
 
-        Vector2 dashDirection = (mousePosition - (Vector2)transform.position).normalized; // Calculate the dash direction
+        float distance = Vector2.Distance(transform.position, mousePos); // Calculate the distance to the target position
+        distance = Mathf.Min(distance, maxRange); // Limit the distance to the maximum range
 
-        float actualDashDistance = Vector2.Distance(transform.position, mousePosition); // Calculate the actual dash distance
-
-        if (actualDashDistance > maxDistance)
-        {
-            actualDashDistance = maxDistance; // Limit the dash distance to the maximum range
-        }
-
-        Vector2 targetPosition = (Vector2)transform.position + dashDirection * actualDashDistance; // Calculate the target position for the dash
-
-        StartCoroutine(DashToTarget(targetPosition, newMoveSpeed)); // Start the dash coroutine
-    }
-    
-    private IEnumerator DashToTarget(Vector2 endPosition, float moveSpeed)
-    {
-        while (Vector2.Distance(transform.position, endPosition) > 0.1f)
-        {
-            if (champion.movementSpeed.Value != moveSpeed){
-                transform.position = Vector3.MoveTowards(transform.position, endPosition, Time.deltaTime * moveSpeed);
-                yield return null;
-            }
-            else{
-                transform.position = Vector3.MoveTowards(transform.position, endPosition, Time.deltaTime * champion.movementSpeed.Value);
-                yield return null;
-            }
-        }
-    
-        transform.position = endPosition; // Snap to the target position
-        targetPosition = transform.position; // Update the target position to the current position
-        Debug.Log("Dash completed.");
+        Vector2 targetPosition = (Vector2)transform.position + dashDirection * distance; // Calculate the target position for the dash
+        targetPositionNet.Value = targetPosition; // Update the target position network variable
+        this.dashSpeed = dashSpeed; // Set the dash speed
+        isDashing.Value = true; // Set the dash state to true
     }
 
     [Rpc(SendTo.Server)]
