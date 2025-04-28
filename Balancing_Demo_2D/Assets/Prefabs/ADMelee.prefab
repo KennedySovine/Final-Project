@@ -106,8 +106,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  mousePosition: {x: 0, y: 0, z: 0}
-  targetPosition: {x: 0, y: 0, z: 0}
+  mousePosition: {x: 0, y: 0}
+  dashSpeed: 0
+  targetPositionNet:
+    m_InternalValue: {x: 0, y: 0, z: 0}
+  isDashing:
+    m_InternalValue: 0
   personalCamera: {fileID: 4986339328056519817}
   champion: {fileID: 5572880182677895893}
 --- !u!114 &5572880182677895893
@@ -154,6 +158,8 @@ MonoBehaviour:
     m_InternalValue: 0
   magicPen:
     m_InternalValue: 0
+  attackRange:
+    m_InternalValue: 100
   currentPosition:
     m_InternalValue: {x: 0, y: 0, z: 0}
   isEmpowered:
@@ -183,7 +189,7 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
-    cooldownTimer: 0
+    timeOfCast: 0
   passive:
     name: 
     description: 
@@ -191,7 +197,7 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
-    cooldownTimer: 0
+    timeOfCast: 0
   ability1:
     name: 
     description: 
@@ -199,7 +205,7 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
-    cooldownTimer: 0
+    timeOfCast: 0
   ability2:
     name: 
     description: 
@@ -207,7 +213,7 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
-    cooldownTimer: 0
+    timeOfCast: 0
   ability3:
     name: 
     description: 
@@ -215,7 +221,7 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
-    cooldownTimer: 0
+    timeOfCast: 0
   lastAutoAttackTime:
     m_InternalValue: 0
   attackConsecutiveAD: 0
@@ -238,7 +244,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 0
   AutoOwnerAuthorityTickOffset: 1
-  PositionInterpolationType: 0
+  PositionInterpolationType: 1
   RotationInterpolationType: 0
   ScaleInterpolationType: 0
   PositionLerpSmoothing: 1
@@ -435,7 +441,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 0
   AutoOwnerAuthorityTickOffset: 1
-  PositionInterpolationType: 0
+  PositionInterpolationType: 1
   RotationInterpolationType: 0
   ScaleInterpolationType: 0
   PositionLerpSmoothing: 1
