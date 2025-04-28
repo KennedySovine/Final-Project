@@ -165,7 +165,8 @@ public class PlayerNetwork : NetworkBehaviour
             }
         }
     
-        targetPosition = endPosition; // Update the target position to the current position
+        transform.position = endPosition; // Snap to the target position
+        targetPosition = transform.position; // Update the target position to the current position
         Debug.Log("Dash completed.");
     }
 
