@@ -33,8 +33,9 @@ public class PlayerNetwork : NetworkBehaviour
 
             // Initialize mousePosition and targetPositionNet
             mousePosition = transform.position;
-            targetPositionNet.Value = transform.position;
             dashSpeed = champion.movementSpeed.Value;
+            //Set velocity 0
+            champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
         }
     }
 
@@ -44,7 +45,6 @@ public class PlayerNetwork : NetworkBehaviour
 
         // Constantly update mouse position
         mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition);
-
         checkInputs(); // Check for player inputs
 
         if (!isDashing.Value)
@@ -59,6 +59,7 @@ public class PlayerNetwork : NetworkBehaviour
 
         if (Input.GetMouseButton(1)) // Right mouse button pressed
         {
+            SendMousePositionRpc(mousePosition); // Send mouse position to the server
             RequestMoveRpc(mousePosition); // Request movement on the server
             Vector3 direction = targetPositionNet.Value - transform.position;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -128,6 +129,16 @@ public class PlayerNetwork : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server)]
+    public void SendMousePositionRpc(Vector2 mousePos)
+    {
+        if (!IsServer) return;
+
+        // Update the server's copy of the mouse position
+        mousePosition = mousePos;
+        //Debug.Log($"Mouse position received on server: {mousePosition}");
+    }
+
+    [Rpc(SendTo.Server)]
     public void RequestMoveRpc(Vector2 targetPosition)
     {
         if (!IsServer) return;
@@ -157,13 +168,13 @@ public class PlayerNetwork : NetworkBehaviour
 
     private IEnumerator DashToTarget(Vector2 targetPosition)
     {
-        while (Vector2.Distance(transform.position, targetPosition) > 0.1f)
+        while (Vector2.Distance(transform.position, targetPositionNet.Value) > 0.1f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * dashSpeed);
+            transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * dashSpeed);
             yield return null;
         }
 
-        transform.position = targetPosition; // Snap to the target position
+        transform.position = targetPositionNet.Value; // Snap to the target position
         isDashing.Value = false; // Reset the dash state
         Debug.Log("Dash completed.");
     }
