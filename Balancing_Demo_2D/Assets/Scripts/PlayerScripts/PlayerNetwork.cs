@@ -36,17 +36,14 @@ public class PlayerNetwork : NetworkBehaviour
 
             // Initialize mousePosition to the player's starting position
             mousePosition = transform.position;
-            targetPosition = transform.position; // Set the target position to the player's starting position
-            targetPosition.z = 0; // Set the z coordinate to 0
+            targetPositionNet.Value = transform.position; // Set the target position to the player's starting position
             dashSpeed = champion.movementSpeed.Value; // Set the dash speed to the champion's movement speed
         }
     }
     // Update is called once per frame
     void Update()
     {
-
         //If game paused, disable input
-
         if (!IsOwner) return; // Only the owner can control the player
         if (GM.gamePaused.Value) return; // If the game is paused, disable input
 
@@ -56,6 +53,7 @@ public class PlayerNetwork : NetworkBehaviour
         checkInputs(); // Check for player inputs
 
         MovePlayer(); // Move the player towards the target position
+        
 
     }
 
@@ -64,9 +62,7 @@ public class PlayerNetwork : NetworkBehaviour
         {
             //Debug.Log("Right mouse button clicked.");
             RequestMoveRpc(mousePosition); // Call the RequestMoveRpc method to request movement on the server
-            targetPosition.x = mousePosition.x; // Set the target position's x coordinate
-            targetPosition.y = mousePosition.y; // Set the target position's y coordinate
-            Vector3 direction = targetPosition - transform.position;
+            Vector3 direction = targetPositionNet.Value - transform.position;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
             UpdateRotationRpc(angle); // Server version of the rotation update
@@ -145,8 +141,8 @@ public class PlayerNetwork : NetworkBehaviour
             champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // Set the linear velocity to 0 when the player reaches the target position
         }
 
-        float speed = isDashing.Value ? dashSpeed : champion.movementSpeed.Value; // Set the speed based on the dash state
-        transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * dashSpeed);
+        //float speed = isDashing.Value ? dashSpeed : champion.movementSpeed.Value; // Set the speed based on the dash state
+        //transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * dashSpeed);
     }
     
     [Rpc(SendTo.Server)]
