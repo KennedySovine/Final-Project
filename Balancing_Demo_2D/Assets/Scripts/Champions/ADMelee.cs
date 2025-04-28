@@ -162,7 +162,7 @@ public class ADMelee : BaseChampion
     {
         if (!IsServer) return; // Only the server can execute this logic
     
-        if (ability1.cooldownTimer > 0)
+        if (ability1.isOnCooldown)
         {
             Debug.Log("Ability is on cooldown!");
             return;
@@ -177,7 +177,7 @@ public class ADMelee : BaseChampion
 
         PN.championDashRpc(ability1.range, newMoveSpeed); // Call the dash RPC to move the player
         // Set the cooldown timer for the ability
-        ability1.cooldownTimer = ability1.cooldown;
+        ability1.timeOfCast = Time.time; // Record the time when the ability was used
         mana.Value -= ability1.manaCost; // Deduct mana cost
         Debug.Log("Tumble ability used. Player dashed towards the target position.");
     
@@ -222,7 +222,7 @@ public class ADMelee : BaseChampion
     {
         if (!IsServer) return; // Only the owner can use this ability
         // Check if ability is off cooldown and if theres enough mana
-        if (ability3.cooldownTimer > 0)
+        if (ability3.isOnCooldown)
         {
             Debug.Log("Ability is on cooldown!");
             return;
@@ -233,7 +233,7 @@ public class ADMelee : BaseChampion
             return;
         }
 
-        ability3.cooldownTimer = ability3.cooldown;
+        ability3.timeOfCast = Time.time; // Record the time when the ability was used
         mana.Value -= ability3.manaCost; // Deduct mana cost
 
         ability3.Update(); // Update the cooldown timer for ability 1
