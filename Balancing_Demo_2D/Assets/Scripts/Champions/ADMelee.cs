@@ -63,7 +63,7 @@ public class ADMelee : BaseChampion
             "Dash forward and empower next attack",
             6f, // Cooldown in seconds
             30f, // Mana cost
-            300f  // Range
+            10f  // Range
         );
 
         ability2 = new Ability(
@@ -141,7 +141,7 @@ public class ADMelee : BaseChampion
         Vector3 directionToEnemy = (enemyChampion.transform.position - transform.position).normalized;
 
         // Get the player's movement direction
-        Vector3 movementDirection = (PN.targetPosition - transform.position).normalized;
+        Vector3 movementDirection = (PN.targetPositionNet.Value - transform.position).normalized;
 
         // Check if the player is moving towards the enemy
         float dotProduct = Vector3.Dot(directionToEnemy, movementDirection);
@@ -162,7 +162,7 @@ public class ADMelee : BaseChampion
     {
         if (!IsServer) return; // Only the server can execute this logic
     
-        if (ability1.cooldownTimer > 0)
+        if (ability1.isOnCooldown)
         {
             Debug.Log("Ability is on cooldown!");
             return;
@@ -173,17 +173,10 @@ public class ADMelee : BaseChampion
             return;
         }
 
-        // Calculate the dash direction
-        Vector2 dashDirection = (PN.mousePosition - transform.position).normalized; // Get the direction to the mouse position
-    
-        // Calculate the target position 3f away in the direction of the mouse
-        Vector2 targetPosition = (Vector2)transform.position + dashDirection * 3f;
-    
-
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, (17 + movementSpeed.Value) * Time.deltaTime);
+        float newMoveSpeed = movementSpeed.Value + 17f; // Increase movement speed by 1 unit
 
         // Set the cooldown timer for the ability
-        ability1.cooldownTimer = ability1.cooldown;
+        ability1.timeOfCast = Time.time; // Record the time when the ability was used
         mana.Value -= ability1.manaCost; // Deduct mana cost
         Debug.Log("Tumble ability used. Player dashed towards the target position.");
     
@@ -191,19 +184,9 @@ public class ADMelee : BaseChampion
         isEmpowered.Value = true;
         empowerStartTime.Value = Time.time; // Record the time when the ability was used
 
-
-        ability1.Update(); // Update the cooldown timer for ability 1
-
-    
+        PN.ChampionDashRpc(PN.mousePosition, ability1.range, newMoveSpeed); // Call the dash function on the player network object
 
         // Put messages up on screen if the ability is on cooldown or not enough mana??? Maybe
-
-        
-        // Empower next attack for 3.5 seconds
-        // Add countdown timer for that empower attack time limit --> Done in Base Champion Update
-        // Alter bullet prefab with a 'damage dealt' variable to be used in the bullet script that will be increased for the empowered dmg
-
-        
     }
 
     [Rpc(SendTo.Server)]
@@ -228,7 +211,7 @@ public class ADMelee : BaseChampion
     {
         if (!IsServer) return; // Only the owner can use this ability
         // Check if ability is off cooldown and if theres enough mana
-        if (ability3.cooldownTimer > 0)
+        if (ability3.isOnCooldown)
         {
             Debug.Log("Ability is on cooldown!");
             return;
@@ -239,7 +222,7 @@ public class ADMelee : BaseChampion
             return;
         }
 
-        ability3.cooldownTimer = ability3.cooldown;
+        ability3.timeOfCast = Time.time; // Record the time when the ability was used
         mana.Value -= ability3.manaCost; // Deduct mana cost
 
         ability3.Update(); // Update the cooldown timer for ability 1
