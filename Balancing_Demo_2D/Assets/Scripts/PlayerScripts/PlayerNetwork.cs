@@ -4,13 +4,14 @@ using System.Collections;
 using Unity.Netcode;
 public class PlayerNetwork : NetworkBehaviour
 {
-    public Vector3 mousePosition; // Mouse position in world space
+    public Vector2 mousePosition; // Mouse position in world space
     public Vector3 targetPosition; // Target position for the player to move towards
+
+    public NetworkVariable<Vector3> targetPositionNet = new NetworkVariable<Vector3>(); // Network variable for target position
 
     public Camera personalCamera;
 
     public BaseChampion champion; // Reference to the champion script
-
     private GameManager GM; // Reference to the GameManager
 
     void Start()
@@ -47,17 +48,10 @@ public class PlayerNetwork : NetworkBehaviour
 
         //Constantly update mouse position
         mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition); // Get the mouse position in world space
-        mousePosition.z = 0; // Set the z coordinate to 0
 
         checkInputs(); // Check for player inputs
 
-        if (transform.position != targetPosition){
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * champion.movementSpeed.Value); // Move the player towards the mouse position
-        }
-        else
-        {
-            champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // Set the linear velocity to 0 when the player reaches the target position
-        }
+        MovePlayer(); // Move the player towards the target position
 
     }
 
@@ -65,6 +59,7 @@ public class PlayerNetwork : NetworkBehaviour
         if (Input.GetMouseButton(1)) // Check if the right mouse button is pressed
         {
             //Debug.Log("Right mouse button clicked.");
+            RequestMoveRpc(mousePosition); // Call the RequestMoveRpc method to request movement on the server
             targetPosition.x = mousePosition.x; // Set the target position's x coordinate
             targetPosition.y = mousePosition.y; // Set the target position's y coordinate
             Vector3 direction = targetPosition - transform.position;
@@ -126,6 +121,26 @@ public class PlayerNetwork : NetworkBehaviour
         }
     }
 
+    private void MovePlayer(){
+        if (transform.position != targetPositionNet.Value) // Check if the player is not at the target position
+        {
+            transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * champion.movementSpeed.Value); // Move the player towards the mouse position
+        }
+        else
+        {
+            champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // Set the linear velocity to 0 when the player reaches the target position
+        }
+    }
+    
+    [Rpc(SendTo.Server)]
+    public void RequestMoveRpc(Vector2 targetPosition)
+    {
+        if (!IsServer) return; // Only the server can execute this logic
+
+        // Update the target position for the player
+        targetPositionNet.Value = targetPosition;
+    }
+    
     [Rpc(SendTo.Everyone)]
     public void UpdateRotationRpc(float angle)
     {
@@ -137,7 +152,7 @@ public class PlayerNetwork : NetworkBehaviour
     public void championDashRpc(float maxDistance, float newMoveSpeed)
     {
 
-        Vector2 dashDirection = (mousePosition - transform.position).normalized; // Calculate the dash direction
+        Vector2 dashDirection = (mousePosition - (Vector2)transform.position).normalized; // Calculate the dash direction
 
         float actualDashDistance = Vector2.Distance(transform.position, mousePosition); // Calculate the actual dash distance
 
