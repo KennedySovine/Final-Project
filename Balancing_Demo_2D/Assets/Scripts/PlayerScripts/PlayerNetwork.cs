@@ -225,33 +225,38 @@ public class PlayerNetwork : NetworkBehaviour
             }
 
             networkObject.SpawnWithOwnership(transform.parent.GetComponent<NetworkObject>().OwnerClientId);
-            bulletComponent.ADDamage = champion.critLogic();
             bulletComponent.targetPosition = targetPosition;
             bulletComponent.targetPlayer = enemyChampion;
             bulletComponent.speed = champion.missileSpeed.Value;
 
+            bullet = champion.critLogic(bullet); // Apply crit logic
+
             if (champion.isEmpowered.Value)
             {
-                champion.empowerLogic(bullet);
+                bullet = champion.empowerLogic(bullet);
                 champion.isEmpowered.Value = false;
             }
 
             if (champion.maxStacks.Value)
             {
-                champion.stackLogic(bullet);
+                bullet = champion.stackLogic(bullet);
                 champion.maxStacks.Value = false;
                 champion.stackCount.Value = 0; // Reset the stack value
             }
 
             if (champion.ability3Used.Value)
             {
-                champion.ability3Logic(bullet);
+                bullet = champion.ability3Logic(bullet);
                 champion.ability3Used.Value = false;
             }
 
             Debug.Log("Bullet spawned on the server.");
             Debug.Log("Auto-attack performed.");
-            StartCoroutine(waitForSec(0.1f)); // Wait for 0.1 seconds before firing another bullet
+             // Wait for 0.1 seconds before firing another bullet
+            if (rapidFire - 1 == i){StartCoroutine(waitForSec(0.1f));}
+            else{
+                rapidFire = 1;
+                } // Reset rapid fire at the end.
         }
     }
 

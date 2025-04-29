@@ -58,10 +58,29 @@ public class ADRange2 : BaseChampion
             maxStacks.Value = true; // Set the max stacks flag to true
             stackCount.Value = 4; // Reset the stack value
         }
+
+        // 1 stack expires after 1 second
+        if (stackCount.Value > 0){
+            if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
+            {
+                stackCount.Value -=; // Reset the stack count
+                stackStartTime.Value = Time.time; // Reset the stack start time
+            }
+        }
     }
 
     public override GameObject stackLogic(GameObject bullet)
     {
+        return bullet;
+    }
+
+    //Slow Logic
+    public override GameObject empowerLogic(GameObject bullet)
+    {
+        var bulletComponent = bullet.GetComponent<Bullet>();
+        if (bulletComponent != null){
+            bulletComponent.slowAmount = 0.2f; // Set the slow amount to 20%
+        }
         return bullet;
     }
 
@@ -85,7 +104,7 @@ public class ADRange2 : BaseChampion
 
         ability2 = new Ability(
             "Ranger's Focus",
-            "PASSIVE: While inactive, basic attacks generate a stack of Focus for 4 seconds, which refreshes on additional attacks and stacks up to 4, expriring after a second.",
+            "PASSIVE: Basic attacks generate a stack of Focus for 4 seconds, which refreshes on additional attacks and stacks up to 4, expriring after a second.",
             0f, // Cooldown in seconds
             0f, // Mana cost
             0f // No range
@@ -104,11 +123,17 @@ public class ADRange2 : BaseChampion
 
     }
 
-    public void passiveStats(){
+    [Rpc(SendTo.Server)]
+    public override void passiveAbilityRpc(){
         // Add a slow thing in base champion.
         // Frost = 20% slow for 2 seconds
         // Additional frost damage = 155% of crit chance as AD damage
         
+    }
+
+    public override GameObject critLogic(GameObject bullet){
+        // CRIT DOES FROST AND DOES NOT DO DMG
+        return bullet;
     }
 
     [Rpc(SendTo.Server)]
@@ -143,6 +168,19 @@ public class ADRange2 : BaseChampion
     public void UseAbility3Rpc(){
         // Check mana and cooldown
         // Crit frost and deal 20 + 100% AD damage
+        if (!IsServer) return; // Ensure this is only executed on the server
+        if (ability3.isOnCooldown)
+        {
+            Debug.Log("Ability is on cooldown!");
+            return;
+        }
+        else if (mana.Value < ability3.manaCost)
+        {
+            Debug.Log("Not enough mana!");
+            return;
+        }
+        ability3.timeOfCast = Time.time; // Record the time when the ability was used
+        mana.Value -= ability3.manaCost; // Deduct mana cost
     }
 
     private IEnumerator RapidFireCoroutine(float duration)
@@ -152,7 +190,7 @@ public class ADRange2 : BaseChampion
         Debug.Log("Rapid Fire ended!");
 
         // Reset rapid fire state
-        rapidFire.Value = 0;
+        rapidFire.Value = 1;
         Debug.Log("Rapid Fire state reset.");
     }
 }

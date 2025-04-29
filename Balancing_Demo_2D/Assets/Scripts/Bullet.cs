@@ -12,6 +12,7 @@ public class Bullet : NetworkBehaviour
 
     public float armorPenetration = 0f; // Armor penetration value
     public float magicPenetration = 0f; // Magic penetration value
+    public float slowAmount = 0f; // Slow amount value
     public Vector3 targetPosition; 
     public float range = 0f; // Range of the bullet
     public ulong ownerId = 3;
@@ -60,9 +61,15 @@ public class Bullet : NetworkBehaviour
             if (champion != null)
             {
                 // NO CODE FOR SELF DAMAGE NEEDED
+                // Apply slow effect to the target player if applicable
+                if (slowAmount != 0f){
+                    champion.ApplySlow(slowAmount, 2f); // Apply slow for 1 second
+                }
 
                 champion.TakeDamage(ADDamage, APDamage, empoweredDamageBasedOnTargetHP);
                 Destroy(gameObject);
+
+                
             }
         }
     }
