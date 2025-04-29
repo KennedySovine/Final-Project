@@ -4,20 +4,21 @@ using Unity.Netcode;
 public class Bullet : NetworkBehaviour
 {
     private GameManager GM; // Reference to the GameManager
+    public Vector3 targetPosition; 
+    public GameObject targetPlayer = null; // Reference to the target player object
+    public GameObject owner; // Reference to the owner of the bullet
+
+    [Header("Bullet Settings")]
 
     public float ADDamage = 0f;
     public float APDamage = 0f;
-    public float empoweredDamageBasedOnTargetHP = 0f; // Damage based on target's HP
-
+    public float speed = 0f; // Speed of the bullet
     public float armorPenetration = 0f; // Armor penetration value
     public float magicPenetration = 0f; // Magic penetration value
-    public Vector3 targetPosition; 
+    public float slowAmount = 0f; // Slow amount value
     public float range = 0f; // Range of the bullet
-    public ulong ownerId = 3;
-
     public bool isAutoAttack = false; // Flag to indicate if it's an auto attack
-    public GameObject targetPlayer = null; // Reference to the target player object
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
         
@@ -26,7 +27,7 @@ public class Bullet : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-    if (!IsServer) return;
+        if (!IsServer) return;
 
         // Ensure the bullet has a valid target
         if (targetPlayer == null)
@@ -37,14 +38,7 @@ public class Bullet : NetworkBehaviour
 
         // Move the bullet towards the target's current position
         Vector3 targetPosition = targetPlayer.transform.position;
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, 10f * Time.deltaTime);
-
-        /*if (empoweredDamageBasedOnTargetHP != 0f){
-            // Calculate the damage based on the target's current HP
-            float targetHP = targetPlayer.GetComponent<BaseChampion>().maxHealth.Value;
-            empoweredDamageBasedOnTargetHP = targetHP * empoweredDamageBasedOnTargetHP; // Example: 10% of target's current HP as damage
-        }*/
-
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -56,11 +50,22 @@ public class Bullet : NetworkBehaviour
         {
             Debug.Log("Bullet hit the target player: " + targetPlayer.name);
             var champion = collision.GetComponent<BaseChampion>();
+            var hasFrost = false;
+            if (champion.slowAmount.Value != 0f) { hasFrost = true; }; // Check if the champion has a slow effect
             if (champion != null)
             {
                 // NO CODE FOR SELF DAMAGE NEEDED
+                // Apply slow effect to the target player if applicable
+                if (slowAmount != 0f){
+                    champion.applySlow(slowAmount, 2f);
+                    champion.slowStartTime.Value = Time.time; // Set the slow start time
+                    // Extra dmg for frost
+                    if (hasFrost){
+                        champion.TakeDamage(ADDamage + (owner.GetComponent<BaseChampion>().critChance.Value * 0.75f), APDamage); // Apply damage with crit chance (ASHE)
+                    }
+                }
 
-                champion.TakeDamage(ADDamage, APDamage, empoweredDamageBasedOnTargetHP);
+                champion.TakeDamage(ADDamage, APDamage);
                 Destroy(gameObject);
             }
         }

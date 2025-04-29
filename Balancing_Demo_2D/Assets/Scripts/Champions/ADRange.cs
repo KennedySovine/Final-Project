@@ -37,6 +37,7 @@ public class ADMelee : BaseChampion
         autoAttack.setRange(18f); // Set the range of the auto attack ability
         health.Value = maxHealth.Value; // Initialize health to max health
         mana.Value = maxMana.Value; // Initialize mana to max mana
+        missileSpeed.Value = 33f;
     }
 
     public override void Update(){
@@ -45,6 +46,13 @@ public class ADMelee : BaseChampion
         if (stackCount.Value >= 3){
             maxStacks.Value = true; // Set the max stacks flag to true
             stackCount.Value = 3; // Reset the stack value
+        }
+
+        if (stackCount.Value > 0){
+            if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
+            {
+                stackCount.Value = 0; // Reset the stack count
+            }
         }
     }
 
@@ -224,8 +232,6 @@ public class ADMelee : BaseChampion
 
         ability3.timeOfCast = Time.time; // Record the time when the ability was used
         mana.Value -= ability3.manaCost; // Deduct mana cost
-
-        ability3.Update(); // Update the cooldown timer for ability 1
 
         ability3Used.Value = true; // Set the ability used flag to true
         // Modify the bullet prefab to deal extra physical damage

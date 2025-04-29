@@ -21,9 +21,12 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> critDamage = new NetworkVariable<float>(1.75f); // 175% damage on crit
     public NetworkVariable<float> armorPen = new NetworkVariable<float>(0f);
     public NetworkVariable<float> magicPen = new NetworkVariable<float>(0f);
-    public NetworkVariable<float> attackRange = new NetworkVariable<float>(100f); // Health percentage for abilities
+    public NetworkVariable<float> missileSpeed = new NetworkVariable<float>(33f); // Health percentage for abilities
 
     public NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>(Vector3.zero);
+    public NetworkVariable<float> slowAmount = new NetworkVariable<float>(0f); // Slow amount for abilities
+    public NetworkVariable<float> slowDuration = new NetworkVariable<float>(0f); // Duration for the slow effect
+    public NetworkVariable<float> slowStartTime = new NetworkVariable<float>(0f); // Time when the slow effect started
 
     [Header("Champion Ability Modifiers")]
     public NetworkVariable<bool> isEmpowered = new NetworkVariable<bool>(false); // Flag to check if the next attack is empowered
@@ -34,6 +37,7 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> stackDuration = new NetworkVariable<float>(3.5f); // Duration for the stacks to last
     public NetworkVariable<bool> maxStacks = new NetworkVariable<bool>(false); // Flag to check if max stacks are reached
     public NetworkVariable<bool> ability3Used = new NetworkVariable<bool>(false); // Flag to check if ability 3 has been used
+    public NetworkVariable<int> rapidFire = new NetworkVariable<int>(1);
 
     [Header("Champion Resources")]
     public NetworkVariable<float> health = new NetworkVariable<float>(600f);
@@ -49,7 +53,6 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> lastAutoAttackTime = new NetworkVariable<float>(0f); // Time of the last auto-attack
 
     [Header("Champion Settings")]
-    public int attackConsecutiveAD = 0; // Number of consecutive attacks against oneself
     public float regenTimer = 0f;
 
     public GameObject enemyChampion; // Reference to the enemy champion prefab
@@ -60,7 +63,7 @@ public class BaseChampion : NetworkBehaviour
 
     public void Start()
     {
-
+        rapidFire.Value = 1; // Initialize rapid fire value
     }
 
     [Rpc(SendTo.Server)]
@@ -90,18 +93,18 @@ public class BaseChampion : NetworkBehaviour
 
 
         //Timer for stacks
-        if (stackCount.Value > 0){
-            if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
-            {
-                stackCount.Value = 0; // Reset the stack count
-            }
-        }
 
         if (isEmpowered.Value){
             if (Time.time > empowerStartTime.Value + empowerDuration.Value)
             {
                 isEmpowered.Value = false;
             }
+        }
+
+        if (slowAmount.Value > 0f && (Time.time > slowStartTime.Value + slowDuration.Value)) // If the slow timer is up
+        {
+            slowAmount.Value = 0f; // Reset the slow amount
+            slowStartTime.Value = 0f; // Reset the slow start time
         }
 
     }
@@ -127,23 +130,25 @@ public class BaseChampion : NetworkBehaviour
         }
     }
 
-    public float critLogic(){
+    public virtual GameObject critLogic(GameObject bullet){
         float chance = Random.Range(0f, 1f);
+        var bulletComponent = bullet.GetComponent<Bullet>();
         if (chance <= critChance.Value) // If the random chance is less than or equal to critChance
         {
             Debug.Log("Critical hit! Damage multiplied by " + critDamage.Value);
-            return AD.Value * critDamage.Value; // Return the critical damage
+            bulletComponent.ADDamage = AD.Value * critDamage.Value; // Multiply the damage by critDamage
         }
         else
         {
             Debug.Log("Normal hit. No critical damage.");
-            return AD.Value; // Return normal damage
         }
+
+        return bullet;
 
     }
 
     //Also will track consecutive attacks based if the dmg type is AD or AP
-    public void TakeDamage(float AD, float AP, float targetHPDmg){
+    public void TakeDamage(float AD, float AP){
         if (IsServer)
         {
             // Calculate damage based on armor and magic resist
@@ -153,10 +158,6 @@ public class BaseChampion : NetworkBehaviour
             }
             if (AP > 0){
                 damage += AP / (1 + (magicResist.Value / 100)); // Magic damage calculation
-            }
-            //Extra dmg based on max hp
-            if (targetHPDmg > 0){
-                damage += targetHPDmg; // Extra damage based on target's max health
             }
             
 
@@ -168,6 +169,14 @@ public class BaseChampion : NetworkBehaviour
                 //Die(); // Call the die function if health is 0 or less
             }
         }
+    }
+
+    public void applySlow(float slowAmount, float duration)
+    {
+        if (!IsServer) return; // Only the server should apply the slow
+        this.slowAmount.Value = slowAmount; // Set the slow amount
+        slowDuration.Value = duration; // Set the slow duration
+        slowStartTime.Value = Time.time; // Set the start time for the slow effect
     }
     public void updateMaxHealth(float healthChange)
     {
