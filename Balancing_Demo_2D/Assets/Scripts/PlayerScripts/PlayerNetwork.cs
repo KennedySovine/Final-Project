@@ -219,6 +219,12 @@ public class PlayerNetwork : NetworkBehaviour
         for (int i = 0; i < rapidFire; i++)
         {
             GameObject bullet = Instantiate(champion.bulletPrefab, transform.position, Quaternion.identity, transform);
+            Debug.Log("Bullet instantiated.");
+            if (bullet == null)
+            {
+                Debug.LogError("Bullet prefab is null. Cannot instantiate.");
+                yield break; // Exit the coroutine if the bullet prefab is null
+            }
             bullet.SetActive(true);
             var networkObject = bullet.GetComponent<NetworkObject>();
             var bulletComponent = bullet.GetComponent<Bullet>();
