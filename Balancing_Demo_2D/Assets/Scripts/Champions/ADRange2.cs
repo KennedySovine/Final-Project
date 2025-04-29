@@ -129,14 +129,14 @@ public class ADRange2 : BaseChampion
         mana.Value -= ability1.manaCost; // Deduct the mana cost
         maxStacks.Value = false; // Reset the max stacks flag
         stackCount.Value = 0; // Reset the stack count
-
     }
 
     [Rpc(SendTo.Server)]
     public void UseAbility2Rpc(){
         // Generate focus stacks 
         // Look at ADRange for code
-        
+        if (!IsServer) return; // Ensure this is only executed on the server
+        Debug.Log("Ability is a passive. No active code to run.");
     }
 
     [Rpc(SendTo.Server)]

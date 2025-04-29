@@ -210,48 +210,53 @@ public class PlayerNetwork : NetworkBehaviour
             return;
         }
         
-
-        GameObject bullet = Instantiate(champion.bulletPrefab, transform.position, Quaternion.identity, transform);
-        bullet.SetActive(true);
-        var networkObject = bullet.GetComponent<NetworkObject>();
-        var bulletComponent = bullet.GetComponent<Bullet>();
-
-        if (networkObject == null || bulletComponent == null)
+        for (int i = 0; i < rapidFire; i++)
         {
-            Debug.LogError("Bullet prefab is missing required components.");
-            Destroy(bullet);
-            return;
+            GameObject bullet = Instantiate(champion.bulletPrefab, transform.position, Quaternion.identity, transform);
+            bullet.SetActive(true);
+            var networkObject = bullet.GetComponent<NetworkObject>();
+            var bulletComponent = bullet.GetComponent<Bullet>();
+
+            if (networkObject == null || bulletComponent == null)
+            {
+                Debug.LogError("Bullet prefab is missing required components.");
+                Destroy(bullet);
+                return;
+            }
+
+            networkObject.SpawnWithOwnership(transform.parent.GetComponent<NetworkObject>().OwnerClientId);
+            bulletComponent.ADDamage = champion.critLogic();
+            bulletComponent.targetPosition = targetPosition;
+            bulletComponent.targetPlayer = enemyChampion;
+            bulletComponent.speed = champion.missileSpeed.Value;
+
+            if (champion.isEmpowered.Value)
+            {
+                champion.empowerLogic(bullet);
+                champion.isEmpowered.Value = false;
+            }
+
+            if (champion.maxStacks.Value)
+            {
+                champion.stackLogic(bullet);
+                champion.maxStacks.Value = false;
+                champion.stackCount.Value = 0; // Reset the stack value
+            }
+
+            if (champion.ability3Used.Value)
+            {
+                champion.ability3Logic(bullet);
+                champion.ability3Used.Value = false;
+            }
+
+            Debug.Log("Bullet spawned on the server.");
+            Debug.Log("Auto-attack performed.");
+            StartCoroutine(waitForSec(0.1f)); // Wait for 0.1 seconds before firing another bullet
         }
+    }
 
-        networkObject.SpawnWithOwnership(transform.parent.GetComponent<NetworkObject>().OwnerClientId);
-        bulletComponent.ADDamage = champion.critLogic();
-        bulletComponent.targetPosition = targetPosition;
-        bulletComponent.targetPlayer = enemyChampion;
-        bulletComponent.speed = champion.missileSpeed.Value;
-
-        if (champion.isEmpowered.Value)
-        {
-            champion.empowerLogic(bullet);
-            champion.isEmpowered.Value = false;
-        }
-
-        if (champion.maxStacks.Value)
-        {
-            champion.stackLogic(bullet);
-            champion.maxStacks.Value = false;
-        }
-
-        if (champion.ability3Used.Value)
-        {
-            champion.ability3Logic(bullet);
-            champion.ability3Used.Value = false;
-        }
-
-        Debug.Log("Bullet spawned on the server.");
-        Debug.Log("Auto-attack performed.");
-
-        if (rapidFire != 0){ //RECURSION
-            PerformAutoAttackRpc(targetPosition, targetNetworkObjectId, rapidFire - 1); // Recursive call for rapid fire
-        }
+    private IEnumerator waitForSec(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
     }
 }
