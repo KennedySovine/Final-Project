@@ -158,7 +158,7 @@ public class ADRange2 : BaseChampion
     }
 
     [Rpc(SendTo.Server)]
-    public void UseAbility1Rpc(){
+    public override void UseAbility1Rpc(){
         // Time delta time to count to 6 seconds or do a coroutine? Maybe?
         // 25 attack speed for 6 seconds
         // Fire 5 arrows rapidly, each doing 21 AD damage
@@ -178,7 +178,7 @@ public class ADRange2 : BaseChampion
     }
 
     [Rpc(SendTo.Server)]
-    public void UseAbility2Rpc(){
+    public override void UseAbility2Rpc(){
         // Generate focus stacks 
         // Look at ADRange for code
         if (!IsServer) return; // Ensure this is only executed on the server
@@ -186,7 +186,7 @@ public class ADRange2 : BaseChampion
     }
 
     [Rpc(SendTo.Server)]
-    public void UseAbility3Rpc(){
+    public override void UseAbility3Rpc(){
         // Check mana and cooldown
         // Crit frost and deal 20 + 100% AD damage
         if (!IsServer) return; // Ensure this is only executed on the server

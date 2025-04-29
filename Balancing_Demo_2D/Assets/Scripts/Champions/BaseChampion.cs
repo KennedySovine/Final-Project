@@ -53,7 +53,6 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> lastAutoAttackTime = new NetworkVariable<float>(0f); // Time of the last auto-attack
 
     [Header("Champion Settings")]
-    public int attackConsecutiveAD = 0; // Number of consecutive attacks against oneself
     public float regenTimer = 0f;
 
     public GameObject enemyChampion; // Reference to the enemy champion prefab

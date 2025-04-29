@@ -106,7 +106,6 @@ public class PlayerNetwork : NetworkBehaviour
                 champion.stackStartTime.Value = Time.time;
             }
 
-            champion.lastAutoAttackTime.Value = Time.time;
             PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value); // Call the auto-attack function on the server
         }
         else
@@ -207,9 +206,16 @@ public class PlayerNetwork : NetworkBehaviour
         if (Time.time < champion.lastAutoAttackTime.Value + (1f / champion.attackSpeed.Value))
         {
             Debug.Log("Auto-attack is on cooldown!");
+            Debug.Log($"Time: {Time.time}, Last Auto Attack Time: {champion.lastAutoAttackTime.Value}, Attack Speed: {champion.attackSpeed.Value}");
             return;
         }
-        
+
+        StartCoroutine(PerformAutoAttackCoroutine(targetPosition, enemyChampion, rapidFire));
+        Debug.Log("Auto-attack performed on the server.");
+    }
+
+    private IEnumerator PerformAutoAttackCoroutine(Vector3 targetPosition, GameObject enemyChampion, int rapidFire)
+    {
         for (int i = 0; i < rapidFire; i++)
         {
             GameObject bullet = Instantiate(champion.bulletPrefab, transform.position, Quaternion.identity, transform);
@@ -221,7 +227,7 @@ public class PlayerNetwork : NetworkBehaviour
             {
                 Debug.LogError("Bullet prefab is missing required components.");
                 Destroy(bullet);
-                return;
+                yield break; // Exit the coroutine if the bullet is invalid
             }
 
             networkObject.SpawnWithOwnership(transform.parent.GetComponent<NetworkObject>().OwnerClientId);
@@ -253,12 +259,17 @@ public class PlayerNetwork : NetworkBehaviour
 
             Debug.Log("Bullet spawned on the server.");
             Debug.Log("Auto-attack performed.");
-             // Wait for 0.1 seconds before firing another bullet
-            if (rapidFire - 1 == i){StartCoroutine(waitForSec(0.1f));}
-            else{
-                rapidFire = 1;
-                } // Reset rapid fire at the end.
+
+            // Update the last auto-attack time after firing each bullet
+            
+
+            // Wait for 0.1 seconds before firing the next bullet
+            yield return new WaitForSeconds(0.1f);
         }
+
+        // Reset rapid fire after all bullets are fired
+        champion.lastAutoAttackTime.Value = Time.time; // Update the last auto-attack time
+        rapidFire = 1;
     }
 
     private IEnumerator waitForSec(float seconds)

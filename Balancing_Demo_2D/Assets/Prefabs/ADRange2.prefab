@@ -10,12 +10,12 @@ GameObject:
   m_Component:
   - component: {fileID: 5529780649511139312}
   - component: {fileID: 7283584346613323515}
+  - component: {fileID: 2750187209312509762}
   - component: {fileID: 479571641050879420}
   - component: {fileID: 5221310434119250730}
   - component: {fileID: 1182713526884703607}
   - component: {fileID: 752664424059945664}
   - component: {fileID: 1340520847739071468}
-  - component: {fileID: 2750187209312509762}
   m_Layer: 0
   m_Name: PlayerController
   m_TagString: Untagged
@@ -93,6 +93,130 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2750187209312509762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3316088473501965052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e24e810e024ee3648b278cd849e1e76e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  championType: 
+  maxHealth:
+    m_InternalValue: 600
+  healthRegen:
+    m_InternalValue: 5
+  AD:
+    m_InternalValue: 60
+  AP:
+    m_InternalValue: 0
+  armor:
+    m_InternalValue: 25
+  magicResist:
+    m_InternalValue: 30
+  attackSpeed:
+    m_InternalValue: 0.65
+  movementSpeed:
+    m_InternalValue: 10
+  maxMana:
+    m_InternalValue: 300
+  manaRegen:
+    m_InternalValue: 7
+  abilityHaste:
+    m_InternalValue: 0
+  critChance:
+    m_InternalValue: 0
+  critDamage:
+    m_InternalValue: 1.75
+  armorPen:
+    m_InternalValue: 0
+  magicPen:
+    m_InternalValue: 0
+  missileSpeed:
+    m_InternalValue: 66.7
+  currentPosition:
+    m_InternalValue: {x: 0, y: 0, z: 0}
+  slowAmount:
+    m_InternalValue: 0
+  slowDuration:
+    m_InternalValue: 0
+  slowStartTime:
+    m_InternalValue: 0
+  isEmpowered:
+    m_InternalValue: 0
+  empowerStartTime:
+    m_InternalValue: 0
+  empowerDuration:
+    m_InternalValue: 3.5
+  stackCount:
+    m_InternalValue: 0
+  stackStartTime:
+    m_InternalValue: 0
+  stackDuration:
+    m_InternalValue: 3.5
+  maxStacks:
+    m_InternalValue: 0
+  ability3Used:
+    m_InternalValue: 0
+  rapidFire:
+    m_InternalValue: 0
+  health:
+    m_InternalValue: 600
+  mana:
+    m_InternalValue: 300
+  autoAttack:
+    name: Auto Attack
+    description: Basic attack
+    cooldown: 0
+    manaCost: 0
+    range: 5
+    duration: 0
+    timeOfCast: 0
+  passive:
+    name: 
+    description: 
+    cooldown: 0
+    manaCost: 0
+    range: 0
+    duration: 0
+    timeOfCast: 0
+  ability1:
+    name: 
+    description: 
+    cooldown: 0
+    manaCost: 0
+    range: 0
+    duration: 0
+    timeOfCast: 0
+  ability2:
+    name: 
+    description: 
+    cooldown: 0
+    manaCost: 0
+    range: 0
+    duration: 0
+    timeOfCast: 0
+  ability3:
+    name: 
+    description: 
+    cooldown: 0
+    manaCost: 0
+    range: 0
+    duration: 0
+    timeOfCast: 0
+  lastAutoAttackTime:
+    m_InternalValue: 0
+  attackConsecutiveAD: 0
+  regenTimer: 0
+  enemyChampion: {fileID: 0}
+  bulletPrefab: {fileID: 2169341123581716514, guid: 66c025e1f784eb2478380fa1d8dd1de2, type: 3}
+  PN: {fileID: 479571641050879420}
+  attackStacks: 0
 --- !u!114 &479571641050879420
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -250,122 +374,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &2750187209312509762
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3316088473501965052}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e24e810e024ee3648b278cd849e1e76e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  championType: 
-  maxHealth:
-    m_InternalValue: 600
-  healthRegen:
-    m_InternalValue: 5
-  AD:
-    m_InternalValue: 60
-  AP:
-    m_InternalValue: 0
-  armor:
-    m_InternalValue: 25
-  magicResist:
-    m_InternalValue: 30
-  attackSpeed:
-    m_InternalValue: 0.65
-  movementSpeed:
-    m_InternalValue: 10
-  maxMana:
-    m_InternalValue: 300
-  manaRegen:
-    m_InternalValue: 7
-  abilityHaste:
-    m_InternalValue: 0
-  critChance:
-    m_InternalValue: 0
-  critDamage:
-    m_InternalValue: 1.75
-  armorPen:
-    m_InternalValue: 0
-  magicPen:
-    m_InternalValue: 0
-  missileSpeed:
-    m_InternalValue: 66.7
-  currentPosition:
-    m_InternalValue: {x: 0, y: 0, z: 0}
-  isEmpowered:
-    m_InternalValue: 0
-  empowerStartTime:
-    m_InternalValue: 0
-  empowerDuration:
-    m_InternalValue: 3.5
-  stackCount:
-    m_InternalValue: 0
-  stackStartTime:
-    m_InternalValue: 0
-  stackDuration:
-    m_InternalValue: 3.5
-  maxStacks:
-    m_InternalValue: 0
-  ability3Used:
-    m_InternalValue: 0
-  health:
-    m_InternalValue: 600
-  mana:
-    m_InternalValue: 300
-  autoAttack:
-    name: Auto Attack
-    description: Basic attack
-    cooldown: 0
-    manaCost: 0
-    range: 5
-    duration: 0
-    timeOfCast: 0
-  passive:
-    name: 
-    description: 
-    cooldown: 0
-    manaCost: 0
-    range: 0
-    duration: 0
-    timeOfCast: 0
-  ability1:
-    name: 
-    description: 
-    cooldown: 0
-    manaCost: 0
-    range: 0
-    duration: 0
-    timeOfCast: 0
-  ability2:
-    name: 
-    description: 
-    cooldown: 0
-    manaCost: 0
-    range: 0
-    duration: 0
-    timeOfCast: 0
-  ability3:
-    name: 
-    description: 
-    cooldown: 0
-    manaCost: 0
-    range: 0
-    duration: 0
-    timeOfCast: 0
-  lastAutoAttackTime:
-    m_InternalValue: 0
-  attackConsecutiveAD: 0
-  regenTimer: 0
-  enemyChampion: {fileID: 0}
-  bulletPrefab: {fileID: 0}
-  PN: {fileID: 0}
-  attackStacks: 0
 --- !u!1 &4431904003385403123
 GameObject:
   m_ObjectHideFlags: 0
