@@ -107,7 +107,7 @@ public class PlayerNetwork : NetworkBehaviour
             }
 
             champion.lastAutoAttackTime.Value = Time.time;
-            PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId);
+            PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value); // Call the auto-attack function on the server
         }
         else
         {
@@ -180,7 +180,7 @@ public class PlayerNetwork : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server)]
-    public void PerformAutoAttackRpc(Vector3 targetPosition, ulong targetNetworkObjectId)
+    public void PerformAutoAttackRpc(Vector3 targetPosition, ulong targetNetworkObjectId, int rapidFire)
     {
         if (!IsServer) return;
 
@@ -209,6 +209,7 @@ public class PlayerNetwork : NetworkBehaviour
             Debug.Log("Auto-attack is on cooldown!");
             return;
         }
+        
 
         GameObject bullet = Instantiate(champion.bulletPrefab, transform.position, Quaternion.identity, transform);
         bullet.SetActive(true);
@@ -248,5 +249,9 @@ public class PlayerNetwork : NetworkBehaviour
 
         Debug.Log("Bullet spawned on the server.");
         Debug.Log("Auto-attack performed.");
+
+        if (rapidFire != 0){ //RECURSION
+            PerformAutoAttackRpc(targetPosition, targetNetworkObjectId, rapidFire - 1); // Recursive call for rapid fire
+        }
     }
 }

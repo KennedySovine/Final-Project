@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Netcode;
+using Unity.Collections;
 
 public class ADRange2 : BaseChampion
 {
@@ -14,9 +15,11 @@ public class ADRange2 : BaseChampion
         AddAbilities();
         health.Value = maxHealth.Value; // Initialize health to max health
         mana.Value = maxMana.Value; // Initialize mana to max mana
+
+
     }
 
-    //Based on Gwen from LOL
+    //Based on Ashe from LOL
     private void UpdateStats()
     {
         if (!IsServer){
@@ -24,7 +27,7 @@ public class ADRange2 : BaseChampion
             return;
         }
         
-        championType = "AP Range";
+        championType = "AD Range";
         maxHealth.Value = 610f;
         healthRegen.Value = 0.7f;
         AD.Value = 59f;
@@ -43,6 +46,23 @@ public class ADRange2 : BaseChampion
         health.Value = maxHealth.Value; // Initialize health to max health
         mana.Value = maxMana.Value; // Initialize mana to max mana
 
+        //Other stuff
+        stackDuration.Value = 4f;
+
+    }
+
+    public override void Update(){
+        base.Update(); // Call the base class Update method
+
+        if (stackCount.Value >= 4){
+            maxStacks.Value = true; // Set the max stacks flag to true
+            stackCount.Value = 4; // Reset the stack value
+        }
+    }
+
+    public override GameObject stackLogic(GameObject bullet)
+    {
+        return bullet;
     }
 
     private void AddAbilities()
@@ -80,6 +100,8 @@ public class ADRange2 : BaseChampion
             0f // Range
         );
 
+        ability1.setDuration(6f);
+
     }
 
     public void passiveStats(){
@@ -97,6 +119,17 @@ public class ADRange2 : BaseChampion
         // Check for stacks of focus and if they are present, consume them
         // Check for mana
 
+        if (!IsServer) return; // Ensure this is only executed on the server
+        if (mana.Value < ability1.manaCost && maxStacks.Value == false) return; // Check if enough mana and stacks are present
+        
+        float startTime = Time.time; // Get the start time of the ability
+        rapidFire.Value = 5; // Fire 5 arrows every auto
+        StartCoroutine(RapidFireCoroutine(ability1.duration)); // Start the rapid fire coroutine
+
+        mana.Value -= ability1.manaCost; // Deduct the mana cost
+        maxStacks.Value = false; // Reset the max stacks flag
+        stackCount.Value = 0; // Reset the stack count
+
     }
 
     [Rpc(SendTo.Server)]
@@ -111,5 +144,15 @@ public class ADRange2 : BaseChampion
         // Check mana and cooldown
         // Crit frost and deal 20 + 100% AD damage
     }
-}
 
+    private IEnumerator RapidFireCoroutine(float duration)
+    {
+        Debug.Log("Rapid Fire started!");
+        yield return new WaitForSeconds(duration); // Wait for the specified duration
+        Debug.Log("Rapid Fire ended!");
+
+        // Reset rapid fire state
+        rapidFire.Value = 0;
+        Debug.Log("Rapid Fire state reset.");
+    }
+}

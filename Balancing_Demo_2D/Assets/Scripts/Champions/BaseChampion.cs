@@ -24,6 +24,7 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> missileSpeed = new NetworkVariable<float>(66.7f); // Health percentage for abilities
 
     public NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>(Vector3.zero);
+    public NetworkVariable<float> slowAmount = new NetworkVariable<float>(0f); // Slow amount for abilities
 
     [Header("Champion Ability Modifiers")]
     public NetworkVariable<bool> isEmpowered = new NetworkVariable<bool>(false); // Flag to check if the next attack is empowered
@@ -34,6 +35,7 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> stackDuration = new NetworkVariable<float>(3.5f); // Duration for the stacks to last
     public NetworkVariable<bool> maxStacks = new NetworkVariable<bool>(false); // Flag to check if max stacks are reached
     public NetworkVariable<bool> ability3Used = new NetworkVariable<bool>(false); // Flag to check if ability 3 has been used
+    public NetworkVariable<int> rapidFire = new NetworkVariable<int>(0); // Flag to check if ability 3 has been used on an enemy
 
     [Header("Champion Resources")]
     public NetworkVariable<float> health = new NetworkVariable<float>(600f);
