@@ -8,6 +8,7 @@ public class Bullet : NetworkBehaviour
     public float ADDamage = 0f;
     public float APDamage = 0f;
     public float empoweredDamageBasedOnTargetHP = 0f; // Damage based on target's HP
+    public float speed = 0f; // Speed of the bullet
 
     public float armorPenetration = 0f; // Armor penetration value
     public float magicPenetration = 0f; // Magic penetration value
@@ -37,7 +38,7 @@ public class Bullet : NetworkBehaviour
 
         // Move the bullet towards the target's current position
         Vector3 targetPosition = targetPlayer.transform.position;
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, 10f * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
 
         /*if (empoweredDamageBasedOnTargetHP != 0f){
             // Calculate the damage based on the target's current HP

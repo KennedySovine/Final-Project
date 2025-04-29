@@ -226,6 +226,7 @@ public class PlayerNetwork : NetworkBehaviour
         bulletComponent.ADDamage = champion.critLogic();
         bulletComponent.targetPosition = targetPosition;
         bulletComponent.targetPlayer = enemyChampion;
+        bulletComponent.speed = champion.missileSpeed.Value;
 
         if (champion.isEmpowered.Value)
         {

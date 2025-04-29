@@ -21,7 +21,7 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<float> critDamage = new NetworkVariable<float>(1.75f); // 175% damage on crit
     public NetworkVariable<float> armorPen = new NetworkVariable<float>(0f);
     public NetworkVariable<float> magicPen = new NetworkVariable<float>(0f);
-    public NetworkVariable<float> attackRange = new NetworkVariable<float>(100f); // Health percentage for abilities
+    public NetworkVariable<float> missileSpeed = new NetworkVariable<float>(66.7f); // Health percentage for abilities
 
     public NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>(Vector3.zero);
 
