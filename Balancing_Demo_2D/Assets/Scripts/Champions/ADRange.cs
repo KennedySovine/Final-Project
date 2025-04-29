@@ -19,7 +19,7 @@ public class ADMelee : BaseChampion
             return;
         }
 
-        championType = "AD Melee";
+        championType = "AD Range";
         maxHealth.Value = 550f;
         healthRegen.Value = 0.7f;
         AD.Value = 60f;
@@ -27,7 +27,7 @@ public class ADMelee : BaseChampion
         armor.Value = 23f;
         magicResist.Value = 30f;
         attackSpeed.Value = 0.685f;
-        movementSpeed.Value = 11f;
+        movementSpeed.Value = 11f; // Look at Base Champ for calculation
         maxMana.Value = 232f;
         manaRegen.Value = 8f;
         abilityHaste.Value = 0f;
