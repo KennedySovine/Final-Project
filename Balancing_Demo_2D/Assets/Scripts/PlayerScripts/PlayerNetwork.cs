@@ -228,6 +228,7 @@ public class PlayerNetwork : NetworkBehaviour
             bulletComponent.targetPosition = targetPosition;
             bulletComponent.targetPlayer = enemyChampion;
             bulletComponent.speed = champion.missileSpeed.Value;
+            bulletComponent.owner = transform.parent.gameObject; // Set the owner of the bullet
 
             bullet = champion.critLogic(bullet); // Apply crit logic
 

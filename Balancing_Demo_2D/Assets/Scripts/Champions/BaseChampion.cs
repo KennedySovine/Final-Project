@@ -149,7 +149,7 @@ public class BaseChampion : NetworkBehaviour
     }
 
     //Also will track consecutive attacks based if the dmg type is AD or AP
-    public void TakeDamage(float AD, float AP, float targetHPDmg){
+    public void TakeDamage(float AD, float AP){
         if (IsServer)
         {
             // Calculate damage based on armor and magic resist
@@ -159,10 +159,6 @@ public class BaseChampion : NetworkBehaviour
             }
             if (AP > 0){
                 damage += AP / (1 + (magicResist.Value / 100)); // Magic damage calculation
-            }
-            //Extra dmg based on max hp
-            if (targetHPDmg > 0){
-                damage += targetHPDmg; // Extra damage based on target's max health
             }
             
 

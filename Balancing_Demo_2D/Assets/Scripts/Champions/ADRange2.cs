@@ -15,8 +15,6 @@ public class ADRange2 : BaseChampion
         AddAbilities();
         health.Value = maxHealth.Value; // Initialize health to max health
         mana.Value = maxMana.Value; // Initialize mana to max mana
-
-
     }
 
     //Based on Ashe from LOL
@@ -42,7 +40,7 @@ public class ADRange2 : BaseChampion
         critChance.Value = 0f;
         critDamage.Value = 1f; // 175% damage on crit
 
-        autoAttack.setRange(2f); // Set the range of the auto attack ability
+        autoAttack.setRange(20f); // Set the range of the auto attack ability
         health.Value = maxHealth.Value; // Initialize health to max health
         mana.Value = maxMana.Value; // Initialize mana to max mana
 
@@ -63,7 +61,7 @@ public class ADRange2 : BaseChampion
         if (stackCount.Value > 0){
             if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
             {
-                stackCount.Value -=; // Reset the stack count
+                stackCount.Value -= 1; // Reset the stack count
                 stackStartTime.Value = Time.time; // Reset the stack start time
             }
         }
@@ -123,17 +121,40 @@ public class ADRange2 : BaseChampion
 
     }
 
+    public virtual GameObject ability3Logic(GameObject bullet){
+        var bulletComponent = bullet.GetComponent<Bullet>();
+        if (bulletComponent != null){
+            bulletComponent.ADDamage = 20f + AD.Value; 
+            bulletComponent.slowAmount = 0.4f; // Set the slow amount to 40%
+        
+        }
+
+        return bullet; // Return the modified bullet
+    }
+
+    public override GameObject critLogic(GameObject bullet){
+        // CRIT DOES FROST AND DOES NOT DO DMG
+        float chance = Random.Range(0f, 1f);
+        var bulletComponent = bullet.GetComponent<Bullet>();
+        if (chance <= critChance.Value) // If the random chance is less than or equal to critChance
+        {
+            Debug.Log("Critical hit! Critical Frost applied.");
+            bulletComponent.slowAmount = 0.4f; // Set the slow amount to 40%
+        }
+        else
+        {
+            Debug.Log("Normal hit. No critical damage.");
+        }
+
+        return bullet;
+    }
+
     [Rpc(SendTo.Server)]
     public override void passiveAbilityRpc(){
         // Add a slow thing in base champion.
         // Frost = 20% slow for 2 seconds
         // Additional frost damage = 155% of crit chance as AD damage
         
-    }
-
-    public override GameObject critLogic(GameObject bullet){
-        // CRIT DOES FROST AND DOES NOT DO DMG
-        return bullet;
     }
 
     [Rpc(SendTo.Server)]
@@ -179,6 +200,7 @@ public class ADRange2 : BaseChampion
             Debug.Log("Not enough mana!");
             return;
         }
+        ability3Used.Value = true; // Set the ability used flag to true
         ability3.timeOfCast = Time.time; // Record the time when the ability was used
         mana.Value -= ability3.manaCost; // Deduct mana cost
     }
