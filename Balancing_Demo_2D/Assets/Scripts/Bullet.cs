@@ -26,8 +26,7 @@ public class Bullet : NetworkBehaviour
 
     // Update is called once per frame
     void Update()
-    {
-        if (!IsServer) return;
+    {  
 
         // Ensure the bullet has a valid target
         if (targetPlayer == null)
@@ -65,8 +64,13 @@ public class Bullet : NetworkBehaviour
                     }
                 }
 
+                Debug.Log($"Bullet hit the target player: {targetPlayer.name}");
+                Debug.Log($"Target Position: {transform.position}");
+                Debug.Log($"Current position: {owner.name}");
+
                 champion.TakeDamage(ADDamage, APDamage);
-                Destroy(gameObject);
+                GetComponent<NetworkObject>().Despawn(); // Destroy the bullet on hit
+                Debug.Log("Bullet despawned on the server.");
             }
         }
     }
