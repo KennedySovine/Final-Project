@@ -205,12 +205,18 @@ public class ADRange2 : BaseChampion
 
     private IEnumerator RapidFireCoroutine(float duration)
     {
+        var tempAS = attackSpeed.Value; // Store the original attack speed
+        var tempAD = AD.Value; // Store the original AD
         Debug.Log("Rapid Fire started!");
+        updateAttackSpeedRpc(tempAS + 0.25f); // Increase attack speed by 25
+        updateADRpc(tempAD + 21f); // Increase AD by 21
         yield return new WaitForSeconds(duration); // Wait for the specified duration
         Debug.Log("Rapid Fire ended!");
 
         // Reset rapid fire state
         updateRapidFireRpc(1);
+        updateAttackSpeedRpc(tempAS); // Reset attack speed to original value
+        updateADRpc(tempAD); // Reset AD to original value
         Debug.Log("Rapid Fire state reset.");
     }
 }

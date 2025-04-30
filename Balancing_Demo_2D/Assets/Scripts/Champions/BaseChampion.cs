@@ -231,7 +231,7 @@ public class BaseChampion : NetworkBehaviour
             }
             else
             {
-                AD.Value += adChange;
+                AD.Value = adChange;
             }
         }
     }
@@ -247,7 +247,7 @@ public class BaseChampion : NetworkBehaviour
             }
             else
             {
-                AP.Value += apChange;
+                AP.Value = apChange;
             }
         }
     }
@@ -263,7 +263,7 @@ public class BaseChampion : NetworkBehaviour
             }
             else
             {
-                armor.Value += armorChange;
+                armor.Value = armorChange;
             }
         }
     }
@@ -279,7 +279,7 @@ public class BaseChampion : NetworkBehaviour
             }
             else
             {
-                magicResist.Value += magicResistChange;
+                magicResist.Value = magicResistChange;
             }
         }
     }
@@ -295,7 +295,7 @@ public class BaseChampion : NetworkBehaviour
             }
             else
             {
-                attackSpeed.Value += attackSpeedChange;
+                attackSpeed.Value = attackSpeedChange;
             }
         }
     }
@@ -311,7 +311,7 @@ public class BaseChampion : NetworkBehaviour
             }
             else
             {
-                movementSpeed.Value += movementSpeedChange;
+                movementSpeed.Value = movementSpeedChange;
             }
         }
     }
@@ -327,7 +327,7 @@ public class BaseChampion : NetworkBehaviour
             }
             else
             {
-                maxMana.Value += manaChange;
+                maxMana.Value = manaChange;
             }
         }
     }
@@ -336,7 +336,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            mana.Value += manaChange;
+            mana.Value = manaChange;
         }
     }
     [Rpc(SendTo.Server)]
@@ -351,7 +351,7 @@ public class BaseChampion : NetworkBehaviour
             }
             else
             {
-                manaRegen.Value += manaRegenChange;
+                manaRegen.Value = manaRegenChange;
             }
         }
     }
@@ -367,7 +367,7 @@ public class BaseChampion : NetworkBehaviour
             }
             else
             {
-                abilityHaste.Value += abilityHasteChange;
+                abilityHaste.Value = abilityHasteChange;
             }
         }
     }
@@ -383,7 +383,7 @@ public class BaseChampion : NetworkBehaviour
             }
             else
             {
-                critChance.Value += critChanceChange;
+                critChance.Value = critChanceChange;
             }
         }
     }
@@ -399,7 +399,7 @@ public class BaseChampion : NetworkBehaviour
             }
             else
             {
-                critDamage.Value += critDamageChange;
+                critDamage.Value = critDamageChange;
             }
         }
     }
@@ -415,7 +415,7 @@ public class BaseChampion : NetworkBehaviour
             }
             else
             {
-                armorPen.Value += armorPenChange;
+                armorPen.Value = armorPenChange;
             }
         }
     }
@@ -431,7 +431,7 @@ public class BaseChampion : NetworkBehaviour
             }
             else
             {
-                magicPen.Value += magicPenChange;
+                magicPen.Value = magicPenChange;
             }
         }
     }
