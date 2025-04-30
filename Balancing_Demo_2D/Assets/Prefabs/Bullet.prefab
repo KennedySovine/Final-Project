@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 4971957196413094315}
   - component: {fileID: 331336325768601896}
   - component: {fileID: 5034923647983437408}
+  - component: {fileID: 607523352292464171}
   - component: {fileID: 8662040862809389514}
   - component: {fileID: 5291631924107779897}
-  - component: {fileID: 607523352292464171}
   - component: {fileID: -5773027604529593968}
   - component: {fileID: 5966925804932186609}
   m_Layer: 0
@@ -118,7 +118,7 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &8662040862809389514
+--- !u!114 &607523352292464171
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -126,6 +126,23 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2169341123581716514}
   m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80d7c879794dfda4687da0e400131852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkRigidbodyBaseExpanded: 0
+  UseRigidBodyForMotion: 1
+  AutoUpdateKinematicState: 1
+  AutoSetKinematicOnDespawn: 1
+--- !u!114 &8662040862809389514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2169341123581716514}
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
@@ -191,23 +208,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
---- !u!114 &607523352292464171
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2169341123581716514}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80d7c879794dfda4687da0e400131852, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 1
-  AutoUpdateKinematicState: 1
-  AutoSetKinematicOnDespawn: 1
 --- !u!114 &-5773027604529593968
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -221,16 +221,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  targetPosition: {x: 0, y: 0, z: 0}
+  targetPlayer: {fileID: 0}
+  owner: {fileID: 0}
   ADDamage: 0
   APDamage: 0
-  empoweredDamageBasedOnTargetHP: 0
+  speed: 0
   armorPenetration: 0
   magicPenetration: 0
-  targetPosition: {x: 0, y: 0, z: 0}
+  slowAmount: 0
   range: 0
-  ownerId: 0
   isAutoAttack: 0
-  targetPlayer: {fileID: 0}
 --- !u!58 &5966925804932186609
 CircleCollider2D:
   m_ObjectHideFlags: 0

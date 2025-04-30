@@ -12,6 +12,7 @@ public class GameManager : NetworkBehaviour
 
     [Header("Player Class Prefabs")]
     public List<GameObject> playerPrefabsList = new List<GameObject>(); // List of player prefabs
+    public GameObject ghostBulletPrefab;
 
     [Header("Player References")]
     public GameObject player1;

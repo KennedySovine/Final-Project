@@ -98,7 +98,7 @@ public class BaseChampion : NetworkBehaviour
         if (isEmpowered.Value){
             if (Time.time > empowerStartTime.Value + empowerDuration.Value)
             {
-                isEmpowered.Value = false;
+                updateIsEmpoweredRpc(false); // Reset the empowered state
             }
         }
 
@@ -106,6 +106,7 @@ public class BaseChampion : NetworkBehaviour
         {
             slowAmount.Value = 0f; // Reset the slow amount
             slowStartTime.Value = 0f; // Reset the slow start time
+            applySlowRpc(0f, 0f); // Reset the slow effect on the client
         }
 
     }
@@ -181,6 +182,13 @@ public class BaseChampion : NetworkBehaviour
     public void applySlowRpc(float slowAmount, float duration)
     {
         if (!IsServer) return; // Only the server should apply the slow
+        if (slowAmount == 0f){
+            slowAmount = 0f; // Ignore if the slow amount is zero or negative
+            slowStartTime.Value = 0f; // Reset the slow start time
+            slowDuration.Value = 0f; // Reset the slow duration
+            return;
+        } // Ignore if the slow amount is zero or negative
+        Debug.Log("Applying slow effect: " + slowAmount + " for " + duration + " seconds.");
         this.slowAmount.Value = slowAmount; // Set the slow amount
         slowDuration.Value = duration; // Set the slow duration
         slowStartTime.Value = Time.time; // Set the start time for the slow effect
@@ -463,5 +471,12 @@ public class BaseChampion : NetworkBehaviour
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         isEmpowered.Value = value;
+    }
+
+    [Rpc(SendTo.Server)]
+    public void updateSlowAmountRpc(float value)
+    {
+        if (!IsServer) return; // Ensure this is only executed on the server
+        slowAmount.Value = value;
     }
 }

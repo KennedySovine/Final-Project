@@ -924,6 +924,7 @@ MonoBehaviour:
   playerPrefabsList:
   - {fileID: 4431904003385403123, guid: 69aed170a264bdd4c8de738e2ae1ea26, type: 3}
   - {fileID: 4431904003385403123, guid: 903938bed89081f48883fc2458b3717c, type: 3}
+  ghostBulletPrefab: {fileID: 2169341123581716514, guid: 973151cc4f138a74387393c819a8a157, type: 3}
   player1: {fileID: 0}
   player1Controller: {fileID: 0}
   player2: {fileID: 0}

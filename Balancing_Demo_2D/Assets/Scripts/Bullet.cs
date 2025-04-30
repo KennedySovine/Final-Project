@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Netcode;
+using System.Collections;
 
 public class Bullet : NetworkBehaviour
 {
@@ -27,6 +28,7 @@ public class Bullet : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {  
+        if (!IsServer) return; // Only the server controls bullet movement
 
         // Ensure the bullet has a valid target
         if (targetPlayer == null)
@@ -63,16 +65,35 @@ public class Bullet : NetworkBehaviour
                     }
                 }
 
+                //HideBulletRpc(); // Hide the bullet on the server
+
                 Debug.Log($"Bullet hit the target player: {targetPlayer.name}");
                 Debug.Log($"Target Position: {transform.position}");
                 Debug.Log($"Current position: {owner.name}");
 
                 champion.TakeDamage(ADDamage, APDamage);
-                GetComponent<NetworkObject>().Despawn(); // Destroy the bullet on hit
+                GetComponent<NetworkObject>().Despawn();
                 Debug.Log("Bullet despawned on the server.");
             }
         }
     }
 
     // Function to destroy prefab if it goes outside of range
+
+    /*[Rpc(SendTo.NotServer)]
+    private void HideBulletRpc()
+    {
+        while (Vector3.Distance(transform.position, targetPosition) > 0.1f)
+        {
+            Debug.Log("Bullet is out of range. Hiding it.");
+            gameObject.SetActive(false); // Hide the bullet
+            break; // Exit the loop after hiding the bullet
+        }
+    }
+
+    private IEnumerator DelayedDespawn(float delay){
+        yield return new WaitForSeconds(delay);
+        if (IsServer)
+            GetComponent<NetworkObject>().Despawn();
+    }*/
 }

@@ -14,6 +14,7 @@ public class PlayerNetwork : NetworkBehaviour
 
     public BaseChampion champion; // Reference to the champion script
     private GameManager GM; // Reference to the GameManager
+    
 
     void Start()
     {
@@ -234,6 +235,8 @@ public class PlayerNetwork : NetworkBehaviour
             bulletComponent.speed = champion.missileSpeed.Value;
             bulletComponent.owner = transform.parent.gameObject; // Set the owner of the bullet
 
+            SpawnGhostBulletRpc(targetPosition, transform.position, champion.missileSpeed.Value); // Spawn the ghost
+
             bullet = champion.critLogic(bullet); // Apply crit logic
 
             if (champion.isEmpowered.Value)
@@ -272,5 +275,29 @@ public class PlayerNetwork : NetworkBehaviour
     private IEnumerator waitForSec(float seconds)
     {
         yield return new WaitForSeconds(seconds);
+    }
+
+
+    //GHOST BULLET
+    [Rpc(SendTo.NotServer)]
+    public void SpawnGhostBulletRpc(Vector3 targetPosition, Vector3 startPos, float speed = 10f)
+    {
+        GameObject ghostBullet = Instantiate(GM.ghostBulletPrefab, startPos, Quaternion.identity);
+
+        StartCoroutine(MoveGhostBullet(ghostBullet, targetPosition, speed));
+        
+    }
+
+    private IEnumerator MoveGhostBullet(GameObject GB, Vector3 targetPosition, float speed)
+    {
+        while (GB!= null && Vector3.Distance(GB.transform.position, targetPosition) > 0.1f)
+        {
+            Debug.Log("Moving ghost bullet towards target position.");
+            Debug.Log("Speed: " + speed);
+            GB.transform.position = Vector3.MoveTowards(GB.transform.position, targetPosition, speed * Time.deltaTime);
+            yield return null;
+        }
+
+        Destroy(GB); // Destroy the ghost bullet after reaching the target position
     }
 }

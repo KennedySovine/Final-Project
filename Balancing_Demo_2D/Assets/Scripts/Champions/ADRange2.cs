@@ -45,10 +45,15 @@ public class ADRange2 : BaseChampion
         //Other stuff
         stackDuration.Value = 4f;
 
+        rapidFire.Value = 1;
+
     }
 
     public override void Update(){
         base.Update(); // Call the base class Update method
+
+        updateIsEmpoweredRpc(true);
+        // Ashe is always 'empowered' so she can always apply frost.
 
         updateStackCountRpc(1, stackCount.Value, 4); // Update the stack count on the server
 
@@ -73,6 +78,23 @@ public class ADRange2 : BaseChampion
         if (bulletComponent != null){
             bulletComponent.slowAmount = 0.2f; // Set the slow amount to 20%
         }
+        return bullet;
+    }
+
+    public override GameObject critLogic(GameObject bullet){
+        // CRIT DOES FROST AND DOES NOT DO DMG
+        float chance = Random.Range(0f, 1f);
+        var bulletComponent = bullet.GetComponent<Bullet>();
+        if (chance <= critChance.Value) // If the random chance is less than or equal to critChance
+        {
+            Debug.Log("Critical hit! Critical Frost applied.");
+            bulletComponent.slowAmount = 0.4f; // Set the slow amount to 40%
+        }
+        else
+        {
+            Debug.Log("Normal hit. No critical damage.");
+        }
+
         return bullet;
     }
 
@@ -126,28 +148,12 @@ public class ADRange2 : BaseChampion
         return bullet; // Return the modified bullet
     }
 
-    public override GameObject critLogic(GameObject bullet){
-        // CRIT DOES FROST AND DOES NOT DO DMG
-        float chance = Random.Range(0f, 1f);
-        var bulletComponent = bullet.GetComponent<Bullet>();
-        if (chance <= critChance.Value) // If the random chance is less than or equal to critChance
-        {
-            Debug.Log("Critical hit! Critical Frost applied.");
-            bulletComponent.slowAmount = 0.4f; // Set the slow amount to 40%
-        }
-        else
-        {
-            Debug.Log("Normal hit. No critical damage.");
-        }
-
-        return bullet;
-    }
-
     [Rpc(SendTo.Server)]
     public override void passiveAbilityRpc(){
         // Add a slow thing in base champion.
         // Frost = 20% slow for 2 seconds
         // Additional frost damage = 155% of crit chance as AD damage
+        //Look at empowerLogic
         
     }
 
