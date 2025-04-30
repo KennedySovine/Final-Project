@@ -43,15 +43,12 @@ public class ADMelee : BaseChampion
     public override void Update(){
         base.Update(); // Call the base class Update method
 
-        if (stackCount.Value >= 3){
-            maxStacks.Value = true; // Set the max stacks flag to true
-            stackCount.Value = 3; // Reset the stack value
-        }
+        updateStackCountRpc(1, stackCount.Value, 3); // Update the stack count on the server
 
         if (stackCount.Value > 0){
             if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
             {
-                stackCount.Value = 0; // Reset the stack count
+                updateStackCountRpc(0, stackCount.Value, 3); // Reset the stack count on the server
             }
         }
     }
@@ -185,12 +182,11 @@ public class ADMelee : BaseChampion
 
         // Set the cooldown timer for the ability
         ability1.timeOfCast = Time.time; // Record the time when the ability was used
-        mana.Value -= ability1.manaCost; // Deduct mana cost
+        updateManaRpc(-ability1.manaCost); // Deduct mana cost
         Debug.Log("Tumble ability used. Player dashed towards the target position.");
     
         // Empower the next attack
-        isEmpowered.Value = true;
-        empowerStartTime.Value = Time.time; // Record the time when the ability was used
+        updateIsEmpoweredRpc(true); // Set the empowered state to true
 
         PN.ChampionDashRpc(PN.mousePosition, ability1.range, newMoveSpeed); // Call the dash function on the player network object
 
@@ -229,11 +225,8 @@ public class ADMelee : BaseChampion
             Debug.Log("Not enough mana!");
             return;
         }
-
-        ability3.timeOfCast = Time.time; // Record the time when the ability was used
-        mana.Value -= ability3.manaCost; // Deduct mana cost
-
-        ability3Used.Value = true; // Set the ability used flag to true
+        updateManaRpc(-ability3.manaCost); // Update the mana on the server
+        updateAbility3UsedRpc(true); // Update the ability used flag
         // Modify the bullet prefab to deal extra physical damage
         // Add a knockback effect to the target if they are hit by the bolt
     }

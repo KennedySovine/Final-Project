@@ -96,15 +96,7 @@ public class PlayerNetwork : NetworkBehaviour
         if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null)
         {
             Debug.Log("Raycast hit the enemy champion!");
-            if (champion.stackCount.Value >= 3)
-            {
-                champion.stackStartTime.Value = Time.time;
-            }
-            else
-            {
-                champion.stackCount.Value += 1;
-                champion.stackStartTime.Value = Time.time;
-            }
+            champion.updateStackCountRpc(1, champion.stackCount.Value, 10);
 
             PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value); // Call the auto-attack function on the server
         }
@@ -247,20 +239,19 @@ public class PlayerNetwork : NetworkBehaviour
             if (champion.isEmpowered.Value)
             {
                 bullet = champion.empowerLogic(bullet);
-                champion.isEmpowered.Value = false;
+                champion.updateIsEmpoweredRpc(false);
             }
 
             if (champion.maxStacks.Value)
             {
                 bullet = champion.stackLogic(bullet);
-                champion.maxStacks.Value = false;
-                champion.stackCount.Value = 0; // Reset the stack value
+                champion.updateStackCountRpc(0, champion.stackCount.Value, 10); // Reset the stack count
             }
 
             if (champion.ability3Used.Value)
             {
                 bullet = champion.ability3Logic(bullet);
-                champion.ability3Used.Value = false;
+                champion.updateAbility3UsedRpc(false); // Reset the ability 3 used state
             }
 
             Debug.Log("Bullet spawned on the server.");

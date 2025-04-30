@@ -312,37 +312,37 @@ public class GameManager : NetworkBehaviour
         switch (newAugment.type)
         {
             case "AbilityHaste":
-                targetChampion.updateAbilityHaste(randomAdjustment);
+                targetChampion.updateAbilityHasteRpc(randomAdjustment);
                 break;
             case "Armor":
-                targetChampion.updateArmor(randomAdjustment);
+                targetChampion.updateArmorRpc(randomAdjustment);
                 break;
             case "AttackDamage":
-                targetChampion.updateAD(randomAdjustment);
+                targetChampion.updateADRpc(randomAdjustment);
                 break;
             case "AbilityPower":
-                targetChampion.updateAP(randomAdjustment);
+                targetChampion.updateAPRpc(randomAdjustment);
                 break;
             case "Health":
-                targetChampion.updateMaxHealth(randomAdjustment);
+                targetChampion.updateMaxHealthRpc(randomAdjustment);
                 break;
             case "AttackSpeed":
-                targetChampion.updateAttackSpeed(randomAdjustment);
+                targetChampion.updateAttackSpeedRpc(randomAdjustment);
                 break;
             case "CriticalStrike":
-                targetChampion.updateCritChance(randomAdjustment);
+                targetChampion.updateCritChanceRpc(randomAdjustment);
                 break;
             case "CriticalDamage":
-                targetChampion.updateCritDamage(randomAdjustment);
+                targetChampion.updateCritDamageRpc(randomAdjustment);
                 break;
             case "ArmorPenitration":
-                targetChampion.updateArmorPen(randomAdjustment); 
+                targetChampion.updateArmorPenRpc(randomAdjustment); 
                 break;
             case "MagicPenitration":
-                targetChampion.updateMagicPen(randomAdjustment);
+                targetChampion.updateMagicPenRpc(randomAdjustment);
                 break;
             case "MagicResist":
-                targetChampion.updateMagicResist(randomAdjustment);
+                targetChampion.updateMagicResistRpc(randomAdjustment);
                 break;
             default:
                 Debug.LogWarning($"Unknown augment type: {newAugment.type}");

@@ -13,8 +13,6 @@ public class ADRange2 : BaseChampion
         base.Start();
         UpdateStats();
         AddAbilities();
-        health.Value = maxHealth.Value; // Initialize health to max health
-        mana.Value = maxMana.Value; // Initialize mana to max mana
     }
 
     //Based on Ashe from LOL
@@ -52,17 +50,13 @@ public class ADRange2 : BaseChampion
     public override void Update(){
         base.Update(); // Call the base class Update method
 
-        if (stackCount.Value >= 4){
-            maxStacks.Value = true; // Set the max stacks flag to true
-            stackCount.Value = 4; // Reset the stack value
-        }
+        updateStackCountRpc(1, stackCount.Value, 4); // Update the stack count on the server
 
         // 1 stack expires after 1 second
         if (stackCount.Value > 0){
             if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
             {
-                stackCount.Value -= 1; // Reset the stack count
-                stackStartTime.Value = Time.time; // Reset the stack start time
+                updateStackCountRpc(-1, stackCount.Value, 4); // Reset the stack count
             }
         }
     }
@@ -168,13 +162,12 @@ public class ADRange2 : BaseChampion
         if (!IsServer) return; // Ensure this is only executed on the server
         if (mana.Value < ability1.manaCost && maxStacks.Value == false) return; // Check if enough mana and stacks are present
         
-        float startTime = Time.time; // Get the start time of the ability
-        rapidFire.Value = 5; // Fire 5 arrows every auto
+        updateRapidFireRpc(5);
         StartCoroutine(RapidFireCoroutine(ability1.duration)); // Start the rapid fire coroutine
 
-        mana.Value -= ability1.manaCost; // Deduct the mana cost
-        maxStacks.Value = false; // Reset the max stacks flag
-        stackCount.Value = 0; // Reset the stack count
+        updateManaRpc(-ability1.manaCost); // Deduct the mana cost
+
+        updateStackCountRpc(0, stackCount.Value, 4); // Update the stack count on the server
     }
 
     [Rpc(SendTo.Server)]
@@ -200,9 +193,8 @@ public class ADRange2 : BaseChampion
             Debug.Log("Not enough mana!");
             return;
         }
-        ability3Used.Value = true; // Set the ability used flag to true
-        ability3.timeOfCast = Time.time; // Record the time when the ability was used
-        mana.Value -= ability3.manaCost; // Deduct mana cost
+        updateAbility3UsedRpc(true); // Update the ability range
+        updateManaRpc(-ability3.manaCost); // Deduct mana cost
     }
 
     private IEnumerator RapidFireCoroutine(float duration)
@@ -212,7 +204,7 @@ public class ADRange2 : BaseChampion
         Debug.Log("Rapid Fire ended!");
 
         // Reset rapid fire state
-        rapidFire.Value = 1;
+        updateRapidFireRpc(1);
         Debug.Log("Rapid Fire state reset.");
     }
 }

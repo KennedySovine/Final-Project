@@ -31,7 +31,7 @@ public class Bullet : NetworkBehaviour
         // Ensure the bullet has a valid target
         if (targetPlayer == null)
         {
-            Destroy(gameObject);
+            if (IsServer){ GetComponent<NetworkObject>().Despawn(); } // Destroy the bullet
             return;
         }
 
@@ -56,8 +56,7 @@ public class Bullet : NetworkBehaviour
                 // NO CODE FOR SELF DAMAGE NEEDED
                 // Apply slow effect to the target player if applicable
                 if (slowAmount != 0f){
-                    champion.applySlow(slowAmount, 2f);
-                    champion.slowStartTime.Value = Time.time; // Set the slow start time
+                    champion.applySlowRpc(slowAmount, 2f);
                     // Extra dmg for frost
                     if (hasFrost){
                         champion.TakeDamage(ADDamage + (owner.GetComponent<BaseChampion>().critChance.Value * 0.75f), APDamage); // Apply damage with crit chance (ASHE)

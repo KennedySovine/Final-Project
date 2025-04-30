@@ -56,6 +56,7 @@ public class BaseChampion : NetworkBehaviour
     public float regenTimer = 0f;
 
     public GameObject enemyChampion; // Reference to the enemy champion prefab
+    public NetworkVariable<ulong> enemyChampionId = new NetworkVariable<ulong>(0); // ID of the enemy champion
 
     public GameObject bulletPrefab; // Prefab for the bullet to be fired
 
@@ -63,7 +64,7 @@ public class BaseChampion : NetworkBehaviour
 
     public void Start()
     {
-        rapidFire.Value = 1; // Initialize rapid fire value
+  
     }
 
     [Rpc(SendTo.Server)]
@@ -130,6 +131,11 @@ public class BaseChampion : NetworkBehaviour
         }
     }
 
+    public void getEnemyChampion(ulong enemyId)
+    {
+        enemyChampion = NetworkManager.Singleton.SpawnManager.SpawnedObjects[enemyId].gameObject; // Get the enemy champion object
+    }
+
     public virtual GameObject critLogic(GameObject bullet){
         float chance = Random.Range(0f, 1f);
         var bulletComponent = bullet.GetComponent<Bullet>();
@@ -161,7 +167,7 @@ public class BaseChampion : NetworkBehaviour
             }
             
 
-            updateHealth(-damage); // Update health with negative damage value
+            updateHealthRpc(-damage); // Update health with negative damage value
 
             if (health.Value <= 0)
             {
@@ -171,14 +177,17 @@ public class BaseChampion : NetworkBehaviour
         }
     }
 
-    public void applySlow(float slowAmount, float duration)
+    [Rpc(SendTo.Server)]
+    public void applySlowRpc(float slowAmount, float duration)
     {
         if (!IsServer) return; // Only the server should apply the slow
         this.slowAmount.Value = slowAmount; // Set the slow amount
         slowDuration.Value = duration; // Set the slow duration
         slowStartTime.Value = Time.time; // Set the start time for the slow effect
     }
-    public void updateMaxHealth(float healthChange)
+
+    [Rpc(SendTo.Server)]
+    public void updateMaxHealthRpc(float healthChange)
     {
         if (IsServer)
         {
@@ -194,14 +203,16 @@ public class BaseChampion : NetworkBehaviour
         }
     }
 
-    public void updateHealth(float healthChange)
+    [Rpc(SendTo.Server)]
+    public void updateHealthRpc(float healthChange)
     {
         if (IsServer)
         {
             health.Value += healthChange;
         }
     }
-    public void updateAD(float adChange)
+    [Rpc(SendTo.Server)]
+    public void updateADRpc(float adChange)
     {
         if (IsServer)
         {
@@ -216,8 +227,8 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
-
-    public void updateAP(float apChange)
+    [Rpc(SendTo.Server)]
+    public void updateAPRpc(float apChange)
     {
         if (IsServer)
         {
@@ -232,8 +243,8 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
-
-    public void updateArmor(float armorChange)
+    [Rpc(SendTo.Server)]
+    public void updateArmorRpc(float armorChange)
     {
         if (IsServer)
         {
@@ -248,8 +259,8 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
-
-    public void updateMagicResist(float magicResistChange)
+    [Rpc(SendTo.Server)]
+    public void updateMagicResistRpc(float magicResistChange)
     {
         if (IsServer)
         {
@@ -264,8 +275,8 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
-
-    public void updateAttackSpeed(float attackSpeedChange)
+    [Rpc(SendTo.Server)]
+    public void updateAttackSpeedRpc(float attackSpeedChange)
     {
         if (IsServer)
         {
@@ -280,8 +291,8 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
-
-    public void updateMovementSpeed(float movementSpeedChange)
+    [Rpc(SendTo.Server)]
+    public void updateMovementSpeedRpc(float movementSpeedChange)
     {
         if (IsServer)
         {
@@ -296,8 +307,8 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
-
-    public void updateMaxMana(float manaChange)
+    [Rpc(SendTo.Server)]
+    public void updateMaxManaRpc(float manaChange)
     {
         if (IsServer)
         {
@@ -312,16 +323,16 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
-
-    public void updateMana(float manaChange)
+    [Rpc(SendTo.Server)]
+    public void updateManaRpc(float manaChange)
     {
         if (IsServer)
         {
             mana.Value += manaChange;
         }
     }
-
-    public void updateManaRegen(float manaRegenChange)
+    [Rpc(SendTo.Server)]
+    public void updateManaRegenRpc(float manaRegenChange)
     {
         if (IsServer)
         {
@@ -336,8 +347,8 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
-
-    public void updateAbilityHaste(float abilityHasteChange)
+    [Rpc(SendTo.Server)]
+    public void updateAbilityHasteRpc(float abilityHasteChange)
     {
         if (IsServer)
         {
@@ -352,8 +363,8 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
-
-    public void updateCritChance(float critChanceChange)
+    [Rpc(SendTo.Server)]
+    public void updateCritChanceRpc(float critChanceChange)
     {
         if (IsServer)
         {
@@ -368,8 +379,8 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
-
-    public void updateCritDamage(float critDamageChange)
+    [Rpc(SendTo.Server)]
+    public void updateCritDamageRpc(float critDamageChange)
     {
         if (IsServer)
         {
@@ -384,8 +395,8 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
-
-    public void updateArmorPen(float armorPenChange)
+    [Rpc(SendTo.Server)]
+    public void updateArmorPenRpc(float armorPenChange)
     {
         if (IsServer)
         {
@@ -400,8 +411,8 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
-
-    public void updateMagicPen(float magicPenChange)
+    [Rpc(SendTo.Server)]
+    public void updateMagicPenRpc(float magicPenChange)
     {
         if (IsServer)
         {
@@ -415,5 +426,42 @@ public class BaseChampion : NetworkBehaviour
                 magicPen.Value += magicPenChange;
             }
         }
+    }
+
+    [Rpc(SendTo.Server)]
+    public void updateStackCountRpc(int value, int current, int max)
+    {
+        if (!IsServer) return; // Ensure this is only executed on the server
+        if (current + value >= max){
+            maxStacks.Value = true; // Set the max stacks flag to true
+            stackStartTime.Value = Time.time; // Reset the stack start time
+        }
+        else if (value == 0){
+            stackCount.Value = 0; // Reset the stack count
+            maxStacks.Value = false; // Reset the max stacks flag
+        }
+        else{
+            stackCount.Value += value;
+            stackStartTime.Value = Time.time; // Reset the stack start time
+        }
+    }
+    [Rpc(SendTo.Server)]
+    public void updateAbility3UsedRpc(bool value)
+    {
+        if (!IsServer) return; // Ensure this is only executed on the server
+        ability3Used.Value = value;
+        ability3.timeOfCast = Time.time; // Record the time when the ability was used
+    }
+    [Rpc(SendTo.Server)]
+    public void updateRapidFireRpc(int value)
+    {
+        if (!IsServer) return; // Ensure this is only executed on the server
+        rapidFire.Value = value;
+    }
+    [Rpc(SendTo.Server)]
+    public void updateIsEmpoweredRpc(bool value)
+    {
+        if (!IsServer) return; // Ensure this is only executed on the server
+        isEmpowered.Value = value;
     }
 }
