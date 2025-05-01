@@ -97,7 +97,7 @@ public class PlayerNetwork : NetworkBehaviour
         if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null)
         {
             Debug.Log("Raycast hit the enemy champion!");
-            champion.updateStackCountRpc(1, champion.stackCount.Value, champion.maxStacks.Value); // Update the stack count
+            
 
             PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value); // Call the auto-attack function on the server
         }
@@ -233,7 +233,7 @@ public class PlayerNetwork : NetworkBehaviour
             bulletComponent.targetPosition = targetPosition;
             bulletComponent.targetPlayer = enemyChampion;
             bulletComponent.speed = champion.missileSpeed.Value;
-            bulletComponent.owner = transform.parent.gameObject; // Set the owner of the bullet
+            bulletComponent.ownerID = transform.parent.GetComponent<NetworkObject>().NetworkObjectId;
 
             SpawnGhostBulletRpc(targetPosition, transform.position, champion.missileSpeed.Value); // Spawn the ghost
 
@@ -262,6 +262,7 @@ public class PlayerNetwork : NetworkBehaviour
             champion.getAbilityUsedRpc().Stats.damage += bulletComponent.ADDamage; // Update the total damage dealt by the ability
 
             // Update the last auto-attack time after firing each bullet
+            champion.updateStackCountRpc(1, champion.stackCount.Value, champion.maxStacks.Value); // Update the stack count
             
 
             // Wait for 0.1 seconds before firing the next bullet

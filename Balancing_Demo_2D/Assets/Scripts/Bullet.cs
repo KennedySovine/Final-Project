@@ -7,7 +7,8 @@ public class Bullet : NetworkBehaviour
     private GameManager GM; // Reference to the GameManager
     public Vector3 targetPosition; 
     public GameObject targetPlayer = null; // Reference to the target player object
-    public GameObject owner; // Reference to the owner of the bullet
+    public ulong ownerID; // Reference to the owner of the bullet
+    private GameObject owner; // Reference to the owner of the bullet
 
     [Header("Bullet Settings")]
 
@@ -22,7 +23,7 @@ public class Bullet : NetworkBehaviour
 
     void Start()
     {
-        
+        owner = NetworkManager.Singleton.SpawnManager.SpawnedObjects[ownerID].gameObject; // Get the owner of the bullet
     }
 
     // Update is called once per frame
@@ -46,6 +47,8 @@ public class Bullet : NetworkBehaviour
     {
         if (!IsServer) return;
 
+        owner = NetworkManager.Singleton.SpawnManager.SpawnedObjects[ownerID].gameObject; // Get the owner of the bullet
+
         // Check if the bullet hit the target player
         if (collision.gameObject == targetPlayer)
         {
@@ -67,10 +70,11 @@ public class Bullet : NetworkBehaviour
 
                 //HideBulletRpc(); // Hide the bullet on the server
 
-                Debug.Log($"Bullet hit the target player: {targetPlayer.name}");
-                Debug.Log($"Target Position: {transform.position}");
-                Debug.Log($"Current position: {owner.name}");
+                //Debug.Log($"Bullet hit the target player: {targetPlayer.name}");
+                //Debug.Log($"Target Position: {transform.position}");
+                //Debug.Log($"Current position: {owner.name}");
 
+                Debug.Log($"Damage dealt: {ADDamage} + {APDamage} (Armor Penetration: {armorPenetration}, Magic Penetration: {magicPenetration})");
                 champion.TakeDamage(ADDamage, APDamage);
                 GetComponent<NetworkObject>().Despawn();
                 Debug.Log("Bullet despawned on the server.");

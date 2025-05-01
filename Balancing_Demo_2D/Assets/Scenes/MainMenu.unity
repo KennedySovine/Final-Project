@@ -969,7 +969,7 @@ MonoBehaviour:
   maxPlayers: 2
   gamePaused:
     m_InternalValue: 0
-  gameTime: 120
+  gameTime: 60
   augmentBuffer: 0
   augmentChoosing:
     m_InternalValue: 0

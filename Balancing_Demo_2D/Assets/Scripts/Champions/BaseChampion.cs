@@ -195,9 +195,10 @@ public class BaseChampion : NetworkBehaviour
         if (IsServer)
         {
             // Calculate damage based on armor and magic resist
+            Debug.Log("Taking damage: " + AD + " AD, " + AP + " AP");
             float damage = 0f;
             if (AD > 0){
-                damage = AD / (1 + (armor.Value / 100)); // Physical damage calculation
+                damage += AD / (1 + (armor.Value / 100)); // Physical damage calculation
             }
             if (AP > 0){
                 damage += AP / (1 + (magicResist.Value / 100)); // Magic damage calculation
@@ -405,6 +406,9 @@ public class BaseChampion : NetworkBehaviour
             {
                 abilityHaste.Value = abilityHasteChange;
             }
+            ability1.setCooldown(ability1.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 1 based on ability haste
+            ability2.setCooldown(ability2.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 2 based on ability haste
+            ability3.setCooldown(ability3.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 3 based on ability haste
         }
     }
     [Rpc(SendTo.Server)]

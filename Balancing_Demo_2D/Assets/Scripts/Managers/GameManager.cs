@@ -35,6 +35,7 @@ public class GameManager : NetworkBehaviour
     public ulong player2ID = 0; // ID of player 2
 
     [Header("Game Settings")]
+    private bool gameEnded = false; // Flag to indicate if the game has ended
     public int playerCount = 0; // Number of players connected
     public int maxPlayers = 2;
     public NetworkVariable<bool> gamePaused = new NetworkVariable<bool>(false); // Flag to pause the game time
@@ -152,9 +153,10 @@ public class GameManager : NetworkBehaviour
                     augmentBuffer = 20f; // Reset the augment buffer for the next cycle
                 }
             }
-            if (gameTime <= 0) // Check if the game time has expired
+            if (gameTime <= 0 && !gameEnded) // Check if the game time has expired
             {
                 gamePaused.Value = true; // Pause the game
+                gameEnded = true; // Set the game ended flag to true
                 EndGame(); // Call the EndGame function to handle game over logic
             }
         }
