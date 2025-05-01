@@ -3,7 +3,7 @@ using Unity.Netcode;
 
 public class BaseChampion : NetworkBehaviour
 {
-    private GameManager GM; // Reference to the GameManager
+    public static GameManager GM; // Reference to the GameManager
     [Header("Champion Stats")]
     public string championType = "";
 
@@ -69,6 +69,7 @@ public class BaseChampion : NetworkBehaviour
 
     public void Start()
     {
+        GM = GameManager.Instance; // Get the instance of the GameManager
   
     }
 

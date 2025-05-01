@@ -9,7 +9,6 @@ public class ADRange : BaseChampion
         base.Start();
         UpdateStats();
         AddAbilities();
-        GM = GameManager.Instance; // Get the GameManager instance
     }
 
     // Based on Vayne from LOL

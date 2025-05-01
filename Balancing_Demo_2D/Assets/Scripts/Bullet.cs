@@ -61,7 +61,7 @@ public class Bullet : NetworkBehaviour
                     champion.applySlowRpc(slowAmount, 2f);
                     // Extra dmg for frost
                     if (hasFrost){
-                        champion.TakeDamage(ADDamage + (owner.GetComponent<BaseChampion>().critChance.Value * 0.75f), APDamage); // Apply damage with crit chance (ASHE)
+                        //champion.TakeDamage(ADDamage + (owner.GetComponent<BaseChampion>().critChance.Value * 0.75f), APDamage); // Apply damage with crit chance (ASHE)
                     }
                 }
 

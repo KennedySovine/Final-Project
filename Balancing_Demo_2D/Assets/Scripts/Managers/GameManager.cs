@@ -6,7 +6,7 @@ using System.Linq;
 
 public class GameManager : NetworkBehaviour
 {
-    protected GameManager GM; // Reference to the GameManager
+    public static GameManager Instance; // Singleton instance
 
     //public NetworkManager networkManager; // Reference to the NetworkManager
 
@@ -152,6 +152,11 @@ public class GameManager : NetworkBehaviour
                     augmentBuffer = 20f; // Reset the augment buffer for the next cycle
                 }
             }
+            if (gameTime <= 0) // Check if the game time has expired
+            {
+                gamePaused.Value = true; // Pause the game
+                EndGame(); // Call the EndGame function to handle game over logic
+            }
         }
     }
 
@@ -267,6 +272,31 @@ public class GameManager : NetworkBehaviour
     {
         Debug.Log("Game Over!");
         // Add logic to handle end of the game (e.g., show results, restart, etc.)
+        List<Augment> player1Aug = new List<Augment>(); // Create a new list to store player 1's augments
+        List<Augment> player2Aug = new List<Augment>(); // Create a new list to store player 2's augments
+        foreach (int augmentID in player1Augments)
+        {
+            Augment augment = AM.augmentFromID(augmentID);
+            if (augment != null)
+            {
+                player1Aug.Add(augment); // Add the augment to player 1's list
+            }
+        }
+        foreach (int augmentID in player2Augments)
+        {
+            Augment augment = AM.augmentFromID(augmentID);
+            if (augment != null)
+            {
+                player2Aug.Add(augment); // Add the augment to player 2's list
+            }
+        }
+
+        player1Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player1Aug); // Call the endGameCalculations method for player 1's champion
+        player2Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player2Aug); // Call the endGameCalculations method for player 2's champion
+        player1Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player1Aug); // Call the endGameCalculations method for player 1's champion
+        player2Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player2Aug); // Call the endGameCalculations method for player 2's champion
+        player1Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player1Aug); // Call the endGameCalculations method for player 1's champion
+        player2Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player2Aug); // Call the endGameCalculations method for player 2's champion
     }
     public void applyAugments(ulong playerID)
     {

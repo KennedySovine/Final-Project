@@ -13,7 +13,6 @@ public class ADRange2 : BaseChampion
         base.Start();
         UpdateStats();
         AddAbilities();
-        GM = GameManager.Instance; // Get the GameManager instance
     }
 
     //Based on Ashe from LOL

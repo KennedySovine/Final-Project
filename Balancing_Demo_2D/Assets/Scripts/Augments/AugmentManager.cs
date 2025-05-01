@@ -54,7 +54,7 @@ public class AugmentManager : NetworkBehaviour
         return v / (int)Mathf.Pow(10, digits - 2);
     }
 
-     private void LoadAugments()
+    private void LoadAugments()
     {
         // Load the JSON file from the Resources folder
         TextAsset jsonFile = Resources.Load<TextAsset>("Augments"); // File name without extension
