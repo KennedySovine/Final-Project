@@ -230,6 +230,7 @@ public class PlayerNetwork : NetworkBehaviour
             }
 
             networkObject.SpawnWithOwnership(transform.parent.GetComponent<NetworkObject>().OwnerClientId);
+            bulletComponent.ADDamage = champion.AD.Value;
             bulletComponent.targetPosition = targetPosition;
             bulletComponent.targetPlayer = enemyChampion;
             bulletComponent.speed = champion.missileSpeed.Value;

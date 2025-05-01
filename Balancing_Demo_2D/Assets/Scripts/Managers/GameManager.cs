@@ -157,6 +157,7 @@ public class GameManager : NetworkBehaviour
             {
                 gamePaused.Value = true; // Pause the game
                 gameEnded = true; // Set the game ended flag to true
+                if (!IsServer) return; // Ensure this runs only on the server
                 EndGame(); // Call the EndGame function to handle game over logic
             }
         }

@@ -236,7 +236,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (healthChange < 0 && healthChange > -1) // If the health change is due to augment that will add %
+            if (healthChange < 1 && healthChange > 0) // If the health change is due to augment that will add %
             {
                 float tempH = maxHealth.Value * healthChange;
                 maxHealth.Value += tempH;
@@ -261,7 +261,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (adChange < 0 && adChange > -1) // If the AD change is due to augment that will add %
+            if (adChange < 1 && adChange > 0) // If the AD change is due to augment that will add %
             {
                 float tempAD = AD.Value * adChange;
                 AD.Value += tempAD;
@@ -277,7 +277,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (apChange < 0 && apChange > -1) // If the AP change is due to augment that will add %
+            if (apChange < 1 && apChange > 0) // If the AP change is due to augment that will add %
             {
                 float tempAP = AP.Value * apChange;
                 AP.Value += tempAP;
@@ -293,7 +293,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (armorChange < 0 && armorChange > -1) // If the armor change is due to augment that will add %
+            if (armorChange < 1 && armorChange > 0) // If the armor change is due to augment that will add %
             {
                 float tempA = armor.Value * armorChange;
                 armor.Value += tempA;
@@ -309,7 +309,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (magicResistChange < 0 && magicResistChange > -1) // If the magic resist change is due to augment that will add %
+            if (magicResistChange < 1 && magicResistChange > 0) // If the magic resist change is due to augment that will add %
             {
                 float tempMR = magicResist.Value * magicResistChange;
                 magicResist.Value += tempMR;
@@ -325,7 +325,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (attackSpeedChange < 0 && attackSpeedChange > -1) // If the attack speed change is due to augment that will add %
+            if (attackSpeedChange < 1 && attackSpeedChange > 0) // If the attack speed change is due to augment that will add %
             {
                 float tempAS = attackSpeed.Value * attackSpeedChange;
                 attackSpeed.Value += tempAS;
@@ -341,7 +341,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (movementSpeedChange < 0 && movementSpeedChange > -1) // If the movement speed change is due to augment that will add %
+            if (movementSpeedChange < 1 && movementSpeedChange > 0) // If the movement speed change is due to augment that will add %
             {
                 float tempMS = movementSpeed.Value * movementSpeedChange;
                 movementSpeed.Value += tempMS;
@@ -357,7 +357,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (manaChange < 0 && manaChange > -1) // If the mana change is due to augment that will add %
+            if (manaChange < 1 && manaChange > 0) // If the mana change is due to augment that will add %
             {
                 float tempM = maxMana.Value * manaChange;
                 maxMana.Value += tempM;
@@ -381,7 +381,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (manaRegenChange < 0 && manaRegenChange > -1) // If the mana regen change is due to augment that will add %
+            if (manaRegenChange < 1 && manaRegenChange > 0) // If the mana regen change is due to augment that will add %
             {
                 float tempMR = manaRegen.Value * manaRegenChange;
                 manaRegen.Value += tempMR;
@@ -397,7 +397,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (abilityHasteChange < 0 && abilityHasteChange > -1) // If the ability haste change is due to augment that will add %
+            if (abilityHasteChange < 1 && abilityHasteChange > 0) // If the ability haste change is due to augment that will add %
             {
                 float tempAH = abilityHaste.Value * abilityHasteChange;
                 abilityHaste.Value += tempAH;
@@ -416,7 +416,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (critChanceChange < 0 && critChanceChange > -1) // If the crit chance change is due to augment that will add %
+            if (critChanceChange < 1 && critChanceChange > 0) // If the crit chance change is due to augment that will add %
             {
                 float tempCC = critChance.Value * critChanceChange;
                 critChance.Value += tempCC;
@@ -432,7 +432,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (critDamageChange < 0 && critDamageChange > -1) // If the crit damage change is due to augment that will add %
+            if (critDamageChange < 1 && critDamageChange > 0) // If the crit damage change is due to augment that will add %
             {
                 float tempCD = critDamage.Value * critDamageChange;
                 critDamage.Value += tempCD;
@@ -448,7 +448,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (armorPenChange < 0 && armorPenChange > -1) // If the armor pen change is due to augment that will add %
+            if (armorPenChange < 1 && armorPenChange > 0) // If the armor pen change is due to augment that will add %
             {
                 float tempAP = armorPen.Value * armorPenChange;
                 armorPen.Value += tempAP;
@@ -464,7 +464,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (magicPenChange < 0 && magicPenChange > -1) // If the magic pen change is due to augment that will add %
+            if (magicPenChange < 1 && magicPenChange > 0) // If the magic pen change is due to augment that will add %
             {
                 float tempMP = magicPen.Value * magicPenChange;
                 magicPen.Value += tempMP;
