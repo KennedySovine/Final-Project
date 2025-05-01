@@ -38,19 +38,11 @@ public class ADMelee : BaseChampion
         health.Value = maxHealth.Value; // Initialize health to max health
         mana.Value = maxMana.Value; // Initialize mana to max mana
         missileSpeed.Value = 33f;
+        maxStacks.Value = 3; // Maximum number of stacks for the ability
     }
 
     public override void Update(){
         base.Update(); // Call the base class Update method
-
-        updateStackCountRpc(1, stackCount.Value, 3); // Update the stack count on the server
-
-        if (stackCount.Value > 0){
-            if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
-            {
-                updateStackCountRpc(0, stackCount.Value, 3); // Reset the stack count on the server
-            }
-        }
     }
 
     private void AddAbilities()
@@ -102,6 +94,15 @@ public class ADMelee : BaseChampion
             Debug.LogError("Bullet component is missing on the bullet prefab.");
         }
         return bullet;
+    }
+
+    public override void stackManager(){
+        if (stackCount.Value > 0){
+            if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
+            {
+                resetStackCountRpc(); // Reset the stack count
+            }
+        }
     }
 
     public override GameObject stackLogic(GameObject bullet)

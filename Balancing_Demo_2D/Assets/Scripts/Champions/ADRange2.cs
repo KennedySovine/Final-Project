@@ -46,6 +46,7 @@ public class ADRange2 : BaseChampion
         stackDuration.Value = 4f;
 
         rapidFire.Value = 1;
+        maxStacks.Value = 4; // Maximum number of stacks for the ability
 
     }
 
@@ -54,23 +55,17 @@ public class ADRange2 : BaseChampion
 
         updateIsEmpoweredRpc(true);
         // Ashe is always 'empowered' so she can always apply frost.
+    }
 
-        updateStackCountRpc(1, stackCount.Value, 4); // Update the stack count on the server
-
+    public override void stackManager(){
         // 1 stack expires after 1 second
         if (stackCount.Value > 0){
             if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
             {
-                updateStackCountRpc(-1, stackCount.Value, 4); // Reset the stack count
+                updateStackCountRpc(-1, stackCount.Value, maxStacks.Value);
             }
         }
     }
-
-    public override GameObject stackLogic(GameObject bullet)
-    {
-        return bullet;
-    }
-
     //Slow Logic
     public override GameObject empowerLogic(GameObject bullet)
     {
@@ -166,14 +161,14 @@ public class ADRange2 : BaseChampion
         // Check for mana
 
         if (!IsServer) return; // Ensure this is only executed on the server
-        if (mana.Value < ability1.manaCost && maxStacks.Value == false) return; // Check if enough mana and stacks are present
+        if (mana.Value < ability1.manaCost && !isMaxStacks) return; // Check if enough mana and stacks are present
         
         updateRapidFireRpc(5);
         StartCoroutine(RapidFireCoroutine(ability1.duration)); // Start the rapid fire coroutine
 
         updateManaRpc(-ability1.manaCost); // Deduct the mana cost
 
-        updateStackCountRpc(0, stackCount.Value, 4); // Update the stack count on the server
+        resetStackCountRpc(); // Reset the stack count
     }
 
     [Rpc(SendTo.Server)]

@@ -35,9 +35,13 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<int> stackCount = new NetworkVariable<int>(0); // Number of stacks for stacking abilities
     public NetworkVariable<float> stackStartTime = new NetworkVariable<float>(0f); // Time when the stack started
     public NetworkVariable<float> stackDuration = new NetworkVariable<float>(3.5f); // Duration for the stacks to last
-    public NetworkVariable<bool> maxStacks = new NetworkVariable<bool>(false); // Flag to check if max stacks are reached
+    public NetworkVariable<int> maxStacks = new NetworkVariable<int>(10); // Maximum number of stacks for abilities
     public NetworkVariable<bool> ability3Used = new NetworkVariable<bool>(false); // Flag to check if ability 3 has been used
     public NetworkVariable<int> rapidFire = new NetworkVariable<int>(1);
+
+    public bool isMaxStacks {
+        get { return maxStacks.Value == stackCount.Value; } // Check if the current stack count is equal to the maximum stack count
+    }
 
     [Header("Champion Resources")]
     public NetworkVariable<float> health = new NetworkVariable<float>(600f);
@@ -76,9 +80,11 @@ public class BaseChampion : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public virtual void UseAbility3Rpc(){ Debug.Log("No ability 3 assigned");}
 
-    public virtual GameObject empowerLogic(GameObject bullet){ Debug.Log("No empower logic assigned"); return null;}
-    public virtual GameObject stackLogic(GameObject bullet){ Debug.Log("No stack logic assigned"); return null;}
-    public virtual GameObject ability3Logic(GameObject bullet){ Debug.Log("No stack logic assigned"); return null;}
+    public virtual GameObject empowerLogic(GameObject bullet){ Debug.Log("No empower logic assigned"); return bullet;}
+    public virtual GameObject stackLogic(GameObject bullet){ Debug.Log("No stack logic assigned"); return bullet;}
+    public virtual GameObject ability3Logic(GameObject bullet){ Debug.Log("No stack logic assigned"); return bullet;}
+
+    public virtual void stackManager(){ Debug.Log("No stack manager assigned");}
     
     public virtual void Update()
     {
@@ -92,7 +98,7 @@ public class BaseChampion : NetworkBehaviour
             passiveAbilityRpc(); // Call the passive ability logic
         }
 
-
+        if (!IsServer) return; // Only the server should execute this logic
         //Timer for stacks
 
         if (isEmpowered.Value){
@@ -108,6 +114,8 @@ public class BaseChampion : NetworkBehaviour
             slowStartTime.Value = 0f; // Reset the slow start time
             applySlowRpc(0f, 0f); // Reset the slow effect on the client
         }
+
+        stackManager(); // Call the stack manager logic
 
     }
 
@@ -437,21 +445,33 @@ public class BaseChampion : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server)]
-    public void updateStackCountRpc(int value, int current, int max)
+    public void updateStackCountRpc(int change, int current, int max)
     {
         if (!IsServer) return; // Ensure this is only executed on the server
-        if (current + value >= max){
-            maxStacks.Value = true; // Set the max stacks flag to true
+        if (change == 0){
+            if (current > max){
+                stackCount.Value = max; // Set the stack count to max
+            }
+            return; // No change to the stack count
+        }
+        else if (change < 0){
+            stackCount.Value += change; // Decrease the stack count
             stackStartTime.Value = Time.time; // Reset the stack start time
+            if (stackCount.Value < 0){
+                stackCount.Value = 0; // Ensure the stack count does not go below zero
+            }
+            return;
         }
-        else if (value == 0){
-            stackCount.Value = 0; // Reset the stack count
-            maxStacks.Value = false; // Reset the max stacks flag
+        else if (current + change >= max){
+            Debug.Log("Max stacks reached: " + max);
+            stackCount.Value = max; // Set the stack count to max
+            stackStartTime.Value = Time.time;
+            return;
         }
-        else{
-            stackCount.Value += value;
-            stackStartTime.Value = Time.time; // Reset the stack start time
-        }
+ 
+        Debug.Log("Adding stacks: " + change);
+        stackCount.Value += change;
+        stackStartTime.Value = Time.time; // Reset the stack start time
     }
     [Rpc(SendTo.Server)]
     public void updateAbility3UsedRpc(bool value)
@@ -478,5 +498,12 @@ public class BaseChampion : NetworkBehaviour
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         slowAmount.Value = value;
+    }
+
+    [Rpc(SendTo.Server)]
+    public void resetStackCountRpc()
+    {
+        if (!IsServer) return; // Ensure this is only executed on the server
+        stackCount.Value = 0; // Reset the stack count
     }
 }

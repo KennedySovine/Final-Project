@@ -97,7 +97,7 @@ public class PlayerNetwork : NetworkBehaviour
         if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null)
         {
             Debug.Log("Raycast hit the enemy champion!");
-            champion.updateStackCountRpc(1, champion.stackCount.Value, 10);
+            champion.updateStackCountRpc(1, champion.stackCount.Value, champion.maxStacks.Value); // Update the stack count
 
             PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value); // Call the auto-attack function on the server
         }
@@ -245,10 +245,10 @@ public class PlayerNetwork : NetworkBehaviour
                 champion.updateIsEmpoweredRpc(false);
             }
 
-            if (champion.maxStacks.Value)
+            if (champion.isMaxStacks && champion.maxStacks.Value == 3) //only for vayne
             {
                 bullet = champion.stackLogic(bullet);
-                champion.updateStackCountRpc(0, champion.stackCount.Value, 10); // Reset the stack count
+                champion.resetStackCountRpc();
             }
 
             if (champion.ability3Used.Value)
