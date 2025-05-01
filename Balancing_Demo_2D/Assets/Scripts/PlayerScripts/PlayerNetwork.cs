@@ -259,6 +259,7 @@ public class PlayerNetwork : NetworkBehaviour
 
             Debug.Log("Bullet spawned on the server.");
             Debug.Log("Auto-attack performed.");
+            champion.getAbilityUsedRpc().Stats.damage += bulletComponent.ADDamage; // Update the total damage dealt by the ability
 
             // Update the last auto-attack time after firing each bullet
             

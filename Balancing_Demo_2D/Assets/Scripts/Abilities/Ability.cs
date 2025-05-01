@@ -9,7 +9,7 @@ public class Ability
     public float manaCost; // Mana cost to use the ability
     public float range; // Range of the ability
     public float duration; // Duration of the ability effect (if applicable)
-
+    public AbilityStats Stats; // Reference to the ability stats object
     public float timeOfCast; // Time when the ability was cast
 
     public bool isOnCooldown // Flag to check if the ability is on cooldown
@@ -25,6 +25,7 @@ public class Ability
         this.manaCost = manaCost;
         this.range = range;
         this.duration = 0f; // Default duration to 0, can be set later if needed
+        this.Stats = new AbilityStats(this); // Initialize ability stats
     }
 
     public void Update()

@@ -3,6 +3,7 @@ using Unity.Netcode;
 
 public class BaseChampion : NetworkBehaviour
 {
+    private GameManager GM; // Reference to the GameManager
     [Header("Champion Stats")]
     public string championType = "";
 
@@ -159,7 +160,33 @@ public class BaseChampion : NetworkBehaviour
         }
 
         return bullet;
+    }
 
+    public void logAbilityUsedRpc(Ability ability)
+    {
+        if (NetworkManager.Singleton.LocalClientId == GM.player1ID)
+        {
+            GM.player1AbilityUsed = ability; // Log the ability used for player 1
+        }
+        else if (NetworkManager.Singleton.LocalClientId == GM.player2ID)
+        {
+            GM.player2AbilityUsed = ability; // Log the ability used for player 2
+        }
+    }
+
+
+    public Ability getAbilityUsedRpc(){
+        if (NetworkManager.Singleton.LocalClientId == GM.player1ID){
+            return GM.player1AbilityUsed; // Get the ability used for player 1
+        }
+        else if (NetworkManager.Singleton.LocalClientId == GM.player2ID)
+        {
+            return GM.player2AbilityUsed; // Get the ability used for player 2
+        }
+        else{
+            Debug.LogError("No player ID found for the current client.");
+            return null; // Return null if no player ID is found
+        }
     }
 
     //Also will track consecutive attacks based if the dmg type is AD or AP

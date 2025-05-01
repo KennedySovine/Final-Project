@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 
-public class ADMelee : BaseChampion
+public class ADRange : BaseChampion
 {
 
     void Start()
@@ -9,6 +9,7 @@ public class ADMelee : BaseChampion
         base.Start();
         UpdateStats();
         AddAbilities();
+        GM = GameManager.Instance; // Get the GameManager instance
     }
 
     // Based on Vayne from LOL
@@ -184,6 +185,8 @@ public class ADMelee : BaseChampion
         // Set the cooldown timer for the ability
         ability1.timeOfCast = Time.time; // Record the time when the ability was used
         updateManaRpc(-ability1.manaCost); // Deduct mana cost
+        ability1.Stats.totalManaSpent += ability1.manaCost; // Update total mana spent for the ability
+        logAbilityUsedRpc(ability1); // Log the ability used
         Debug.Log("Tumble ability used. Player dashed towards the target position.");
     
         // Empower the next attack
@@ -227,6 +230,8 @@ public class ADMelee : BaseChampion
             return;
         }
         updateManaRpc(-ability3.manaCost); // Update the mana on the server
+        ability3.Stats.totalManaSpent += ability3.manaCost; // Update the total mana spent for the ability
+        logAbilityUsedRpc(ability3); // Log the ability used
         updateAbility3UsedRpc(true); // Update the ability used flag
         // Modify the bullet prefab to deal extra physical damage
         // Add a knockback effect to the target if they are hit by the bolt

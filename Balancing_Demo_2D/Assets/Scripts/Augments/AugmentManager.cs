@@ -38,7 +38,6 @@ public class AugmentManager : NetworkBehaviour
         augmentUIList.Add(augment1); // Add augment UI elements to the list
         augmentUIList.Add(augment2);
         augmentUIList.Add(augment3);
-        
     }
 
     // Update is called once per frame

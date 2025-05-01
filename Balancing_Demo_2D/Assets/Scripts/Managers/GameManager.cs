@@ -6,7 +6,7 @@ using System.Linq;
 
 public class GameManager : NetworkBehaviour
 {
-    public static GameManager Instance; // Singleton instance
+    protected GameManager GM; // Reference to the GameManager
 
     //public NetworkManager networkManager; // Reference to the NetworkManager
 
@@ -21,6 +21,9 @@ public class GameManager : NetworkBehaviour
     public GameObject player2Controller; // Reference to the player controller for player 2
     public NetworkList<int> player1Augments = new NetworkList<int>();
     public NetworkList<int> player2Augments = new NetworkList<int>();
+
+    public Ability player1AbilityUsed = null; // Reference to the ability used by player 1
+    public Ability player2AbilityUsed = null; // Reference to the ability used by player 2
 
     [Header("Server Settings")]
     public Dictionary<ulong, GameObject> playerChampions = new Dictionary<ulong, GameObject>(); // Dictionary to store player prefabs and connect it to the client ID
