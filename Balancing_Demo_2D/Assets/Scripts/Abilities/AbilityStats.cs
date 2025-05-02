@@ -44,10 +44,35 @@ public class AbilityStats
 
     public void SaveToFile()
     {
-        string json = JsonUtility.ToJson(this, true); // Convert the AbilityStats object to a JSON string (pretty print)
         string filePath = Path.Combine(Application.dataPath, "Resources/PlayerStats.json"); // Construct the file path
+        List<AbilityStats> statsList = new List<AbilityStats>();
 
-        File.WriteAllText(filePath, json); // Write the JSON string to the file
-        Debug.Log($"Ability stats saved to {filePath}");
+        // Check if the file exists
+        if (File.Exists(filePath))
+        {
+            // Read the existing file content
+            string existingJson = File.ReadAllText(filePath);
+
+            // Parse the existing JSON into a list of AbilityStats
+            statsList = JsonUtility.FromJson<AbilityStatsListWrapper>(existingJson)?.stats ?? new List<AbilityStats>();
+        }
+
+        // Add the current AbilityStats object to the list
+        statsList.Add(this);
+
+        // Wrap the list in a wrapper class and convert it back to JSON
+        string updatedJson = JsonUtility.ToJson(new AbilityStatsListWrapper { stats = statsList }, true);
+
+        // Write the updated JSON back to the file
+        File.WriteAllText(filePath, updatedJson);
+
+        Debug.Log($"Ability stats appended to {filePath}");
+    }
+
+    // Wrapper class to handle JSON arrays
+    [System.Serializable]
+    private class AbilityStatsListWrapper
+    {
+        public List<AbilityStats> stats;
     }
 }

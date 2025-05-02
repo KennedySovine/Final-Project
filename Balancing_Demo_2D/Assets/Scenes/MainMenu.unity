@@ -973,8 +973,8 @@ MonoBehaviour:
   maxPlayers: 2
   gamePaused:
     m_InternalValue: 0
-  gameTime: 30
   maxGameTime: 30
+  gameTime: 30
   augmentBuffer: 0
   augmentChoosing:
     m_InternalValue: 0
@@ -1759,7 +1759,7 @@ MonoBehaviour:
   m_MaxConnectAttempts: 60
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
-    Address: 127.0.0.1
+    Address: 192.168.1.237
     Port: 7777
     ServerListenAddress: 0.0.0.0
   DebugSimulator:

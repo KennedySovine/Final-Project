@@ -81,9 +81,7 @@ public class ADRange : BaseChampion
 
         ability3.setDuration(8f);
 
-        ability1.Stats.championType = championType; // Set the champion type for ability 1
-        ability2.Stats.championType = championType; // Set the champion type for ability 2
-        ability3.Stats.championType = championType; // Set the champion type for ability 3
+        passive.Stats.championType = championType; // Set the champion type for the passive ability
     }
 
     public override GameObject empowerLogic(GameObject bullet)
