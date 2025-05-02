@@ -175,21 +175,6 @@ public class BaseChampion : NetworkBehaviour
         }
     }
 
-
-    public Ability getAbilityUsedRpc(){
-        if (NetworkManager.Singleton.LocalClientId == GM.player1ID){
-            return GM.player1AbilityUsed; // Get the ability used for player 1
-        }
-        else if (NetworkManager.Singleton.LocalClientId == GM.player2ID)
-        {
-            return GM.player2AbilityUsed; // Get the ability used for player 2
-        }
-        else{
-            Debug.LogError("No player ID found for the current client.");
-            return null; // Return null if no player ID is found
-        }
-    }
-
     //Also will track consecutive attacks based if the dmg type is AD or AP
     public void TakeDamage(float AD, float AP, float armorPen, float magicPen)
     {

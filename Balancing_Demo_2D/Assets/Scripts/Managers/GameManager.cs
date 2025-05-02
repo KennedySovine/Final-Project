@@ -234,6 +234,9 @@ public class GameManager : NetworkBehaviour
                 // Add any additional logic to start the game here
                 player1Controller.GetComponent<BaseChampion>().enemyChampion = player2Controller;
                 player2Controller.GetComponent<BaseChampion>().enemyChampion = player1Controller; // Set the enemy champion reference for both players
+
+                player1Controller.GetComponent<BaseChampion>().enemyChampionId.Value = player2.GetComponent<NetworkObject>().OwnerClientId; // Set the player ID for player 1
+                player2Controller.GetComponent<BaseChampion>().enemyChampionId.Value = player1.GetComponent<NetworkObject>().OwnerClientId; // Set the player ID for player 2
             }
         }
     }
@@ -326,7 +329,7 @@ public class GameManager : NetworkBehaviour
             return;
         }
 
-        targetChampion.ability1.Stats.saveBetweenAugments();
+        targetChampion.passive.Stats.saveBetweenAugments();
 
         // Get the last augment chosen by the player
         int augmentID = (playerID == player1ID) 

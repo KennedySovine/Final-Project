@@ -973,9 +973,9 @@ MonoBehaviour:
   maxPlayers: 2
   gamePaused:
     m_InternalValue: 0
-  maxGameTime: 30
-  gameTime: 30
-  augmentBuffer: 0
+  maxGameTime: 60
+  gameTime: 60
+  augmentBuffer: 30
   augmentChoosing:
     m_InternalValue: 0
   championPrefab: {fileID: 0}
