@@ -75,18 +75,21 @@ public class PlayerNetwork : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.Q)) // Q key pressed
         {
             Debug.Log("Ability 1 key pressed.");
+            GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "Q"); // Update ability 1 used state
             champion.UseAbility1Rpc();
         }
 
         if (Input.GetKeyDown(KeyCode.W)) // W key pressed
         {
             Debug.Log("Ability 2 key pressed.");
+            GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "W"); // Update ability 2 used state
             champion.UseAbility2Rpc();
         }
 
         if (Input.GetKeyDown(KeyCode.E)) // E key pressed
         {
             Debug.Log("Ability 3 key pressed.");
+            GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "E"); // Update ability 3 used state
             champion.UseAbility3Rpc();
         }
     }

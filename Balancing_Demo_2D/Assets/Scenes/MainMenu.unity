@@ -942,7 +942,9 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   player2AbilityUsed:
     name: 
@@ -957,7 +959,9 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   playerIDsSpawned: 
   hostReady:
@@ -969,7 +973,8 @@ MonoBehaviour:
   maxPlayers: 2
   gamePaused:
     m_InternalValue: 0
-  gameTime: 60
+  gameTime: 30
+  maxGameTime: 30
   augmentBuffer: 0
   augmentChoosing:
     m_InternalValue: 0

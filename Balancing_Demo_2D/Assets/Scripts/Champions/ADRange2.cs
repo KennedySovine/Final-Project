@@ -130,6 +130,10 @@ public class ADRange2 : BaseChampion
 
         ability1.setDuration(6f);
 
+        ability1.Stats.championType = championType; // Set the champion type for ability 1
+        ability2.Stats.championType = championType; // Set the champion type for ability 2
+        ability3.Stats.championType = championType; // Set the champion type for ability 3
+
     }
 
     public virtual GameObject ability3Logic(GameObject bullet){

@@ -14,19 +14,27 @@ public class AbilityStats
     public float costToDamage = 0f; // Cost to damage value
     public float totalManaSpent = 0f; // Total mana spent on the ability
 
+    public string championType = ""; // Type of champion using the ability
+
     private float damageTotal = 0f; // Total damage calculated from the list of damage values
     public float gameTime = 0f; // Game time value
 
-    public AbilityStats(Ability ability){
+    public List<Augment> chosenAugments = new List<Augment>(); // List of chosen augments for the ability
+
+    public AbilityStats()
+    {
+
     }
     public void saveBetweenAugments()
     {
         damageValues.Add(damage); // Add the current damage value to the list
+        Debug.Log($"Damage value saved: {damage}"); // Log the saved damage value
         damageTotal = 0f; // Reset the total damage for calculation
     }
 
-    public void endGameCalculations(List<Augment> chosenAugments)
+    public void endGameCalculations(List<Augment> chosenAugments, float gameTime)
     {
+        this.chosenAugments = chosenAugments; // Assign the chosen augments to the class variable
         damageTotal = damageValues.Sum(); // Calculate the total damage from the list of damage values
         damageOverTime = gameTime > 0 ? damageTotal / gameTime : 0f; // Calculate damage over time
         costToDamage = damageTotal > 0 ? totalManaSpent / damageTotal : 0f; // Calculate cost to damage ratio

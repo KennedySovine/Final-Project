@@ -39,6 +39,7 @@ public class GameManager : NetworkBehaviour
     public int playerCount = 0; // Number of players connected
     public int maxPlayers = 2;
     public NetworkVariable<bool> gamePaused = new NetworkVariable<bool>(false); // Flag to pause the game time
+    [SerializeField] private float maxGameTime;
     public float gameTime = 120f; // Game duration in seconds
     public float augmentBuffer = 20f; //Choose aug every 40 seconds
     public NetworkVariable<bool> augmentChoosing = new NetworkVariable<bool>(false); //If the player is choosing an augment, dont countdown the game time
@@ -97,6 +98,7 @@ public class GameManager : NetworkBehaviour
     private void Start()
     {
         Debug.Log("Game Manager Initialized");
+        maxGameTime = gameTime; // Set the maximum game time
     }
 
     private void Update()
@@ -294,12 +296,12 @@ public class GameManager : NetworkBehaviour
             }
         }
 
-        player1Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player1Aug); // Call the endGameCalculations method for player 1's champion
-        player2Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player2Aug); // Call the endGameCalculations method for player 2's champion
-        player1Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player1Aug); // Call the endGameCalculations method for player 1's champion
-        player2Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player2Aug); // Call the endGameCalculations method for player 2's champion
-        player1Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player1Aug); // Call the endGameCalculations method for player 1's champion
-        player2Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player2Aug); // Call the endGameCalculations method for player 2's champion
+        player1Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's champion
+        player2Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's champion
+        player1Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's champion
+        player2Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's champion
+        player1Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's champion
+        player2Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's champion
     }
     public void applyAugments(ulong playerID)
     {
@@ -387,6 +389,8 @@ public class GameManager : NetworkBehaviour
         }
 
         Debug.Log($"Applied augment {newAugment.name} to player {playerID} with adjustment {randomAdjustment}.");
+
+        targetChampion.ability1.Stats.saveBetweenAugments();
     }
 
     //Add Augments to UI for Choosing
@@ -396,5 +400,61 @@ public class GameManager : NetworkBehaviour
         Debug.Log("Loading Augments for Client " + NetworkManager.Singleton.LocalClientId); // Log the client ID for debugging
         AM.augmentUI.SetActive(true); // Show the augment UI
         AM.augmentUISetup(AM.augmentSelector()); // Get the list of chosen augments
+    }
+
+    [Rpc(SendTo.Server)]
+    public void updatePlayerAbilityUsedRpc(ulong playerID, string abilityKey)
+    {
+        if (!IsServer) return; // Ensure this runs only on the server
+
+        BaseChampion playerChampion = null;
+
+        // Determine which player's champion to update
+        if (playerID == player1ID)
+        {
+            playerChampion = player1Controller.GetComponent<BaseChampion>();
+        }
+        else if (playerID == player2ID)
+        {
+            playerChampion = player2Controller.GetComponent<BaseChampion>();
+        }
+        else
+        {
+            Debug.LogWarning($"Invalid player ID: {playerID}.");
+            return;
+        }
+
+        // Update the ability used based on the ability key
+        switch (abilityKey)
+        {
+            case "Q":
+                if (playerID == player1ID)
+                    player1AbilityUsed = playerChampion.ability1;
+                else
+                    player2AbilityUsed = playerChampion.ability1;
+                break;
+
+            case "W":
+                if (playerID == player1ID)
+                    player1AbilityUsed = playerChampion.ability2;
+                else
+                    player2AbilityUsed = playerChampion.ability2;
+                break;
+
+            case "E":
+                if (playerID == player1ID)
+                    player1AbilityUsed = playerChampion.ability3;
+                else
+                    player2AbilityUsed = playerChampion.ability3;
+                break;
+
+            default:
+                Debug.LogWarning($"Invalid ability key: {abilityKey} for player {playerID}.");
+                return;
+        }
+
+        // Log the ability used
+        Ability abilityUsed = (playerID == player1ID) ? player1AbilityUsed : player2AbilityUsed;
+        Debug.Log($"Player {playerID} used ability: {abilityUsed.name}");
     }
 }

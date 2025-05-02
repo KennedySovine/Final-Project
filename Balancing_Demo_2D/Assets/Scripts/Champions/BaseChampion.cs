@@ -194,6 +194,64 @@ public class BaseChampion : NetworkBehaviour
     public void TakeDamage(float AD, float AP, float armorPen, float magicPen){
         if (!IsServer) return;
 
+        // for ability stats
+        switch (enemyChampionId.Value)
+        {
+            case var id when id == GM.player1ID:
+                if (GM.player1AbilityUsed != null)
+                {
+                    switch (GM.player1AbilityUsed)
+                    {
+                        case var ability when ability == GM.player1Controller.GetComponent<BaseChampion>().ability1:
+                            GM.player1AbilityUsed.Stats.damage = AD + AP;
+                            break;
+                        case var ability when ability == GM.player1Controller.GetComponent<BaseChampion>().ability2:
+                            GM.player1AbilityUsed.Stats.damage = AD + AP;
+                            break;
+                        case var ability when ability == GM.player1Controller.GetComponent<BaseChampion>().ability3:
+                            GM.player1AbilityUsed.Stats.damage = AD + AP;
+                            break;
+                        default:
+                            Debug.LogError("No valid ability used for player 1.");
+                            break;
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Player 1 ability used is null.");
+                }
+                break;
+
+            case var id when id == GM.player2ID:
+                if (GM.player2AbilityUsed != null)
+                {
+                    switch (GM.player2AbilityUsed)
+                    {
+                        case var ability when ability == GM.player2Controller.GetComponent<BaseChampion>().ability1:
+                            GM.player2AbilityUsed.Stats.damage = AD + AP;
+                            break;
+                        case var ability when ability == GM.player2Controller.GetComponent<BaseChampion>().ability2:
+                            GM.player2AbilityUsed.Stats.damage = AD + AP;
+                            break;
+                        case var ability when ability == GM.player2Controller.GetComponent<BaseChampion>().ability3:
+                            GM.player2AbilityUsed.Stats.damage = AD + AP;
+                            break;
+                        default:
+                            Debug.LogError("No valid ability used for player 2.");
+                            break;
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Player 2 ability used is null.");
+                }
+                break;
+
+            default:
+                Debug.LogError($"No valid player ID found for enemyChampionId: {enemyChampionId.Value}");
+                break;
+        }
+
         float damage = 0f;
  
         damage += AD / (1 + (armor.Value - armorPen) / 100); // Calculate damage with armor penetration
@@ -347,6 +405,7 @@ public class BaseChampion : NetworkBehaviour
             mana.Value += maxMana.Value;
         }
     }
+    
     [Rpc(SendTo.Server)]
     public void updateManaRegenRpc(float manaRegenChange)
     {

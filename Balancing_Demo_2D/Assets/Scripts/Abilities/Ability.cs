@@ -25,7 +25,7 @@ public class Ability
         this.manaCost = manaCost;
         this.range = range;
         this.duration = 0f; // Default duration to 0, can be set later if needed
-        this.Stats = new AbilityStats(this); // Initialize ability stats
+        this.Stats = new AbilityStats(); // Initialize ability stats
     }
 
     public void Update()
