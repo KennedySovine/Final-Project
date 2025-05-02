@@ -150,7 +150,7 @@ public class GameManager : NetworkBehaviour
                     loadAugmentsRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
 
                     augmentChoosing.Value = false;
-                    augmentBuffer = 20f; // Reset the augment buffer for the next cycle
+                    augmentBuffer = 30f; // Reset the augment buffer for the next cycle
                 }
             }
             if (gameTime <= 0 && !gameEnded) // Check if the game time has expired
@@ -349,37 +349,37 @@ public class GameManager : NetworkBehaviour
         switch (newAugment.type)
         {
             case "AbilityHaste":
-                targetChampion.updateAbilityHasteRpc(targetChampion.abilityHaste.Value + randomAdjustment);
+                targetChampion.updateAbilityHasteRpc(randomAdjustment);
                 break;
             case "Armor":
-                targetChampion.updateArmorRpc(targetChampion.armor.Value + randomAdjustment);
+                targetChampion.updateArmorRpc(randomAdjustment);
                 break;
             case "AttackDamage":
-                targetChampion.updateADRpc(targetChampion.AD.Value + randomAdjustment);
+                targetChampion.updateADRpc(randomAdjustment);
                 break;
             case "AbilityPower":
-                targetChampion.updateAPRpc(targetChampion.AP.Value + randomAdjustment);
+                targetChampion.updateAPRpc(randomAdjustment);
                 break;
             case "Health":
-                targetChampion.updateMaxHealthRpc(targetChampion.maxHealth.Value + randomAdjustment);
+                targetChampion.updateMaxHealthRpc(randomAdjustment);
                 break;
             case "AttackSpeed":
-                targetChampion.updateAttackSpeedRpc(targetChampion.attackSpeed.Value + randomAdjustment);
+                targetChampion.updateAttackSpeedRpc(randomAdjustment);
                 break;
             case "CriticalStrike":
-                targetChampion.updateCritChanceRpc(targetChampion.critChance.Value + randomAdjustment);
+                targetChampion.updateCritChanceRpc(randomAdjustment);
                 break;
             case "CriticalDamage":
-                targetChampion.updateCritDamageRpc(targetChampion.critDamage.Value + randomAdjustment);
+                targetChampion.updateCritDamageRpc(randomAdjustment);
                 break;
-            case "ArmorPenitration":
-                targetChampion.updateArmorPenRpc(targetChampion.armorPen.Value + randomAdjustment);
+            case "ArmorPenetration":
+                targetChampion.updateArmorPenRpc(randomAdjustment);
                 break;
-            case "MagicPenitration":
-                targetChampion.updateMagicPenRpc(targetChampion.magicPen.Value + randomAdjustment);
+            case "MagicPenetration":
+                targetChampion.updateMagicPenRpc(randomAdjustment);
                 break;
             case "MagicResist":
-                targetChampion.updateMagicResistRpc(targetChampion.magicResist.Value + randomAdjustment);
+                targetChampion.updateMagicResistRpc(randomAdjustment);
                 break;
             default:
                 Debug.LogWarning($"Unknown augment type: {newAugment.type}");

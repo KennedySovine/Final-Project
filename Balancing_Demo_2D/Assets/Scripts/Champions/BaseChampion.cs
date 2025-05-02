@@ -191,28 +191,18 @@ public class BaseChampion : NetworkBehaviour
     }
 
     //Also will track consecutive attacks based if the dmg type is AD or AP
-    public void TakeDamage(float AD, float AP){
-        if (IsServer)
-        {
-            // Calculate damage based on armor and magic resist
-            Debug.Log("Taking damage: " + AD + " AD, " + AP + " AP");
-            float damage = 0f;
-            if (AD > 0){
-                damage += AD / (1 + (armor.Value / 100)); // Physical damage calculation
-            }
-            if (AP > 0){
-                damage += AP / (1 + (magicResist.Value / 100)); // Magic damage calculation
-            }
-            
+    public void TakeDamage(float AD, float AP, float armorPen, float magicPen){
+        if (!IsServer) return;
 
-            updateHealthRpc(-damage); // Update health with negative damage value
+        float damage = 0f;
+ 
+        damage += AD / (1 + (armor.Value - armorPen) / 100); // Calculate damage with armor penetration
 
-            if (health.Value <= 0)
-            {
-                Debug.Log("Champion has died!");
-                //Die(); // Call the die function if health is 0 or less
-            }
-        }
+        damage += AP / (1 + (magicResist.Value - magicPen) / 100); // Calculate damage with magic penetration
+
+        updateHealthRpc(-damage); // Update health with the calculated damage
+        Debug.Log("Damage taken: " + damage + " (AD: " + AD + ", AP: " + AP + ", Armor Pen: " + armorPen + ", Magic Pen: " + magicPen + ")");
+
     }
 
     [Rpc(SendTo.Server)]
@@ -242,7 +232,7 @@ public class BaseChampion : NetworkBehaviour
             maxHealth.Value += tempH;
             return;
         }
-        maxHealth.Value = healthChange;
+        maxHealth.Value += healthChange;
     }
 
     [Rpc(SendTo.Server)]
@@ -266,7 +256,7 @@ public class BaseChampion : NetworkBehaviour
             AD.Value += tempAD;
             return;
         }
-        AD.Value = adChange;
+        AD.Value += adChange;
     }
     [Rpc(SendTo.Server)]
     public void updateAPRpc(float apChange)
@@ -279,7 +269,7 @@ public class BaseChampion : NetworkBehaviour
             AP.Value += tempAP;
             return;
         }
-        AP.Value = apChange;
+        AP.Value += apChange;
     }
     [Rpc(SendTo.Server)]
     public void updateArmorRpc(float armorChange)
@@ -292,7 +282,7 @@ public class BaseChampion : NetworkBehaviour
             armor.Value += tempA;
             return;
         }
-        armor.Value = armorChange;
+        armor.Value += armorChange;
     }
     [Rpc(SendTo.Server)]
     public void updateMagicResistRpc(float magicResistChange)
@@ -305,7 +295,7 @@ public class BaseChampion : NetworkBehaviour
             magicResist.Value += tempMR;
             return;
         }
-        magicResist.Value = magicResistChange;
+        magicResist.Value += magicResistChange;
     }
     [Rpc(SendTo.Server)]
     public void updateAttackSpeedRpc(float attackSpeedChange)
@@ -318,7 +308,7 @@ public class BaseChampion : NetworkBehaviour
             attackSpeed.Value += tempAS;
             return;
         }
-        attackSpeed.Value = attackSpeedChange;
+        attackSpeed.Value += attackSpeedChange;
     }
     [Rpc(SendTo.Server)]
     public void updateMovementSpeedRpc(float movementSpeedChange)
@@ -331,7 +321,7 @@ public class BaseChampion : NetworkBehaviour
             movementSpeed.Value += tempMS;
             return;
         }
-        movementSpeed.Value = movementSpeedChange;
+        movementSpeed.Value += movementSpeedChange;
     }
     [Rpc(SendTo.Server)]
     public void updateMaxManaRpc(float manaChange)
@@ -344,7 +334,7 @@ public class BaseChampion : NetworkBehaviour
             maxMana.Value += tempM;
             return;
         }
-        maxMana.Value = manaChange;
+        maxMana.Value += manaChange;
     }
     [Rpc(SendTo.Server)]
     public void updateManaRpc(float manaChange)
@@ -354,7 +344,7 @@ public class BaseChampion : NetworkBehaviour
         mana.Value += manaChange; // Update the mana value
         if (mana.Value > maxMana.Value) // Ensure mana does not exceed maxMana
         {
-            mana.Value = maxMana.Value;
+            mana.Value += maxMana.Value;
         }
     }
     [Rpc(SendTo.Server)]
@@ -368,7 +358,7 @@ public class BaseChampion : NetworkBehaviour
             manaRegen.Value += tempMR;
             return;
         }
-        manaRegen.Value = manaRegenChange;
+        manaRegen.Value += manaRegenChange;
     }
     [Rpc(SendTo.Server)]
     public void updateAbilityHasteRpc(float abilityHasteChange)
@@ -382,7 +372,7 @@ public class BaseChampion : NetworkBehaviour
         }
         else
         {
-            abilityHaste.Value = abilityHasteChange;
+            abilityHaste.Value += abilityHasteChange;
         }
         ability1.setCooldown(ability1.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 1 based on ability haste
         ability2.setCooldown(ability2.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 2 based on ability haste
@@ -399,7 +389,7 @@ public class BaseChampion : NetworkBehaviour
             critChance.Value += tempCC;
             return;
         }
-        critChance.Value = critChanceChange;
+        critChance.Value += critChanceChange;
     }
     [Rpc(SendTo.Server)]
     public void updateCritDamageRpc(float critDamageChange)
@@ -412,7 +402,7 @@ public class BaseChampion : NetworkBehaviour
             critDamage.Value += tempCD;
             return;
         }
-        critDamage.Value = critDamageChange;
+        critDamage.Value += critDamageChange;
     }
     [Rpc(SendTo.Server)]
     public void updateArmorPenRpc(float armorPenChange)
@@ -425,7 +415,7 @@ public class BaseChampion : NetworkBehaviour
             armorPen.Value += tempAP;
             return;
         }
-        armorPen.Value = armorPenChange;
+        armorPen.Value += armorPenChange;
     }
     [Rpc(SendTo.Server)]
     public void updateMagicPenRpc(float magicPenChange)
@@ -438,7 +428,7 @@ public class BaseChampion : NetworkBehaviour
             magicPen.Value += tempMP;
             return;
         }
-        magicPen.Value = magicPenChange;
+        magicPen.Value += magicPenChange;
     }
 
     [Rpc(SendTo.Server)]

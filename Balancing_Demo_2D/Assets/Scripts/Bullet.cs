@@ -75,7 +75,7 @@ public class Bullet : NetworkBehaviour
                 //Debug.Log($"Current position: {owner.name}");
 
                 Debug.Log($"Damage dealt: {ADDamage} + {APDamage} (Armor Penetration: {armorPenetration}, Magic Penetration: {magicPenetration})");
-                champion.TakeDamage(ADDamage, APDamage);
+                champion.TakeDamage(ADDamage, APDamage, armorPenetration, magicPenetration); // Apply damage to the target player
                 GetComponent<NetworkObject>().Despawn();
                 Debug.Log("Bullet despawned on the server.");
             }

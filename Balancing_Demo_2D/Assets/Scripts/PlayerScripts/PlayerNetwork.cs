@@ -231,6 +231,8 @@ public class PlayerNetwork : NetworkBehaviour
 
             networkObject.SpawnWithOwnership(transform.parent.GetComponent<NetworkObject>().OwnerClientId);
             bulletComponent.ADDamage = champion.AD.Value;
+            bulletComponent.armorPenetration = champion.armorPen.Value;
+            bulletComponent.magicPenetration = champion.magicPen.Value;
             bulletComponent.targetPosition = targetPosition;
             bulletComponent.targetPlayer = enemyChampion;
             bulletComponent.speed = champion.missileSpeed.Value;
