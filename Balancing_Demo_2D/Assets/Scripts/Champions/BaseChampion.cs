@@ -234,246 +234,211 @@ public class BaseChampion : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void updateMaxHealthRpc(float healthChange)
     {
-        if (IsServer)
+        if (!IsServer) return; // Ensure this is only executed on the server
+
+        if (healthChange < 1 && healthChange > 0) // If the health change is due to augment that will add %
         {
-            if (healthChange < 1 && healthChange > 0) // If the health change is due to augment that will add %
-            {
-                float tempH = maxHealth.Value * healthChange;
-                maxHealth.Value += tempH;
-            }
-            else
-            {
-                maxHealth.Value += healthChange;
-            }
+            float tempH = maxHealth.Value * healthChange;
+            maxHealth.Value += tempH;
+            return;
         }
+        maxHealth.Value = healthChange;
     }
 
     [Rpc(SendTo.Server)]
     public void updateHealthRpc(float healthChange)
     {
-        if (IsServer)
+        if (!IsServer) return; // Ensure this is only executed on the server
+        health.Value += healthChange; // Update the health value
+        if (health.Value > maxHealth.Value) // Ensure health does not exceed maxHealth
         {
-            health.Value += healthChange;
+            health.Value = maxHealth.Value;
         }
     }
     [Rpc(SendTo.Server)]
     public void updateADRpc(float adChange)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        if (adChange < 1 && adChange > 0) // If the AD change is due to augment that will add %
         {
-            if (adChange < 1 && adChange > 0) // If the AD change is due to augment that will add %
-            {
-                float tempAD = AD.Value * adChange;
-                AD.Value += tempAD;
-            }
-            else
-            {
-                AD.Value = adChange;
-            }
+            float tempAD = AD.Value * adChange;
+            AD.Value += tempAD;
+            return;
         }
+        AD.Value = adChange;
     }
     [Rpc(SendTo.Server)]
     public void updateAPRpc(float apChange)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        if (apChange < 1 && apChange > 0) // If the AP change is due to augment that will add %
         {
-            if (apChange < 1 && apChange > 0) // If the AP change is due to augment that will add %
-            {
-                float tempAP = AP.Value * apChange;
-                AP.Value += tempAP;
-            }
-            else
-            {
-                AP.Value = apChange;
-            }
+            float tempAP = AP.Value * apChange;
+            AP.Value += tempAP;
+            return;
         }
+        AP.Value = apChange;
     }
     [Rpc(SendTo.Server)]
     public void updateArmorRpc(float armorChange)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        if (armorChange < 1 && armorChange > 0) // If the armor change is due to augment that will add %
         {
-            if (armorChange < 1 && armorChange > 0) // If the armor change is due to augment that will add %
-            {
-                float tempA = armor.Value * armorChange;
-                armor.Value += tempA;
-            }
-            else
-            {
-                armor.Value = armorChange;
-            }
+            float tempA = armor.Value * armorChange;
+            armor.Value += tempA;
+            return;
         }
+        armor.Value = armorChange;
     }
     [Rpc(SendTo.Server)]
     public void updateMagicResistRpc(float magicResistChange)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        if (magicResistChange < 1 && magicResistChange > 0) // If the magic resist change is due to augment that will add %
         {
-            if (magicResistChange < 1 && magicResistChange > 0) // If the magic resist change is due to augment that will add %
-            {
-                float tempMR = magicResist.Value * magicResistChange;
-                magicResist.Value += tempMR;
-            }
-            else
-            {
-                magicResist.Value = magicResistChange;
-            }
+            float tempMR = magicResist.Value * magicResistChange;
+            magicResist.Value += tempMR;
+            return;
         }
+        magicResist.Value = magicResistChange;
     }
     [Rpc(SendTo.Server)]
     public void updateAttackSpeedRpc(float attackSpeedChange)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        if (attackSpeedChange < 1 && attackSpeedChange > 0) // If the attack speed change is due to augment that will add %
         {
-            if (attackSpeedChange < 1 && attackSpeedChange > 0) // If the attack speed change is due to augment that will add %
-            {
-                float tempAS = attackSpeed.Value * attackSpeedChange;
-                attackSpeed.Value += tempAS;
-            }
-            else
-            {
-                attackSpeed.Value = attackSpeedChange;
-            }
+            float tempAS = attackSpeed.Value * attackSpeedChange;
+            attackSpeed.Value += tempAS;
+            return;
         }
+        attackSpeed.Value = attackSpeedChange;
     }
     [Rpc(SendTo.Server)]
     public void updateMovementSpeedRpc(float movementSpeedChange)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        if (movementSpeedChange < 1 && movementSpeedChange > 0) // If the movement speed change is due to augment that will add %
         {
-            if (movementSpeedChange < 1 && movementSpeedChange > 0) // If the movement speed change is due to augment that will add %
-            {
-                float tempMS = movementSpeed.Value * movementSpeedChange;
-                movementSpeed.Value += tempMS;
-            }
-            else
-            {
-                movementSpeed.Value = movementSpeedChange;
-            }
+            float tempMS = movementSpeed.Value * movementSpeedChange;
+            movementSpeed.Value += tempMS;
+            return;
         }
+        movementSpeed.Value = movementSpeedChange;
     }
     [Rpc(SendTo.Server)]
     public void updateMaxManaRpc(float manaChange)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        if (manaChange < 1 && manaChange > 0) // If the mana change is due to augment that will add %
         {
-            if (manaChange < 1 && manaChange > 0) // If the mana change is due to augment that will add %
-            {
-                float tempM = maxMana.Value * manaChange;
-                maxMana.Value += tempM;
-            }
-            else
-            {
-                maxMana.Value = manaChange;
-            }
+            float tempM = maxMana.Value * manaChange;
+            maxMana.Value += tempM;
+            return;
         }
+        maxMana.Value = manaChange;
     }
     [Rpc(SendTo.Server)]
     public void updateManaRpc(float manaChange)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        mana.Value += manaChange; // Update the mana value
+        if (mana.Value > maxMana.Value) // Ensure mana does not exceed maxMana
         {
-            mana.Value = manaChange;
+            mana.Value = maxMana.Value;
         }
     }
     [Rpc(SendTo.Server)]
     public void updateManaRegenRpc(float manaRegenChange)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        if (manaRegenChange < 1 && manaRegenChange > 0) // If the mana regen change is due to augment that will add %
         {
-            if (manaRegenChange < 1 && manaRegenChange > 0) // If the mana regen change is due to augment that will add %
-            {
-                float tempMR = manaRegen.Value * manaRegenChange;
-                manaRegen.Value += tempMR;
-            }
-            else
-            {
-                manaRegen.Value = manaRegenChange;
-            }
+            float tempMR = manaRegen.Value * manaRegenChange;
+            manaRegen.Value += tempMR;
+            return;
         }
+        manaRegen.Value = manaRegenChange;
     }
     [Rpc(SendTo.Server)]
     public void updateAbilityHasteRpc(float abilityHasteChange)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        if (abilityHasteChange < 1 && abilityHasteChange > 0) // If the ability haste change is due to augment that will add %
         {
-            if (abilityHasteChange < 1 && abilityHasteChange > 0) // If the ability haste change is due to augment that will add %
-            {
-                float tempAH = abilityHaste.Value * abilityHasteChange;
-                abilityHaste.Value += tempAH;
-            }
-            else
-            {
-                abilityHaste.Value = abilityHasteChange;
-            }
-            ability1.setCooldown(ability1.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 1 based on ability haste
-            ability2.setCooldown(ability2.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 2 based on ability haste
-            ability3.setCooldown(ability3.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 3 based on ability haste
+            float tempAH = abilityHaste.Value * abilityHasteChange;
+            abilityHaste.Value += tempAH;
         }
+        else
+        {
+            abilityHaste.Value = abilityHasteChange;
+        }
+        ability1.setCooldown(ability1.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 1 based on ability haste
+        ability2.setCooldown(ability2.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 2 based on ability haste
+        ability3.setCooldown(ability3.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 3 based on ability haste
     }
     [Rpc(SendTo.Server)]
     public void updateCritChanceRpc(float critChanceChange)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        if (critChanceChange < 1 && critChanceChange > 0) // If the crit chance change is due to augment that will add %
         {
-            if (critChanceChange < 1 && critChanceChange > 0) // If the crit chance change is due to augment that will add %
-            {
-                float tempCC = critChance.Value * critChanceChange;
-                critChance.Value += tempCC;
-            }
-            else
-            {
-                critChance.Value = critChanceChange;
-            }
+            float tempCC = critChance.Value * critChanceChange;
+            critChance.Value += tempCC;
+            return;
         }
+        critChance.Value = critChanceChange;
     }
     [Rpc(SendTo.Server)]
     public void updateCritDamageRpc(float critDamageChange)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        if (critDamageChange < 1 && critDamageChange > 0) // If the crit damage change is due to augment that will add %
         {
-            if (critDamageChange < 1 && critDamageChange > 0) // If the crit damage change is due to augment that will add %
-            {
-                float tempCD = critDamage.Value * critDamageChange;
-                critDamage.Value += tempCD;
-            }
-            else
-            {
-                critDamage.Value = critDamageChange;
-            }
+            float tempCD = critDamage.Value * critDamageChange;
+            critDamage.Value += tempCD;
+            return;
         }
+        critDamage.Value = critDamageChange;
     }
     [Rpc(SendTo.Server)]
     public void updateArmorPenRpc(float armorPenChange)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        if (armorPenChange < 1 && armorPenChange > 0) // If the armor pen change is due to augment that will add %
         {
-            if (armorPenChange < 1 && armorPenChange > 0) // If the armor pen change is due to augment that will add %
-            {
-                float tempAP = armorPen.Value * armorPenChange;
-                armorPen.Value += tempAP;
-            }
-            else
-            {
-                armorPen.Value = armorPenChange;
-            }
+            float tempAP = armorPen.Value * armorPenChange;
+            armorPen.Value += tempAP;
+            return;
         }
+        armorPen.Value = armorPenChange;
     }
     [Rpc(SendTo.Server)]
     public void updateMagicPenRpc(float magicPenChange)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        if (magicPenChange < 1 && magicPenChange > 0) // If the magic pen change is due to augment that will add %
         {
-            if (magicPenChange < 1 && magicPenChange > 0) // If the magic pen change is due to augment that will add %
-            {
-                float tempMP = magicPen.Value * magicPenChange;
-                magicPen.Value += tempMP;
-            }
-            else
-            {
-                magicPen.Value = magicPenChange;
-            }
+            float tempMP = magicPen.Value * magicPenChange;
+            magicPen.Value += tempMP;
+            return;
         }
+        magicPen.Value = magicPenChange;
     }
 
     [Rpc(SendTo.Server)]

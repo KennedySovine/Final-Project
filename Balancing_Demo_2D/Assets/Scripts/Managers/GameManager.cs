@@ -349,37 +349,37 @@ public class GameManager : NetworkBehaviour
         switch (newAugment.type)
         {
             case "AbilityHaste":
-                targetChampion.updateAbilityHasteRpc(randomAdjustment);
+                targetChampion.updateAbilityHasteRpc(targetChampion.abilityHaste.Value + randomAdjustment);
                 break;
             case "Armor":
-                targetChampion.updateArmorRpc(randomAdjustment);
+                targetChampion.updateArmorRpc(targetChampion.armor.Value + randomAdjustment);
                 break;
             case "AttackDamage":
-                targetChampion.updateADRpc(randomAdjustment);
+                targetChampion.updateADRpc(targetChampion.AD.Value + randomAdjustment);
                 break;
             case "AbilityPower":
-                targetChampion.updateAPRpc(randomAdjustment);
+                targetChampion.updateAPRpc(targetChampion.AP.Value + randomAdjustment);
                 break;
             case "Health":
-                targetChampion.updateMaxHealthRpc(randomAdjustment);
+                targetChampion.updateMaxHealthRpc(targetChampion.maxHealth.Value + randomAdjustment);
                 break;
             case "AttackSpeed":
-                targetChampion.updateAttackSpeedRpc(randomAdjustment);
+                targetChampion.updateAttackSpeedRpc(targetChampion.attackSpeed.Value + randomAdjustment);
                 break;
             case "CriticalStrike":
-                targetChampion.updateCritChanceRpc(randomAdjustment);
+                targetChampion.updateCritChanceRpc(targetChampion.critChance.Value + randomAdjustment);
                 break;
             case "CriticalDamage":
-                targetChampion.updateCritDamageRpc(randomAdjustment);
+                targetChampion.updateCritDamageRpc(targetChampion.critDamage.Value + randomAdjustment);
                 break;
             case "ArmorPenitration":
-                targetChampion.updateArmorPenRpc(randomAdjustment); 
+                targetChampion.updateArmorPenRpc(targetChampion.armorPen.Value + randomAdjustment);
                 break;
             case "MagicPenitration":
-                targetChampion.updateMagicPenRpc(randomAdjustment);
+                targetChampion.updateMagicPenRpc(targetChampion.magicPen.Value + randomAdjustment);
                 break;
             case "MagicResist":
-                targetChampion.updateMagicResistRpc(randomAdjustment);
+                targetChampion.updateMagicResistRpc(targetChampion.magicResist.Value + randomAdjustment);
                 break;
             default:
                 Debug.LogWarning($"Unknown augment type: {newAugment.type}");
