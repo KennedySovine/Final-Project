@@ -94,7 +94,7 @@ public class PlayerNetwork : NetworkBehaviour
     public void PerformAutoAttack()
     {
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
-        if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null)
+        if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && (hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId))
         {
             Debug.Log("Raycast hit the enemy champion!");
             

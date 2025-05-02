@@ -33,7 +33,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1330155807776156165}
@@ -158,10 +158,16 @@ MonoBehaviour:
     m_InternalValue: 0
   magicPen:
     m_InternalValue: 0
-  attackRange:
-    m_InternalValue: 100
+  missileSpeed:
+    m_InternalValue: 33
   currentPosition:
     m_InternalValue: {x: 0, y: 0, z: 0}
+  slowAmount:
+    m_InternalValue: 0
+  slowDuration:
+    m_InternalValue: 0
+  slowStartTime:
+    m_InternalValue: 0
   isEmpowered:
     m_InternalValue: 0
   empowerStartTime:
@@ -178,6 +184,8 @@ MonoBehaviour:
     m_InternalValue: 0
   ability3Used:
     m_InternalValue: 0
+  rapidFire:
+    m_InternalValue: 1
   health:
     m_InternalValue: 600
   mana:
@@ -189,6 +197,13 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    Stats:
+      damageValues: []
+      damageOverTime: 0
+      damage: 0
+      costToDamage: 0
+      totalManaSpent: 0
+      gameTime: 0
     timeOfCast: 0
   passive:
     name: 
@@ -197,6 +212,13 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    Stats:
+      damageValues: []
+      damageOverTime: 0
+      damage: 0
+      costToDamage: 0
+      totalManaSpent: 0
+      gameTime: 0
     timeOfCast: 0
   ability1:
     name: 
@@ -205,6 +227,13 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    Stats:
+      damageValues: []
+      damageOverTime: 0
+      damage: 0
+      costToDamage: 0
+      totalManaSpent: 0
+      gameTime: 0
     timeOfCast: 0
   ability2:
     name: 
@@ -213,6 +242,13 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    Stats:
+      damageValues: []
+      damageOverTime: 0
+      damage: 0
+      costToDamage: 0
+      totalManaSpent: 0
+      gameTime: 0
     timeOfCast: 0
   ability3:
     name: 
@@ -221,12 +257,20 @@ MonoBehaviour:
     manaCost: 0
     range: 0
     duration: 0
+    Stats:
+      damageValues: []
+      damageOverTime: 0
+      damage: 0
+      costToDamage: 0
+      totalManaSpent: 0
+      gameTime: 0
     timeOfCast: 0
   lastAutoAttackTime:
     m_InternalValue: 0
-  attackConsecutiveAD: 0
   regenTimer: 0
   enemyChampion: {fileID: 0}
+  enemyChampionId:
+    m_InternalValue: 0
   bulletPrefab: {fileID: 2169341123581716514, guid: 66c025e1f784eb2478380fa1d8dd1de2, type: 3}
   PN: {fileID: 479571641050879420}
 --- !u!114 &5221310434119250730
@@ -349,7 +393,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
