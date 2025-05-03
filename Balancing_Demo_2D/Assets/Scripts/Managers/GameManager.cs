@@ -42,15 +42,16 @@ public class GameManager : NetworkBehaviour
     public float gameTime = 120f; // Game duration in seconds
     public float augmentBuffer = 20f; //Choose aug every 40 seconds
     public NetworkVariable<bool> augmentChoosing = new NetworkVariable<bool>(false); //If the player is choosing an augment, dont countdown the game time
-    
+    private Camera serverCamera; // Reference to the server camera
 
     [Header("Champion Management")]
     public GameObject championPrefab; // Prefab for spawning champions
     public Transform[] spawnPoints; // Array of spawn points for champions
 
-    private Camera serverCamera; // Reference to the server camera
+    [Header("Managers")]
     public AugmentManager AM; // Reference to the AugmentManager
     public InGameManager IGM; // Reference to the InGameManager
+    public InGameUIManager IGUIM; // Reference to the InGameUIManager
 
     private void Awake()
     {
@@ -103,7 +104,7 @@ public class GameManager : NetworkBehaviour
     {
         playerCount = playerChampions.Count; // Update player count
 
-        if (NetworkManager.Singleton.IsServer) // Ensure this runs only on the server
+        if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost) // Ensure this runs only on the server
         {
             
             //Debug.Log("Player Count: " + playerCount); // Debug log for player count
@@ -183,7 +184,7 @@ public class GameManager : NetworkBehaviour
 
     public void spawnChampions()
     {
-        if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost) // Ensure only the server can execute this
+        if (!IsServer) // Ensure only the server can execute this
         {
             Debug.LogWarning("Only the server can spawn champions!");
             return;
@@ -207,6 +208,7 @@ public class GameManager : NetworkBehaviour
                         playerIDsSpawned.Add(playerId);
                         player1ID = playerId; // Store the ID of player 1
                         player1Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[0].position; // Set the target position for player 1
+                        initializeIGUIMRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 1
                         Debug.Log($"Spawned champion for Player 1 (Client {playerId}).");
                         break;
 
@@ -217,6 +219,7 @@ public class GameManager : NetworkBehaviour
                         playerIDsSpawned.Add(playerId);
                         player2ID = playerId; // Store the ID of player 2
                         player2Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[1].position; // Set the target position for player 2
+                        initializeIGUIMRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 2
                         Debug.Log($"Spawned champion for Player 2 (Client {playerId}).");
                         break;
 
@@ -399,10 +402,9 @@ public class GameManager : NetworkBehaviour
     }
 
     [Rpc(SendTo.SpecifiedInParams)]
-    public void updateHealthAndManaBars(RpcParams rpcParams)
+    public void initializeIGUIMRpc(RpcParams rpcParams)
     {
-        Debug.Log("Updating health and mana bars for Client " + NetworkManager.Singleton.LocalClientId); // Log the client ID for debugging
-        player1Controller.GetComponent<BaseChampion>().updateHealthAndManaBarsRpc(); // Update the health and mana bars for player 1
-        player2Controller.GetComponent<BaseChampion>().updateHealthAndManaBarsRpc(); // Update the health and mana bars for player 2
+        Debug.Log("Initializing InGameUIManager for Client " + NetworkManager.Singleton.LocalClientId); // Log the client ID for debugging
+        IGUIM.InitializeIGUIM(); // Call the method to initialize the InGameUIManager
     }
 }
