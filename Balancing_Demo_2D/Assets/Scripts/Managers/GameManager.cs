@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 using Unity.Netcode;
 using TMPro;
 using System.Linq;
@@ -43,15 +44,16 @@ public class GameManager : NetworkBehaviour
     public float gameTime = 120f; // Game duration in seconds
     public float augmentBuffer = 20f; //Choose aug every 40 seconds
     public NetworkVariable<bool> augmentChoosing = new NetworkVariable<bool>(false); //If the player is choosing an augment, dont countdown the game time
-    
+    private Camera serverCamera; // Reference to the server camera
 
     [Header("Champion Management")]
     public GameObject championPrefab; // Prefab for spawning champions
     public Transform[] spawnPoints; // Array of spawn points for champions
 
-    private Camera serverCamera; // Reference to the server camera
+    [Header("Managers")]
     public AugmentManager AM; // Reference to the AugmentManager
     public InGameManager IGM; // Reference to the InGameManager
+    public InGameUIManager IGUIM; // Reference to the InGameUIManager
 
     private void Awake()
     {
@@ -105,7 +107,7 @@ public class GameManager : NetworkBehaviour
     {
         playerCount = playerChampions.Count; // Update player count
 
-        if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost) // Ensure this runs only on the server
+        if (IsServer || IsHost) // Ensure this runs only on the server
         {
             
             //Debug.Log("Player Count: " + playerCount); // Debug log for player count
@@ -185,7 +187,7 @@ public class GameManager : NetworkBehaviour
 
     public void spawnChampions()
     {
-        if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost) // Ensure only the server can execute this
+        if (!IsServer) // Ensure only the server can execute this
         {
             Debug.LogWarning("Only the server can spawn champions!");
             return;
@@ -237,6 +239,9 @@ public class GameManager : NetworkBehaviour
 
                 player1Controller.GetComponent<BaseChampion>().enemyChampionId.Value = player2.GetComponent<NetworkObject>().OwnerClientId; // Set the player ID for player 1
                 player2Controller.GetComponent<BaseChampion>().enemyChampionId.Value = player1.GetComponent<NetworkObject>().OwnerClientId; // Set the player ID for player 2
+                
+                initializeIGUIMRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 1
+                initializeIGUIMRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 2
             }
         }
     }
@@ -299,12 +304,6 @@ public class GameManager : NetworkBehaviour
             }
         }
 
-        /*player1Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's champion
-        player2Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's champion
-        player1Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's champion
-        player2Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's champion
-        player1Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's champion
-        player2Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's champion*/
         player1Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's champion
         player2Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's champion
     }
@@ -462,4 +461,12 @@ public class GameManager : NetworkBehaviour
         Ability abilityUsed = (playerID == player1ID) ? player1AbilityUsed : player2AbilityUsed;
         Debug.Log($"Player {playerID} used ability: {abilityUsed.name}");
     }
+    [Rpc(SendTo.SpecifiedInParams)]
+    public void initializeIGUIMRpc(RpcParams rpcParams)
+    {
+        IGUIM.inGameUI.SetActive(true); // Activate the in-game UI
+        Debug.Log("In-game UI initialized and activated.");
+    }
+
+
 }

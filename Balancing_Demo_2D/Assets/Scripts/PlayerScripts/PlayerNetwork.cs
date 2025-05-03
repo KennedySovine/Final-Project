@@ -298,8 +298,8 @@ public class PlayerNetwork : NetworkBehaviour
     {
         while (GB!= null && Vector3.Distance(GB.transform.position, targetPosition) > 0.1f)
         {
-            Debug.Log("Moving ghost bullet towards target position.");
-            Debug.Log("Speed: " + speed);
+            //Debug.Log("Moving ghost bullet towards target position.");
+            //Debug.Log("Speed: " + speed);
             GB.transform.position = Vector3.MoveTowards(GB.transform.position, targetPosition, speed * Time.deltaTime);
             yield return null;
         }
