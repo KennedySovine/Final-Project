@@ -9,11 +9,10 @@ public class InGameUIManager : NetworkBehaviour
     private GameManager GM;
     private InGameManager IGM;
 
-    [SerializeField] private Slider healthSlider;
-    [SerializeField] private Slider manaSlider;
+    public Slider healthSlider;
+    public Slider manaSlider;
 
     public GameObject inGameUI; // Reference to the in-game UI GameObject
-    [SerializeField] public BaseChampion localPlayerChampion; // Reference to the local player champion object
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     private void Awake()
@@ -46,35 +45,15 @@ public class InGameUIManager : NetworkBehaviour
         
     }
 
-    public void InitializeIGUIM(float maxHealth, float maxMana){
-        if (!IsOwner) return; // Only run this for clients
-        setHealthSlider(maxHealth); // Set the health slider maximum value
-        setManaSlider(maxMana); // Set the mana slider maximum value
+    public void InitializeIGUIM(){
+        inGameUI.SetActive(true); // Activate the in-game UI
         Debug.Log("In-game UI initialized and activated.");
     }
 
-    public void UpdateHealthSlider(float previousValue, float newValue)
+    public void updateSliders(float health, float mana)
     {
-        if (!IsOwner) return; // Only run this for clients
-        healthSlider.value = newValue; // Update the health slider value
-    }
-    public void UpdateManaSlider(float previousValue, float newValue)
-    {
-        if (!IsOwner) return; // Only run this for clients
-        manaSlider.value = newValue; // Update the mana slider value
-    }
 
-    private void setHealthSlider(float max)
-    {
-        if (!IsOwner) return; // Only run this for clients
-        healthSlider.maxValue = localPlayerChampion.maxHealth.Value; // Set the maximum value of the health slider
-        healthSlider.value = localPlayerChampion.health.Value; // Set the current value of the health slider
-    }
-    
-    private void setManaSlider(float max)
-    {
-        if (!IsOwner) return; // Only run this for clients
-        manaSlider.maxValue = localPlayerChampion.maxMana.Value; // Set the maximum value of the mana slider
-        manaSlider.value = localPlayerChampion.mana.Value; // Set the current value of the mana slider
+        healthSlider.value = health; // Update the health slider value
+        manaSlider.value = mana; // Update the mana slider value
     }
 }

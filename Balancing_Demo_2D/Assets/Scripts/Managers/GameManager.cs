@@ -238,6 +238,8 @@ public class GameManager : NetworkBehaviour
                 // Add any additional logic to start the game here
                 player1Controller.GetComponent<BaseChampion>().enemyChampion = player2Controller;
                 player2Controller.GetComponent<BaseChampion>().enemyChampion = player1Controller; // Set the enemy champion reference for both players
+                initializeIGUIMRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 1
+                initializeIGUIMRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 2
             }
         }
     }
@@ -408,29 +410,8 @@ public class GameManager : NetworkBehaviour
     public void initializeIGUIMRpc(RpcParams rpcParams)
     {
         Debug.Log("Initializing InGameUIManager for Client " + NetworkManager.Singleton.LocalClientId);
-
-        if (rpcParams.Receive.SenderClientId == player1ID)
-        {
-            waitForChampionSpawn(player1Controller); // Wait for the player 1 controller to be assigned
-        }
-        else if (rpcParams.Receive.SenderClientId == player2ID)
-        {
-            waitForChampionSpawn(player2Controller); // Wait for the player 2 controller to be assigned
-        }
-        else
-        {
-            Debug.LogWarning("Unknown client ID. Cannot initialize InGameUIManager.");
-        }
+        IGUIM.InitializeIGUIM();
     }
 
-    private IEnumerator waitForChampionSpawn(GameObject controller)
-    {
-        while (controller == null)
-        {
-            yield return null; // Wait until the controller is assigned
-        }
-        Debug.Log("Champion spawned and controller assigned: " + controller.name);
-        controller.GetComponent<BaseChampion>().initIGUIM(); // Call the initIGUIM method on the controller
-    }
 
 }

@@ -82,8 +82,39 @@ public class BaseChampion : NetworkBehaviour
             Debug.LogError("InGameUIManager instance is null. Ensure the InGameUIManager is active in the scene.");
         }
 
-        health.OnValueChanged += IGUIM.UpdateHealthSlider; // Subscribe to health value changes
-        mana.OnValueChanged += IGUIM.UpdateManaSlider; // Subscribe to mana value changes
+        maxHealth.OnValueChanged += UpdateMaxHealthSlider; // Subscribe to max health value changes
+        maxMana.OnValueChanged += UpdateMaxManaSlider; // Subscribe to max mana value changes
+
+        health.OnValueChanged += UpdateHealthSlider; // Subscribe to health value changes
+        mana.OnValueChanged += UpdateManaSlider; // Subscribe to mana value changes
+    }
+
+    public void UpdateMaxHealthSlider(float previousValue, float newValue)
+    {
+        Debug.Log($"Max Health changed from {previousValue} to {newValue}"); // Log the max health change
+        IGUIM.healthSlider.maxValue = newValue; // Update the maximum value of the health slider in the UI
+        Debug.Log($"Max Health slider updated to {IGUIM.healthSlider.maxValue}"); // Log the max health slider update
+    }
+
+    public void UpdateMaxManaSlider(float previousValue, float newValue)
+    {
+        Debug.Log($"Max Mana changed from {previousValue} to {newValue}"); // Log the max mana change
+        IGUIM.manaSlider.maxValue = newValue; // Update the maximum value of the mana slider in the UI
+        Debug.Log($"Max Mana slider updated to {IGUIM.manaSlider.maxValue}"); // Log the max mana slider update
+    }
+
+    public void UpdateHealthSlider(float previousValue, float newValue)
+    {
+        Debug.Log($"Health changed from {previousValue} to {newValue}"); // Log the health change
+        IGUIM.updateSliders(newValue, mana.Value); // Update the health slider in the UI
+        Debug.Log($"Health slider updated to {IGUIM.healthSlider.value}"); // Log the health slider update
+    }
+
+    public void UpdateManaSlider(float previousValue, float newValue)
+    {
+        Debug.Log($"Mana changed from {previousValue} to {newValue}"); // Log the mana change
+        IGUIM.updateSliders(health.Value, newValue); // Update the mana slider in the UI
+        Debug.Log($"Mana slider updated to {IGUIM.manaSlider.value}"); // Log the mana slider update
     }
 
     [Rpc(SendTo.Server)]
@@ -132,13 +163,6 @@ public class BaseChampion : NetworkBehaviour
 
         stackManager(); // Call the stack manager logic
 
-    }
-
-    public void initIGUIM(){
-        if (!IsOwner) return; // Only run this for clients
-        IGUIM.InitializeIGUIM(maxHealth.Value, maxMana.Value); // Initialize the InGameUIManager with max health and mana
-        IGUIM.gameObject.SetActive(true); // Activate the InGameUIManager
-        Debug.Log("In-game UI initialized and activated.");
     }
 
     private void HealthandManaRegen()

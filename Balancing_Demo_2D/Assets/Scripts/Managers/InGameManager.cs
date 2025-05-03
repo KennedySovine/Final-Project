@@ -136,7 +136,6 @@ public class InGameManager : NetworkBehaviour
                 GM.playerChampions.Add(clientID, champChoice); // Add the player prefab to the player list
                 Debug.Log($"Client {clientID} added to game with champion {champChoice.name}.");
                 ChampSelectUI.SetActive(false); // Hide the champion selection UI
-                GM.initializeIGUIMRpc(RpcTarget.Single(clientID, RpcTargetUse.Temp));
             }
             else
             {
