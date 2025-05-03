@@ -239,7 +239,7 @@ public class GameManager : NetworkBehaviour
 
                 player1Controller.GetComponent<BaseChampion>().enemyChampionId.Value = player2.GetComponent<NetworkObject>().OwnerClientId; // Set the player ID for player 1
                 player2Controller.GetComponent<BaseChampion>().enemyChampionId.Value = player1.GetComponent<NetworkObject>().OwnerClientId; // Set the player ID for player 2
-                
+
                 initializeIGUIMRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 1
                 initializeIGUIMRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 2
             }
@@ -306,6 +306,13 @@ public class GameManager : NetworkBehaviour
 
         player1Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's champion
         player2Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's champion
+
+        player1Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's ability
+        player2Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's ability
+        player1Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's ability
+        player2Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's ability
+        player1Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's ability
+        player2Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's ability
     }
     public void applyAugments(ulong playerID)
     {

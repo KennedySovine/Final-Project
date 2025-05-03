@@ -8,7 +8,7 @@ public class Bullet : NetworkBehaviour
     public Vector3 targetPosition; 
     public GameObject targetPlayer = null; // Reference to the target player object
     public ulong ownerID; // Reference to the owner of the bullet
-    private GameObject owner; // Reference to the owner of the bullet
+    public GameObject owner; // Reference to the owner of the bullet
 
     [Header("Bullet Settings")]
 
@@ -16,6 +16,7 @@ public class Bullet : NetworkBehaviour
     public float APDamage = 0f;
     public float speed = 0f; // Speed of the bullet
     public float armorPenetration = 0f; // Armor penetration value
+    public float critChance = 0f; // Critical chance value
     public float magicPenetration = 0f; // Magic penetration value
     public float slowAmount = 0f; // Slow amount value
     public float range = 0f; // Range of the bullet
@@ -47,7 +48,7 @@ public class Bullet : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        //owner = NetworkManager.Singleton.SpawnManager.SpawnedObjects[ownerID].gameObject; // Get the owner of the bullet
+        //owner = owner.transform.Find("PlayerController")?.gameObject;
 
         // Check if the bullet hit the target player
         if (collision.gameObject == targetPlayer)
@@ -64,40 +65,22 @@ public class Bullet : NetworkBehaviour
                     champion.applySlowRpc(slowAmount, 2f);
                     // Extra dmg for frost
                     if (hasFrost){
-                        //champion.TakeDamage(ADDamage + (owner.GetComponent<BaseChampion>().critChance.Value * 0.75f), APDamage); // Apply damage with crit chance (ASHE)
+                        Debug.Log("Frost damage applied to the target player: " + targetPlayer.name);
+                        champion.TakeDamage(ADDamage + (owner.GetComponent<BaseChampion>().critChance.Value * 0.75f), APDamage, armorPenetration, magicPenetration); // Apply damage with crit chance (ASHE)
+                    
+                    }
+                    else{
+                        champion.TakeDamage(ADDamage, APDamage, armorPenetration, magicPenetration); // Apply damage to the target player
                     }
                 }
-
-                //HideBulletRpc(); // Hide the bullet on the server
-
-                //Debug.Log($"Bullet hit the target player: {targetPlayer.name}");
-                //Debug.Log($"Target Position: {transform.position}");
-                //Debug.Log($"Current position: {owner.name}");
+                else{
+                    champion.TakeDamage(ADDamage, APDamage, armorPenetration, magicPenetration); // Apply damage to the target player
+                }
 
                 Debug.Log($"Damage dealt: {ADDamage} + {APDamage} (Armor Penetration: {armorPenetration}, Magic Penetration: {magicPenetration})");
-                champion.TakeDamage(ADDamage, APDamage, armorPenetration, magicPenetration); // Apply damage to the target player
                 GetComponent<NetworkObject>().Despawn();
                 Debug.Log("Bullet despawned on the server.");
             }
         }
     }
-
-    // Function to destroy prefab if it goes outside of range
-
-    /*[Rpc(SendTo.NotServer)]
-    private void HideBulletRpc()
-    {
-        while (Vector3.Distance(transform.position, targetPosition) > 0.1f)
-        {
-            Debug.Log("Bullet is out of range. Hiding it.");
-            gameObject.SetActive(false); // Hide the bullet
-            break; // Exit the loop after hiding the bullet
-        }
-    }
-
-    private IEnumerator DelayedDespawn(float delay){
-        yield return new WaitForSeconds(delay);
-        if (IsServer)
-            GetComponent<NetworkObject>().Despawn();
-    }*/
 }

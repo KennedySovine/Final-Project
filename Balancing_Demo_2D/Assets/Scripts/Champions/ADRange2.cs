@@ -169,6 +169,7 @@ public class ADRange2 : BaseChampion
         StartCoroutine(RapidFireCoroutine(ability1.duration)); // Start the rapid fire coroutine
 
         updateManaRpc(-ability1.manaCost); // Deduct the mana cost
+        ability1.Stats.totalManaSpent += ability1.manaCost; // Update the total mana spent for the ability
 
         resetStackCountRpc(); // Reset the stack count
     }
@@ -198,6 +199,7 @@ public class ADRange2 : BaseChampion
         }
         updateAbility3UsedRpc(true); // Update the ability range
         updateManaRpc(-ability3.manaCost); // Deduct mana cost
+        ability3.Stats.totalManaSpent += ability3.manaCost; // Update the total mana spent for the ability
     }
 
     private IEnumerator RapidFireCoroutine(float duration)
@@ -206,7 +208,7 @@ public class ADRange2 : BaseChampion
         var tempAD = AD.Value; // Store the original AD
         Debug.Log("Rapid Fire started!");
         updateAttackSpeedRpc(0.25f); // Increase attack speed by 25
-        updateADRpc(21f); // Increase AD by 21
+        updateADRpc(.21f); // Increase AD by 21
         yield return new WaitForSeconds(duration); // Wait for the specified duration
         Debug.Log("Rapid Fire ended!");
 

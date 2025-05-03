@@ -47,25 +47,25 @@ public class InGameUIManager : NetworkBehaviour
 
     public void UpdateHealthSlider(float previousValue, float newValue)
     {
-        Debug.Log($"Updating health slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
+        //Debug.Log($"Updating health slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
         healthSlider.value = newValue; // Update the health slider in the UI
     }
 
     public void UpdateManaSlider(float previousValue, float newValue)
     {
-        Debug.Log($"Updating mana slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
+        //Debug.Log($"Updating mana slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
         manaSlider.value = newValue; // Update the mana slider in the UI
     }
 
     public void UpdateMaxHealthSlider(float previousValue, float newValue)
     {
-        Debug.Log($"Updating max health slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
+        //Debug.Log($"Updating max health slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
         healthSlider.maxValue = newValue; // Update the max health slider in the UI
     }
 
     public void UpdateMaxManaSlider(float previousValue, float newValue)
     {
-        Debug.Log($"Updating max mana slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
+        //Debug.Log($"Updating max mana slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
         manaSlider.maxValue = newValue; // Update the max mana slider in the UI
     }
 

@@ -239,7 +239,8 @@ public class PlayerNetwork : NetworkBehaviour
             bulletComponent.targetPosition = targetPosition;
             bulletComponent.targetPlayer = enemyChampion;
             bulletComponent.speed = champion.missileSpeed.Value;
-            bulletComponent.ownerID = transform.parent.GetComponent<NetworkObject>().NetworkObjectId;
+            //bulletComponent.ownerID = transform.parent.GetComponent<NetworkObject>().clientId;
+            bulletComponent.owner = this.gameObject; // Set the owner of the bullet
 
             SpawnGhostBulletRpc(targetPosition, transform.position, champion.missileSpeed.Value); // Spawn the ghost
 

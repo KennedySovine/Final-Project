@@ -29,7 +29,7 @@ public class ADRange : BaseChampion
         attackSpeed.Value = 0.685f;
         movementSpeed.Value = 11f; // Look at Base Champ for calculation
         maxMana.Value = 232f;
-        manaRegen.Value = 8f;
+        manaRegen.Value = 1.4f;
         abilityHaste.Value = 0f;
         critChance.Value = 0f;
         critDamage.Value = 1.75f; // 175% damage on crit
