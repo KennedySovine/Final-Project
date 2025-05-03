@@ -33,9 +33,7 @@ public class GameManager : NetworkBehaviour
     private bool playerSpawningStart = false;
     public ulong ServerID = 3; // ID of the server
     public ulong player1ID = 0; // ID of player 1
-    public NetworkVariable<ulong> player1IDNet = new NetworkVariable<ulong>(0); // Network variable for player 1 ID
     public ulong player2ID = 0; // ID of player 2
-    public NetworkVariable<ulong> player2IDNet = new NetworkVariable<ulong>(0); // Network variable for player 2 ID
 
     [Header("Game Settings")]
     private bool gameEnded = false; // Flag to indicate if the game has ended
@@ -210,7 +208,6 @@ public class GameManager : NetworkBehaviour
                         player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                         playerIDsSpawned.Add(playerId);
                         player1ID = playerId; // Store the ID of player 1
-                        player1IDNet.Value = playerId; // Set the network variable for player 1 ID
                         player1Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[0].position; // Set the target position for player 1
                         Debug.Log($"Spawned champion for Player 1 (Client {playerId}).");
                         break;
@@ -221,7 +218,6 @@ public class GameManager : NetworkBehaviour
                         player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                         playerIDsSpawned.Add(playerId);
                         player2ID = playerId; // Store the ID of player 2
-                        player2IDNet.Value = playerId; // Set the network variable for player 2 ID
                         player2Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[1].position; // Set the target position for player 2
                         Debug.Log($"Spawned champion for Player 2 (Client {playerId}).");
                         break;
@@ -409,8 +405,8 @@ public class GameManager : NetworkBehaviour
     [Rpc(SendTo.SpecifiedInParams)]
     public void initializeIGUIMRpc(RpcParams rpcParams)
     {
-        Debug.Log("Initializing InGameUIManager for Client " + NetworkManager.Singleton.LocalClientId);
-        IGUIM.InitializeIGUIM();
+        IGUIM.inGameUI.SetActive(true); // Activate the in-game UI
+        Debug.Log("In-game UI initialized and activated.");
     }
 
 

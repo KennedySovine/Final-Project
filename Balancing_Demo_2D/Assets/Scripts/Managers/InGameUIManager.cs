@@ -45,11 +45,6 @@ public class InGameUIManager : NetworkBehaviour
         
     }
 
-    public void InitializeIGUIM(){
-        inGameUI.SetActive(true); // Activate the in-game UI
-        Debug.Log("In-game UI initialized and activated.");
-    }
-
     public void UpdateHealthSlider(float previousValue, float newValue)
     {
         Debug.Log($"Updating health slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
