@@ -46,75 +46,35 @@ public class InGameUIManager : NetworkBehaviour
         
     }
 
-    public void InitializeIGUIM(){
-        if (!IsClient) return; // Only run this for clients
-
-        inGameUI.SetActive(true); // Activate the in-game UI
-
-        /*switch (localClientId){
-            case var id when id == GM.player1ID:
-                localPlayer = GM.player1;
-                localPlayerController = GM.player1Controller;
-                localPlayerChampion = localPlayerController.GetComponent<BaseChampion>();
-                break;
-            case var id when id == GM.player2IDNet.Value:
-                localPlayer = NetworkManager.Singleton.SpawnManager.SpawnedObjects[GM.player2IDNet.Value].gameObject; // Get the local player object
-                localPlayerController = localPlayer.transform.Find("PlayerController").gameObject; // Get the local player controller object
-                localPlayerChampion = localPlayerController.GetComponent<BaseChampion>(); // Get the BaseChampion component from the local player controller
-                break;
-            default:
-                Debug.LogError("Local player not found. Ensure the player is spawned correctly.");
-                yield break; // Exit the coroutine
-        }
-
-        if (localPlayerChampion == null)
-        {
-            Debug.LogError("BaseChampion component not found on localPlayerController.");
-            return;  
-        }*/
-
-        StartCoroutine(waitForBaseChampion()); // Wait for the BaseChampion to be assigned
-
+    public void InitializeIGUIM(float maxHealth, float maxMana){
+        if (!IsOwner) return; // Only run this for clients
+        setHealthSlider(maxHealth); // Set the health slider maximum value
+        setManaSlider(maxMana); // Set the mana slider maximum value
         Debug.Log("In-game UI initialized and activated.");
     }
 
-    private void UpdateHealthSlider(float previousValue, float newValue)
+    public void UpdateHealthSlider(float previousValue, float newValue)
     {
-        if (!IsClient) return; // Only run this for clients
+        if (!IsOwner) return; // Only run this for clients
         healthSlider.value = newValue; // Update the health slider value
     }
-    private void UpdateManaSlider(float previousValue, float newValue)
+    public void UpdateManaSlider(float previousValue, float newValue)
     {
-        if (!IsClient) return; // Only run this for clients
+        if (!IsOwner) return; // Only run this for clients
         manaSlider.value = newValue; // Update the mana slider value
     }
 
-    private void setHealthSlider()
+    private void setHealthSlider(float max)
     {
-        if (!IsClient) return; // Only run this for clients
+        if (!IsOwner) return; // Only run this for clients
         healthSlider.maxValue = localPlayerChampion.maxHealth.Value; // Set the maximum value of the health slider
         healthSlider.value = localPlayerChampion.health.Value; // Set the current value of the health slider
     }
     
-    private void setManaSlider()
+    private void setManaSlider(float max)
     {
-        if (!IsClient) return; // Only run this for clients
+        if (!IsOwner) return; // Only run this for clients
         manaSlider.maxValue = localPlayerChampion.maxMana.Value; // Set the maximum value of the mana slider
         manaSlider.value = localPlayerChampion.mana.Value; // Set the current value of the mana slider
-    }
-
-    private IEnumerator waitForBaseChampion()
-    {
-        while (localPlayerChampion == null)
-        {
-            yield return null; // Wait for the BaseChampion to be assigned
-        }
-        Debug.Log("BaseChampion assigned successfully.");
-
-        localPlayerChampion.health.OnValueChanged += UpdateHealthSlider; // Subscribe to health value chosenAugments
-        localPlayerChampion.mana.OnValueChanged += UpdateManaSlider; // Subscribe to mana value changes
-
-        setHealthSlider(); // Set the health slider
-        setManaSlider(); // Set the mana slider
     }
 }

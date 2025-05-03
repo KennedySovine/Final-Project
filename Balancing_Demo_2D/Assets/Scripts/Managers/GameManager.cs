@@ -212,7 +212,6 @@ public class GameManager : NetworkBehaviour
                         player1ID = playerId; // Store the ID of player 1
                         player1IDNet.Value = playerId; // Set the network variable for player 1 ID
                         player1Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[0].position; // Set the target position for player 1
-                        initializeIGUIMRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 1
                         Debug.Log($"Spawned champion for Player 1 (Client {playerId}).");
                         break;
 
@@ -224,7 +223,6 @@ public class GameManager : NetworkBehaviour
                         player2ID = playerId; // Store the ID of player 2
                         player2IDNet.Value = playerId; // Set the network variable for player 2 ID
                         player2Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[1].position; // Set the target position for player 2
-                        initializeIGUIMRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 2
                         Debug.Log($"Spawned champion for Player 2 (Client {playerId}).");
                         break;
 
@@ -409,9 +407,20 @@ public class GameManager : NetworkBehaviour
     [Rpc(SendTo.SpecifiedInParams)]
     public void initializeIGUIMRpc(RpcParams rpcParams)
     {
-        Debug.Log("Initializing InGameUIManager for Client " + NetworkManager.Singleton.LocalClientId); // Log the client ID for debugging
-        IGUIM.inGameUI.SetActive(true); // Hide the in-game UI initially
-        IGUIM.InitializeIGUIM(); // Call the method to initialize the InGameUIManager
+        Debug.Log("Initializing InGameUIManager for Client " + NetworkManager.Singleton.LocalClientId);
+
+        if (rpcParams.Receive.SenderClientId == player1ID)
+        {
+            player1Controller.GetComponent<BaseChampion>().initIGUIM(); // Set the enemy champion reference for player 1
+        }
+        else if (rpcParams.Receive.SenderClientId == player2ID)
+        {
+            player2Controller.GetComponent<BaseChampion>().initIGUIM(); // Set the enemy champion reference for player 2
+        }
+        else
+        {
+            Debug.LogWarning("Unknown client ID. Cannot initialize InGameUIManager.");
+        }
     }
 
 }

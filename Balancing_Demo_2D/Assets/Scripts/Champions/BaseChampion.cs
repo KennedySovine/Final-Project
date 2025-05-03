@@ -82,7 +82,8 @@ public class BaseChampion : NetworkBehaviour
             Debug.LogError("InGameUIManager instance is null. Ensure the InGameUIManager is active in the scene.");
         }
 
-        IGUIM.localPlayerChampion = this; // Set the local player champion in the InGameUIManager
+        health.OnValueChanged += IGUIM.UpdateHealthSlider; // Subscribe to health value changes
+        mana.OnValueChanged += IGUIM.UpdateManaSlider; // Subscribe to mana value changes
     }
 
     [Rpc(SendTo.Server)]
@@ -131,6 +132,13 @@ public class BaseChampion : NetworkBehaviour
 
         stackManager(); // Call the stack manager logic
 
+    }
+
+    public void initIGUIM(){
+        if (!IsOwner) return; // Only run this for clients
+        IGUIM.InitializeIGUIM(maxHealth.Value, maxMana.Value); // Initialize the InGameUIManager with max health and mana
+        IGUIM.gameObject.SetActive(true); // Activate the InGameUIManager
+        Debug.Log("In-game UI initialized and activated.");
     }
 
     private void HealthandManaRegen()
