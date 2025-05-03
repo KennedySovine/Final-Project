@@ -2,9 +2,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
 using System.Collections;
+using System.Collections.Generic;
 
 public class InGameUIManager : NetworkBehaviour
 {
+    public List<Sprite> abilityIconsADRange = new List<Sprite>(); // List to hold ability icons for AD range
+    public List<Sprite> abilityIconsADRange2 = new List<Sprite>(); // List to hold ability icons for AP range
+
+    public List<Button> abilityIcons = new List<Button>(); // List to hold ability icons
 
     private GameManager GM;
     private InGameManager IGM;
@@ -67,6 +72,59 @@ public class InGameUIManager : NetworkBehaviour
     {
         Debug.Log($"Updating max mana slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
         manaSlider.maxValue = newValue; // Update the max mana slider in the UI
+    }
+
+
+    public void SetIconImages(string championType){
+        // Set the ability icons based on the champion type
+        if (championType == "ADRange")
+        {
+            for (int i = 0; i < abilityIcons.Count; i++)
+            {
+                abilityIcons[i].GetComponent<Image>().sprite = abilityIconsADRange[i]; // Set the icon image for each ability
+            }
+        }
+        else if (championType == "ADRange2")
+        {
+            for (int i = 0; i < abilityIcons.Count; i++)
+            {
+                abilityIcons[i].GetComponent<Image>().sprite = abilityIconsADRange2[i]; // Set the icon image for each ability
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"Unknown champion type: {championType}. No icons set.");
+        }
+    }
+
+    public void AsheEmpowerIcon(bool isEmpowered)
+    {
+        // Set the empowered icon for Ashe
+        if (isEmpowered)
+        {
+            abilityIcons[0].GetComponent<Image>().sprite = abilityIconsADRange[3]; // Set the empowered icon
+        }
+        else
+        {
+            abilityIcons[0].GetComponent<Image>().sprite = abilityIconsADRange[0]; // Set the normal icon
+        }
+    }
+
+    public void buttonInteractable(string position){
+        switch (position){
+            case "Q":
+                abilityIcons[0].interactable = true; // Disable the Q ability button
+                break;
+            case "W":
+                abilityIcons[1].interactable = true; // Disable the W ability button
+                break;
+            case "E":
+                abilityIcons[2].interactable = true; // Disable the E ability button
+                break;
+            default:
+                Debug.LogWarning($"Unknown button position: {position}. No action taken.");
+                break;
+        }
     }
 
 }

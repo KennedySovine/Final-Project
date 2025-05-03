@@ -88,26 +88,32 @@ public class BaseChampion : NetworkBehaviour
         {
             health.OnValueChanged += (previousValue, newValue) =>
             {
-                Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Health changed from {previousValue} to {newValue}");
+                //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Health changed from {previousValue} to {newValue}");
                 IGUIM.UpdateHealthSlider(previousValue, newValue);
             };
 
             mana.OnValueChanged += (previousValue, newValue) =>
             {
-                Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Mana changed from {previousValue} to {newValue}");
+                //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Mana changed from {previousValue} to {newValue}");
                 IGUIM.UpdateManaSlider(previousValue, newValue);
             };
 
             maxHealth.OnValueChanged += (previousValue, newValue) =>
             {
-                Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Health changed from {previousValue} to {newValue}");
+                //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Health changed from {previousValue} to {newValue}");
                 IGUIM.UpdateMaxHealthSlider(previousValue, newValue); // Update the health slider when max health changes
             };
 
             maxMana.OnValueChanged += (previousValue, newValue) =>
             {
-                Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Mana changed from {previousValue} to {newValue}");
+                //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Mana changed from {previousValue} to {newValue}");
                 IGUIM.UpdateMaxManaSlider(previousValue, newValue); // Update the mana slider when max mana changes
+            };
+
+            isEmpowered.OnValueChanged += (previousValue, newValue) =>
+            {
+                //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Empowered state changed from {previousValue} to {newValue}");
+                if (championType == "ADRange2") {IGUIM.AsheEmpowerIcon(newValue);}
             };
         }
     }
@@ -156,8 +162,33 @@ public class BaseChampion : NetworkBehaviour
             applySlowRpc(0f, 0f); // Reset the slow effect on the client
         }
 
+        abilityIconCooldownManaChecks();
+
         stackManager(); // Call the stack manager logic
 
+    }
+
+    private void abilityIconCooldownManaChecks()
+    {
+        if (IsOwner) // Only the owner should check cooldowns and mana
+        {
+            if (ability1 != null && !(ability1.isOnCooldown) && ability1.manaCost <= mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("Q");
+            }
+            else if (ability2 != null && !(ability2.isOnCooldown) && ability2.manaCost <= mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("Q");
+            }
+            else if (ability3 != null && !(ability3.isOnCooldown) && ability3.manaCost <= mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("Q");
+            }
+            else{
+                return; // No ability is available for use
+            }
+            
+        }
     }
 
     private void HealthandManaRegen()
@@ -517,6 +548,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         isEmpowered.Value = value;
+        
     }
 
     [Rpc(SendTo.Server)]
