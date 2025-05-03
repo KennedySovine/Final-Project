@@ -5,7 +5,7 @@ public class BaseChampion : NetworkBehaviour
 {
     public static GameManager GM; // Reference to the GameManager
 
-    private InGameUIManager IGUIM; // Reference to the InGameUIManager
+    public InGameUIManager IGUIM; // Reference to the InGameUIManager
     [Header("Champion Stats")]
     public string championType = "";
 
@@ -109,12 +109,6 @@ public class BaseChampion : NetworkBehaviour
                 //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Mana changed from {previousValue} to {newValue}");
                 IGUIM.UpdateMaxManaSlider(previousValue, newValue); // Update the mana slider when max mana changes
             };
-
-            isEmpowered.OnValueChanged += (previousValue, newValue) =>
-            {
-                //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Empowered state changed from {previousValue} to {newValue}");
-                if (championType == "ADRange2") {IGUIM.AsheEmpowerIcon(newValue);}
-            };
         }
     }
 
@@ -162,27 +156,44 @@ public class BaseChampion : NetworkBehaviour
             applySlowRpc(0f, 0f); // Reset the slow effect on the client
         }
 
-        abilityIconCooldownManaChecks();
+        if (IsOwner){
+            IGUIM.SetIconImages(championType); // Set the ability icons based on the champion type
+
+            abilityIconCooldownManaChecks();
+        }
 
         stackManager(); // Call the stack manager logic
 
     }
 
-    private void abilityIconCooldownManaChecks()
+    public virtual void abilityIconCooldownManaChecks()
     {
         if (IsOwner) // Only the owner should check cooldowns and mana
         {
             if (ability1 != null && !(ability1.isOnCooldown) && ability1.manaCost <= mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
             {
-                IGUIM.buttonInteractable("Q");
+                IGUIM.buttonInteractable("Q", true);
+                IGUIM.AsheEmpowerIcon(isEmpowered.Value); // Set the empowered icon for Ashe
+            }
+            else if (ability1 == null || ability1.isOnCooldown || ability1.manaCost > mana.Value) // Check if ability 1 is on cooldown or not enough mana is available
+            {
+                IGUIM.buttonInteractable("Q", false); // Disable the button if ability 1 is on cooldown or not enough mana
             }
             else if (ability2 != null && !(ability2.isOnCooldown) && ability2.manaCost <= mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
             {
-                IGUIM.buttonInteractable("Q");
+                IGUIM.buttonInteractable("W", true);
+            }
+            else if (ability2 == null || ability2.isOnCooldown || ability2.manaCost > mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("W", false); // Disable the button if ability 1 is on cooldown or not enough mana
             }
             else if (ability3 != null && !(ability3.isOnCooldown) && ability3.manaCost <= mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
             {
-                IGUIM.buttonInteractable("Q");
+                IGUIM.buttonInteractable("E", true);
+            }
+            else if (ability3 == null || ability3.isOnCooldown || ability3.manaCost > mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("E", false); // Disable the button if ability 1 is on cooldown or not enough mana
             }
             else{
                 return; // No ability is available for use

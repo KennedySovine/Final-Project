@@ -5,8 +5,8 @@ public class Ability
 {
     public string name; // Name of the ability
     public string description; // Description of the ability
-    public float cooldown; // Cooldown time in seconds
-    public float manaCost; // Mana cost to use the ability
+    public float cooldown = 0f; // Cooldown time in seconds
+    public float manaCost = 0f; // Mana cost to use the ability
     public float range; // Range of the ability
     public float duration; // Duration of the ability effect (if applicable)
     public AbilityStats Stats; // Reference to the ability stats object
@@ -14,7 +14,12 @@ public class Ability
 
     public bool isOnCooldown // Flag to check if the ability is on cooldown
     {
-        get { return timeOfCast > 0f && Time.time - timeOfCast < cooldown; }
+        get {
+            if (cooldown == 0f){
+                return false; // No cooldown, ability is available
+            }
+            return timeOfCast > 0f && Time.time - timeOfCast < cooldown; 
+        }
     }
 
     public Ability(string name, string description, float cooldown, float manaCost, float range)

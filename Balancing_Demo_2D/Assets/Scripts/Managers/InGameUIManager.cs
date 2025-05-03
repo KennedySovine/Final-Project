@@ -77,14 +77,14 @@ public class InGameUIManager : NetworkBehaviour
 
     public void SetIconImages(string championType){
         // Set the ability icons based on the champion type
-        if (championType == "ADRange")
+        if (championType == "AD Range")
         {
             for (int i = 0; i < abilityIcons.Count; i++)
             {
                 abilityIcons[i].GetComponent<Image>().sprite = abilityIconsADRange[i]; // Set the icon image for each ability
             }
         }
-        else if (championType == "ADRange2")
+        else if (championType == "AD Range2")
         {
             for (int i = 0; i < abilityIcons.Count; i++)
             {
@@ -110,16 +110,16 @@ public class InGameUIManager : NetworkBehaviour
         }
     }
 
-    public void buttonInteractable(string position){
+    public void buttonInteractable(string position, bool isInteractable){
         switch (position){
             case "Q":
-                abilityIcons[0].interactable = true; // Disable the Q ability button
+                abilityIcons[0].interactable = isInteractable; // Disable the Q ability button
                 break;
             case "W":
-                abilityIcons[1].interactable = true; // Disable the W ability button
+                abilityIcons[1].interactable = isInteractable; // Disable the W ability button
                 break;
             case "E":
-                abilityIcons[2].interactable = true; // Disable the E ability button
+                abilityIcons[2].interactable = isInteractable; // Disable the E ability button
                 break;
             default:
                 Debug.LogWarning($"Unknown button position: {position}. No action taken.");

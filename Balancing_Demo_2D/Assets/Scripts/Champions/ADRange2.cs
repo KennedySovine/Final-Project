@@ -23,7 +23,7 @@ public class ADRange2 : BaseChampion
             return;
         }
         
-        championType = "AD Range";
+        championType = "AD Range2";
         maxHealth.Value = 610f;
         healthRegen.Value = 0.7f;
         AD.Value = 59f;
@@ -130,6 +130,41 @@ public class ADRange2 : BaseChampion
 
         ability1.setDuration(6f);
 
+    }
+
+    public override void abilityIconCooldownManaChecks()
+    {
+        if (IsOwner) // Only the owner should check cooldowns and mana
+        {
+            if (ability1 != null && isMaxStacks && ability1.manaCost <= mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("Q", true);
+            }
+            else if (ability1 == null || !isMaxStacks|| ability1.manaCost > mana.Value) // Check if ability 1 is on cooldown or not enough mana is available
+            {
+                IGUIM.buttonInteractable("Q", false); // Disable the button if ability 1 is on cooldown or not enough mana
+            }
+            else if (ability2 != null && !(ability2.isOnCooldown) && ability2.manaCost <= mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("W", true);
+            }
+            else if (ability2 == null || ability2.isOnCooldown || ability2.manaCost > mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("W", false); // Disable the button if ability 1 is on cooldown or not enough mana
+            }
+            else if (ability3 != null && !(ability3.isOnCooldown) && ability3.manaCost <= mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("E", true);
+            }
+            else if (ability3 == null || ability3.isOnCooldown || ability3.manaCost > mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("E", false); // Disable the button if ability 1 is on cooldown or not enough mana
+            }
+            else{
+                return; // No ability is available for use
+            }
+            
+        }
     }
 
     public virtual GameObject ability3Logic(GameObject bullet){
