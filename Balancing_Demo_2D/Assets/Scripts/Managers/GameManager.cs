@@ -103,7 +103,7 @@ public class GameManager : NetworkBehaviour
     {
         playerCount = playerChampions.Count; // Update player count
 
-        if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost) // Ensure this runs only on the server
+        if (NetworkManager.Singleton.IsServer) // Ensure this runs only on the server
         {
             
             //Debug.Log("Player Count: " + playerCount); // Debug log for player count
@@ -396,5 +396,13 @@ public class GameManager : NetworkBehaviour
         Debug.Log("Loading Augments for Client " + NetworkManager.Singleton.LocalClientId); // Log the client ID for debugging
         AM.augmentUI.SetActive(true); // Show the augment UI
         AM.augmentUISetup(AM.augmentSelector()); // Get the list of chosen augments
+    }
+
+    [Rpc(SendTo.SpecifiedInParams)]
+    public void updateHealthAndManaBars(RpcParams rpcParams)
+    {
+        Debug.Log("Updating health and mana bars for Client " + NetworkManager.Singleton.LocalClientId); // Log the client ID for debugging
+        player1Controller.GetComponent<BaseChampion>().updateHealthAndManaBarsRpc(); // Update the health and mana bars for player 1
+        player2Controller.GetComponent<BaseChampion>().updateHealthAndManaBarsRpc(); // Update the health and mana bars for player 2
     }
 }
