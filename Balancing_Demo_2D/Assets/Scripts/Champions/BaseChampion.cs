@@ -4,6 +4,8 @@ using Unity.Netcode;
 public class BaseChampion : NetworkBehaviour
 {
     public static GameManager GM; // Reference to the GameManager
+
+    private InGameUIManager IGUIM; // Reference to the InGameUIManager
     [Header("Champion Stats")]
     public string championType = "";
 
@@ -70,7 +72,17 @@ public class BaseChampion : NetworkBehaviour
     public void Start()
     {
         GM = GameManager.Instance; // Get the instance of the GameManager
-  
+        IGUIM = GM.IGUIM; // Get the instance of the InGameUIManager
+        if (GM == null)
+        {
+            Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
+        }
+        if (IGUIM == null)
+        {
+            Debug.LogError("InGameUIManager instance is null. Ensure the InGameUIManager is active in the scene.");
+        }
+
+        IGUIM.localPlayerChampion = this; // Set the local player champion in the InGameUIManager
     }
 
     [Rpc(SendTo.Server)]

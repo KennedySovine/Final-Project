@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
+using System.Collections;
 
 public class InGameUIManager : NetworkBehaviour
 {
@@ -12,11 +13,7 @@ public class InGameUIManager : NetworkBehaviour
     [SerializeField] private Slider manaSlider;
 
     public GameObject inGameUI; // Reference to the in-game UI GameObject
-
-    [SerializeField] private ulong localClientId;
-    [SerializeField] private GameObject localPlayer; // Reference to the local player object
-    [SerializeField] private GameObject localPlayerController; // Reference to the local player controller object
-    [SerializeField] private BaseChampion localPlayerChampion; // Reference to the local player champion object
+    [SerializeField] public BaseChampion localPlayerChampion; // Reference to the local player champion object
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     private void Awake()
@@ -39,7 +36,7 @@ public class InGameUIManager : NetworkBehaviour
 
         if (!IsClient) return; // Only run this for clients
 
-        localClientId = NetworkManager.Singleton.LocalClientId; // Get the local client ID
+    
         
     }
 
@@ -50,11 +47,11 @@ public class InGameUIManager : NetworkBehaviour
     }
 
     public void InitializeIGUIM(){
-        if (IsServer) return; // Only run this for clients
+        if (!IsClient) return; // Only run this for clients
 
         inGameUI.SetActive(true); // Activate the in-game UI
 
-        switch (localClientId){
+        /*switch (localClientId){
             case var id when id == GM.player1ID:
                 localPlayer = GM.player1;
                 localPlayerController = GM.player1Controller;
@@ -72,39 +69,50 @@ public class InGameUIManager : NetworkBehaviour
         if (localPlayerChampion == null){
             Debug.LogError("BaseChampion component not found on localPlayerController.");
             return;  
-        }
+        }*/
+
+        StartCoroutine(waitForBaseChampion()); // Wait for the BaseChampion to be assigned
 
         Debug.Log("In-game UI initialized and activated.");
-
-        localPlayerChampion.health.OnValueChanged += UpdateHealthSlider; // Subscribe to health value chosenAugments
-        localPlayerChampion.mana.OnValueChanged += UpdateManaSlider; // Subscribe to mana value changes
-
-        setHealthSlider(); // Set the health slider
-        setManaSlider(); // Set the mana slider
     }
 
     private void UpdateHealthSlider(float previousValue, float newValue)
     {
-        if (IsServer) return; // Only run this for clients
+        if (!IsClient) return; // Only run this for clients
         healthSlider.value = newValue; // Update the health slider value
     }
     private void UpdateManaSlider(float previousValue, float newValue)
     {
-        if (IsServer) return; // Only run this for clients
+        if (!IsClient) return; // Only run this for clients
         manaSlider.value = newValue; // Update the mana slider value
     }
 
     private void setHealthSlider()
     {
-        if (IsServer) return; // Only run this for clients
+        if (!IsClient) return; // Only run this for clients
         healthSlider.maxValue = localPlayerChampion.maxHealth.Value; // Set the maximum value of the health slider
         healthSlider.value = localPlayerChampion.health.Value; // Set the current value of the health slider
     }
     
     private void setManaSlider()
     {
-        if (IsServer) return; // Only run this for clients
+        if (!IsClient) return; // Only run this for clients
         manaSlider.maxValue = localPlayerChampion.maxMana.Value; // Set the maximum value of the mana slider
         manaSlider.value = localPlayerChampion.mana.Value; // Set the current value of the mana slider
+    }
+
+    private IEnumerator waitForBaseChampion()
+    {
+        while (localPlayerChampion == null)
+        {
+            yield return null; // Wait for the BaseChampion to be assigned
+        }
+        Debug.Log("BaseChampion assigned successfully.");
+
+        localPlayerChampion.health.OnValueChanged += UpdateHealthSlider; // Subscribe to health value chosenAugments
+        localPlayerChampion.mana.OnValueChanged += UpdateManaSlider; // Subscribe to mana value changes
+
+        setHealthSlider(); // Set the health slider
+        setManaSlider(); // Set the mana slider
     }
 }
