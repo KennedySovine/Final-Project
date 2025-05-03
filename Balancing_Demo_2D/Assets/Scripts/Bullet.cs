@@ -23,7 +23,7 @@ public class Bullet : NetworkBehaviour
 
     void Start()
     {
-        owner = NetworkManager.Singleton.SpawnManager.SpawnedObjects[ownerID].gameObject; // Get the owner of the bullet
+        //owner = NetworkManager.Singleton.SpawnManager.SpawnedObjects[ownerID].gameObject; // Get the owner of the bullet
     }
 
     // Update is called once per frame
@@ -47,7 +47,7 @@ public class Bullet : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        owner = NetworkManager.Singleton.SpawnManager.SpawnedObjects[ownerID].gameObject; // Get the owner of the bullet
+        //owner = NetworkManager.Singleton.SpawnManager.SpawnedObjects[ownerID].gameObject; // Get the owner of the bullet
 
         // Check if the bullet hit the target player
         if (collision.gameObject == targetPlayer)

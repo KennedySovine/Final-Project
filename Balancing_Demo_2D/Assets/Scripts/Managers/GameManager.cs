@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 using Unity.Netcode;
 using TMPro;
 using System.Linq;
@@ -42,15 +43,16 @@ public class GameManager : NetworkBehaviour
     public float gameTime = 120f; // Game duration in seconds
     public float augmentBuffer = 20f; //Choose aug every 40 seconds
     public NetworkVariable<bool> augmentChoosing = new NetworkVariable<bool>(false); //If the player is choosing an augment, dont countdown the game time
-    
+    private Camera serverCamera; // Reference to the server camera
 
     [Header("Champion Management")]
     public GameObject championPrefab; // Prefab for spawning champions
     public Transform[] spawnPoints; // Array of spawn points for champions
 
-    private Camera serverCamera; // Reference to the server camera
+    [Header("Managers")]
     public AugmentManager AM; // Reference to the AugmentManager
     public InGameManager IGM; // Reference to the InGameManager
+    public InGameUIManager IGUIM; // Reference to the InGameUIManager
 
     private void Awake()
     {
@@ -103,7 +105,7 @@ public class GameManager : NetworkBehaviour
     {
         playerCount = playerChampions.Count; // Update player count
 
-        if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost) // Ensure this runs only on the server
+        if (IsServer || IsHost) // Ensure this runs only on the server
         {
             
             //Debug.Log("Player Count: " + playerCount); // Debug log for player count
@@ -183,7 +185,7 @@ public class GameManager : NetworkBehaviour
 
     public void spawnChampions()
     {
-        if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost) // Ensure only the server can execute this
+        if (!IsServer) // Ensure only the server can execute this
         {
             Debug.LogWarning("Only the server can spawn champions!");
             return;
@@ -232,6 +234,8 @@ public class GameManager : NetworkBehaviour
                 // Add any additional logic to start the game here
                 player1Controller.GetComponent<BaseChampion>().enemyChampion = player2Controller;
                 player2Controller.GetComponent<BaseChampion>().enemyChampion = player1Controller; // Set the enemy champion reference for both players
+                initializeIGUIMRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 1
+                initializeIGUIMRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 2
             }
         }
     }
@@ -397,4 +401,13 @@ public class GameManager : NetworkBehaviour
         AM.augmentUI.SetActive(true); // Show the augment UI
         AM.augmentUISetup(AM.augmentSelector()); // Get the list of chosen augments
     }
+
+    [Rpc(SendTo.SpecifiedInParams)]
+    public void initializeIGUIMRpc(RpcParams rpcParams)
+    {
+        IGUIM.inGameUI.SetActive(true); // Activate the in-game UI
+        Debug.Log("In-game UI initialized and activated.");
+    }
+
+
 }
