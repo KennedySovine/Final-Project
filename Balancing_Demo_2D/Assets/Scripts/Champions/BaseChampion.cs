@@ -156,11 +156,12 @@ public class BaseChampion : NetworkBehaviour
             applySlowRpc(0f, 0f); // Reset the slow effect on the client
         }
 
-        if (IsOwner){
+        if (!IGUIM.iconsSet && IsOwner){
             IGUIM.SetIconImages(championType); // Set the ability icons based on the champion type
-
-            abilityIconCooldownManaChecks();
+            IGUIM.iconsSet = true; // Set the flag to true to avoid setting icons again
         }
+
+        abilityIconCooldownManaChecks(); // Check cooldowns and mana for abilities
 
         stackManager(); // Call the stack manager logic
 

@@ -18,6 +18,7 @@ public class InGameUIManager : NetworkBehaviour
     public Slider manaSlider;
 
     public GameObject inGameUI; // Reference to the in-game UI GameObject
+    public bool iconsSet = false; // Flag to check if icons are set
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     private void Awake()
