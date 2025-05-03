@@ -73,6 +73,7 @@ public class BaseChampion : NetworkBehaviour
     {
         GM = GameManager.Instance; // Get the instance of the GameManager
         IGUIM = GM.IGUIM; // Get the instance of the InGameUIManager
+
         if (GM == null)
         {
             Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
@@ -82,39 +83,33 @@ public class BaseChampion : NetworkBehaviour
             Debug.LogError("InGameUIManager instance is null. Ensure the InGameUIManager is active in the scene.");
         }
 
-        maxHealth.OnValueChanged += UpdateMaxHealthSlider; // Subscribe to max health value changes
-        maxMana.OnValueChanged += UpdateMaxManaSlider; // Subscribe to max mana value changes
+        // Subscribe to health and mana changes only for the owner
+        if (IsOwner)
+        {
+            health.OnValueChanged += (previousValue, newValue) =>
+            {
+                Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Health changed from {previousValue} to {newValue}");
+                IGUIM.UpdateHealthSlider(previousValue, newValue);
+            };
 
-        health.OnValueChanged += UpdateHealthSlider; // Subscribe to health value changes
-        mana.OnValueChanged += UpdateManaSlider; // Subscribe to mana value changes
-    }
+            mana.OnValueChanged += (previousValue, newValue) =>
+            {
+                Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Mana changed from {previousValue} to {newValue}");
+                IGUIM.UpdateManaSlider(previousValue, newValue);
+            };
 
-    public void UpdateMaxHealthSlider(float previousValue, float newValue)
-    {
-        Debug.Log($"Max Health changed from {previousValue} to {newValue}"); // Log the max health change
-        IGUIM.healthSlider.maxValue = newValue; // Update the maximum value of the health slider in the UI
-        Debug.Log($"Max Health slider updated to {IGUIM.healthSlider.maxValue}"); // Log the max health slider update
-    }
+            maxHealth.OnValueChanged += (previousValue, newValue) =>
+            {
+                Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Health changed from {previousValue} to {newValue}");
+                IGUIM.UpdateMaxHealthSlider(previousValue, newValue); // Update the health slider when max health changes
+            };
 
-    public void UpdateMaxManaSlider(float previousValue, float newValue)
-    {
-        Debug.Log($"Max Mana changed from {previousValue} to {newValue}"); // Log the max mana change
-        IGUIM.manaSlider.maxValue = newValue; // Update the maximum value of the mana slider in the UI
-        Debug.Log($"Max Mana slider updated to {IGUIM.manaSlider.maxValue}"); // Log the max mana slider update
-    }
-
-    public void UpdateHealthSlider(float previousValue, float newValue)
-    {
-        Debug.Log($"Health changed from {previousValue} to {newValue}"); // Log the health change
-        IGUIM.updateSliders(newValue, mana.Value); // Update the health slider in the UI
-        Debug.Log($"Health slider updated to {IGUIM.healthSlider.value}"); // Log the health slider update
-    }
-
-    public void UpdateManaSlider(float previousValue, float newValue)
-    {
-        Debug.Log($"Mana changed from {previousValue} to {newValue}"); // Log the mana change
-        IGUIM.updateSliders(health.Value, newValue); // Update the mana slider in the UI
-        Debug.Log($"Mana slider updated to {IGUIM.manaSlider.value}"); // Log the mana slider update
+            maxMana.OnValueChanged += (previousValue, newValue) =>
+            {
+                Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Mana changed from {previousValue} to {newValue}");
+                IGUIM.UpdateMaxManaSlider(previousValue, newValue); // Update the mana slider when max mana changes
+            };
+        }
     }
 
     [Rpc(SendTo.Server)]
