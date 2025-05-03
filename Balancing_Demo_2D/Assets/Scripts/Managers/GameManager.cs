@@ -411,16 +411,26 @@ public class GameManager : NetworkBehaviour
 
         if (rpcParams.Receive.SenderClientId == player1ID)
         {
-            player1Controller.GetComponent<BaseChampion>().initIGUIM(); // Set the enemy champion reference for player 1
+            waitForChampionSpawn(player1Controller); // Wait for the player 1 controller to be assigned
         }
         else if (rpcParams.Receive.SenderClientId == player2ID)
         {
-            player2Controller.GetComponent<BaseChampion>().initIGUIM(); // Set the enemy champion reference for player 2
+            waitForChampionSpawn(player2Controller); // Wait for the player 2 controller to be assigned
         }
         else
         {
             Debug.LogWarning("Unknown client ID. Cannot initialize InGameUIManager.");
         }
+    }
+
+    private IEnumerator waitForChampionSpawn(GameObject controller)
+    {
+        while (controller == null)
+        {
+            yield return null; // Wait until the controller is assigned
+        }
+        Debug.Log("Champion spawned and controller assigned: " + controller.name);
+        controller.GetComponent<BaseChampion>().initIGUIM(); // Call the initIGUIM method on the controller
     }
 
 }
