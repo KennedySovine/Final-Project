@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
-
+using System.Collections;
 public class InGameUIManager : NetworkBehaviour
 {
 
@@ -49,34 +49,46 @@ public class InGameUIManager : NetworkBehaviour
         
     }
 
-    public void InitializeIGUIM(){
+    public void InitializeIGUIM()
+    {
         if (IsServer) return; // Only run this for clients
 
         inGameUI.SetActive(true); // Activate the in-game UI
+        StartCoroutine(InitializeAfterPlayerIds());
+    }
 
-        switch (localClientId){
-            case var id when id == GM.player1ID:
-                localPlayer = GM.player1;
-                localPlayerController = GM.player1Controller;
-                localPlayerChampion = localPlayerController.GetComponent<BaseChampion>();
+    private IEnumerator InitializeAfterPlayerIds()
+    {
+        // Wait for player IDs to be different
+        yield return WaitforPlayerIds();
+
+        // Proceed with initialization after player IDs are ready
+        switch (localClientId)
+        {
+            case var id when id == GM.player1IDNet.Value:
+                localPlayer = NetworkManager.Singleton.SpawnManager.SpawnedObjects[GM.player1IDNet.Value].gameObject; // Get the local player object
+                localPlayerController = localPlayer.transform.Find("PlayerController").gameObject; // Get the local player controller object
+                localPlayerChampion = localPlayerController.GetComponent<BaseChampion>(); // Get the BaseChampion component from the local player controller
                 break;
-            case var id when id == GM.player2ID:
-                localPlayer = GM.player2;
-                localPlayerController = GM.player2Controller;
-                localPlayerChampion = localPlayerController.GetComponent<BaseChampion>();
+            case var id when id == GM.player2IDNet.Value:
+                localPlayer = NetworkManager.Singleton.SpawnManager.SpawnedObjects[GM.player2IDNet.Value].gameObject; // Get the local player object
+                localPlayerController = localPlayer.transform.Find("PlayerController").gameObject; // Get the local player controller object
+                localPlayerChampion = localPlayerController.GetComponent<BaseChampion>(); // Get the BaseChampion component from the local player controller
                 break;
             default:
                 Debug.LogError("Local player not found. Ensure the player is spawned correctly.");
-                break;
+                yield break; // Exit the coroutine
         }
-        if (localPlayerChampion == null){
+
+        if (localPlayerChampion == null)
+        {
             Debug.LogError("BaseChampion component not found on localPlayerController.");
-            return;  
+            yield break; // Exit the coroutine
         }
 
         Debug.Log("In-game UI initialized and activated.");
 
-        localPlayerChampion.health.OnValueChanged += UpdateHealthSlider; // Subscribe to health value chosenAugments
+        localPlayerChampion.health.OnValueChanged += UpdateHealthSlider; // Subscribe to health value changes
         localPlayerChampion.mana.OnValueChanged += UpdateManaSlider; // Subscribe to mana value changes
 
         setHealthSlider(); // Set the health slider
@@ -106,5 +118,17 @@ public class InGameUIManager : NetworkBehaviour
         if (IsServer) return; // Only run this for clients
         manaSlider.maxValue = localPlayerChampion.maxMana.Value; // Set the maximum value of the mana slider
         manaSlider.value = localPlayerChampion.mana.Value; // Set the current value of the mana slider
+    }
+
+    private IEnumerator WaitforPlayerIds()
+    {
+        while (GM.player1IDNet.Value == GM.player2IDNet.Value)
+        {
+            yield return null; // Wait until player IDs are different
+        }
+
+        Debug.Log("Player IDs are different. Proceeding with initialization.");
+        Debug.Log("Player 1 ID: " + GM.player1IDNet.Value); // Log player 1 ID
+        Debug.Log("Player 2 ID: " + GM.player2IDNet.Value); // Log player 2 ID
     }
 }
