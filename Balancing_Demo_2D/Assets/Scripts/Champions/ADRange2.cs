@@ -25,10 +25,7 @@ public class ADRange2 : BaseChampion
     //Based on Ashe from LOL
     private void UpdateStats()
     {
-        if (!IsServer){
-            Debug.LogWarning("UpdateStats can only be called on the server.");
-            return;
-        }
+        if (!IsServer) return;
         
         championType = "AD Range2";
         maxHealth.Value = 610f;

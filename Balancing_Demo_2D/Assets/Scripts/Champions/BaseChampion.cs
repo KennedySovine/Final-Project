@@ -111,6 +111,21 @@ public class BaseChampion : NetworkBehaviour
                 //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Mana changed from {previousValue} to {newValue}");
                 IGUIM.UpdateMaxManaSlider(previousValue, newValue); // Update the mana slider when max mana changes
             };
+
+            GM.playersSpawned.OnValueChanged += (previousValue, newValue) =>
+            {
+                Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Players Spawned changed from {previousValue} to {newValue}");
+                if (iconsSet) return; // If icons are already set, do nothing
+                if (newValue)
+                {
+                    Debug.Log("Setting abilities to buttons for player " + NetworkManager.Singleton.LocalClientId);
+                    IGUIM.abilityDict.Add("Q", ability1); // Add ability 1 to the button dictionary
+                    IGUIM.abilityDict.Add("W", ability2); // Add ability 2 to the button dictionary
+                    IGUIM.abilityDict.Add("E", ability3); // Add ability 3 to the button dictionary
+                    IGUIM.setAbilityToButtons(); // Set the abilities to the buttons in the UI
+                    iconsSet = true; // Set the flag to true to indicate icons are set
+                }
+            };
         }
     }
 
@@ -159,20 +174,13 @@ public class BaseChampion : NetworkBehaviour
         }
 
         if (!IsOwner) return; // Only the owner should execute this logic
-        if (GM.playersSpawned.Value && !iconsSet){ // Check if players are spawned and icons are not set
-            Debug.Log("Setting abilities to buttons for player " + NetworkManager.Singleton.LocalClientId);
-            IGUIM.abilityDict.Add("Q", ability1); // Add ability 1 to the button dictionary
-            IGUIM.abilityDict.Add("W", ability2); // Add ability 2 to the button dictionary
-            IGUIM.abilityDict.Add("E", ability3); // Add ability 3 to the button dictionary
-            IGUIM.setAbilityToButtons(); // Set the abilities to the buttons in the UI
-            iconsSet = true; // Set the flag to true to indicate icons are set
-        }
 
         abilityIconCooldownManaChecks(); // Check cooldowns and mana for abilities
 
         stackManager(); // Call the stack manager logic
 
     }
+    
 
     public virtual void abilityIconCooldownManaChecks()
     {

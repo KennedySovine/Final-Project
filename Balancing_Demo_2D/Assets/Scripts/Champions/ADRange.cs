@@ -14,10 +14,7 @@ public class ADRange : BaseChampion
     // Based on Vayne from LOL
     private void UpdateStats()
     {
-        if (!IsServer){
-            Debug.LogWarning("UpdateStats can only be called on the server.");
-            return;
-        }
+        if (!IsServer) return;
 
         championType = "AD Range";
         maxHealth.Value = 550f;
