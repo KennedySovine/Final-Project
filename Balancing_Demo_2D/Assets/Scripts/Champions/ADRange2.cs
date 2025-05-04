@@ -14,8 +14,8 @@ public class ADRange2 : BaseChampion
         UpdateStats();
         AddAbilities();
 
-        attackSpeed.OnValueChanged += (value) => { // Update the attack speed value
-            updateAbility1CooldownRpc(value); // Update the ability cooldown based on attack speed
+        attackSpeed.OnValueChanged += (previousValue, newValue) => { // Update the attack speed value
+            updateAbility1CooldownRpc(newValue); // Update the ability cooldown based on attack speed
         };
     }
 
@@ -263,28 +263,28 @@ public class ADRange2 : BaseChampion
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         
-        if (attackSpeed.Value < 0.75f){
+        if (attackSpeed < 0.75f){
             ability1.setCooldown(6.08f);
         }
-        else if (attackSpeed.Value < 1f){
+        else if (attackSpeed < 1f){
             ability1.setCooldown(5.33f);
         }
-        else if (attackSpeed.Value < 1.25f){
+        else if (attackSpeed < 1.25f){
             ability1.setCooldown(4f);
         }
-        else if (attackSpeed.Value < 1.5f){
+        else if (attackSpeed < 1.5f){
             ability1.setCooldown(3.2f);
         }
-        else if (attackSpeed.Value < 1.75f){
+        else if (attackSpeed < 1.75f){
             ability1.setCooldown(2.67f);
         }
-        else if (attackSpeed.Value < 2f){
+        else if (attackSpeed < 2f){
             ability1.setCooldown(2.29f);
         }
-        else if (attackSpeed.Value < 2.25f){
+        else if (attackSpeed < 2.25f){
             ability1.setCooldown(1.78f);
         }
-        else if (attackSpeed.Value < 2.5f){
+        else if (attackSpeed < 2.5f){
             ability1.setCooldown(1.6f);
         }
     }

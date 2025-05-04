@@ -28,6 +28,7 @@ public class HoverButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public void OnPointerEnter(PointerEventData eventData)
     {
         // Code to execute when the mouse enters the button
+        infoBox.SetActive(true); // Show the info box when the mouse enters the button
         Debug.Log("Mouse entered button");
         // Example: Change button color, add audio feedback, etc.
     }
@@ -35,6 +36,7 @@ public class HoverButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public void OnPointerExit(PointerEventData eventData)
     {
         // Code to execute when the mouse leaves the button
+        infoBox.SetActive(false); // Hide the info box when the mouse exits the button
         Debug.Log("Mouse exited button");
         // Example: Restore original color, stop audio, etc.
     }
