@@ -142,6 +142,12 @@ public class ADRange2 : BaseChampion
 
         ability1.setDuration(6f);
 
+        abilityDict.Add("Q", ability1); // Add the ability to the UI manager
+        abilityDict.Add("W", ability2); // Add the ability to the UI manager
+        abilityDict.Add("E", ability3); // Add the ability to the UI manager
+
+        SendToUI();
+
     }
 
     public override void abilityIconCooldownManaChecks()

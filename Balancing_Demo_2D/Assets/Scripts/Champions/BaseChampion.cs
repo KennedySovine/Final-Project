@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Netcode;
+using System.Collections.Generic;
 
 public class BaseChampion : NetworkBehaviour
 {
@@ -57,6 +58,8 @@ public class BaseChampion : NetworkBehaviour
     public Ability ability2;
     public Ability ability3;
 
+    public Dictionary<string, Ability> abilityDict = new Dictionary<string, Ability>(); // Dictionary to hold abilities by name
+
     public NetworkVariable<float> lastAutoAttackTime = new NetworkVariable<float>(0f); // Time of the last auto-attack
 
     [Header("Champion Settings")]
@@ -110,21 +113,6 @@ public class BaseChampion : NetworkBehaviour
             {
                 //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Mana changed from {previousValue} to {newValue}");
                 IGUIM.UpdateMaxManaSlider(previousValue, newValue); // Update the mana slider when max mana changes
-            };
-
-            GM.playersSpawned.OnValueChanged += (previousValue, newValue) =>
-            {
-                Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Players Spawned changed from {previousValue} to {newValue}");
-                if (iconsSet) return; // If icons are already set, do nothing
-                if (newValue)
-                {
-                    Debug.Log("Setting abilities to buttons for player " + NetworkManager.Singleton.LocalClientId);
-                    IGUIM.abilityDict.Add("Q", ability1); // Add ability 1 to the button dictionary
-                    IGUIM.abilityDict.Add("W", ability2); // Add ability 2 to the button dictionary
-                    IGUIM.abilityDict.Add("E", ability3); // Add ability 3 to the button dictionary
-                    IGUIM.setAbilityToButtons(); // Set the abilities to the buttons in the UI
-                    iconsSet = true; // Set the flag to true to indicate icons are set
-                }
             };
         }
     }
@@ -215,6 +203,24 @@ public class BaseChampion : NetworkBehaviour
                 return; // No ability is available for use
             }
             
+        }
+    }
+
+    public void SendToUI()
+    {
+        if (!IsOwner) return;
+        while (!iconsSet){
+            if (abilityDict.ContainsKey("E")) // Check if the abilities are not null and icons are not set
+            {
+                Debug.Log("Setting abilities to buttons for player " + NetworkManager.Singleton.LocalClientId);
+                IGUIM.setAbilityToButtons(abilityDict); // Set the abilities to the buttons in the UI
+                iconsSet = true; // Set the flag to true to indicate icons are set
+            }
+            else
+            {
+                Debug.LogWarning("Ability dictionary is empty or abilities are not set yet.");
+                return; // Exit the loop if the abilities are not set
+            }
         }
     }
 

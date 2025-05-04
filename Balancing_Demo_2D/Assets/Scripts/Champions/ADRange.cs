@@ -83,6 +83,12 @@ public class ADRange : BaseChampion
         ability3.icon = Resources.Load<Sprite>("Sprites/Vayne_Condemn"); // Load the icon for the ability from Resources folder
 
         ability3.setDuration(8f);
+
+        abilityDict.Add("Q", ability1); // Add the ability to the UI manager
+        abilityDict.Add("W", ability2); // Add the ability to the UI manager
+        abilityDict.Add("E", ability3); // Add the ability to the UI manager
+
+        SendToUI();
     }
 
     public override GameObject empowerLogic(GameObject bullet)

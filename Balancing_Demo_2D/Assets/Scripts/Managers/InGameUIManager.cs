@@ -104,7 +104,7 @@ public class InGameUIManager : NetworkBehaviour
         }
     }
 
-    public void setAbilityToButtons(){
+    public void setAbilityToButtons(Dictionary<string, Ability> abilityDict){
         // Set the ability to the button based on the position
         foreach (Button button in abilityIcons){
             if (button == null){
