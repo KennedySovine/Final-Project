@@ -187,7 +187,7 @@ public class BaseChampion : NetworkBehaviour
             {
                 IGUIM.buttonInteractable("Q", false); // Disable the button if ability 1 is on cooldown or not enough mana
             }
-            else if ((ability2.cooldown == 0) || (ability2 != null && !(ability2.isOnCooldown) && ability2.manaCost <= mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            if ((ability2.cooldown == 0) || (ability2 != null && !(ability2.isOnCooldown) && ability2.manaCost <= mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
             {
                 IGUIM.buttonInteractable("W", true);
             }
@@ -195,7 +195,7 @@ public class BaseChampion : NetworkBehaviour
             {
                 IGUIM.buttonInteractable("W", false); // Disable the button if ability 1 is on cooldown or not enough mana
             }
-            else if ((ability3.cooldown == 0) || (ability3 != null && !(ability3.isOnCooldown) && ability3.manaCost <= mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            if ((ability3.cooldown == 0) || (ability3 != null && !(ability3.isOnCooldown) && ability3.manaCost <= mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
             {
                 IGUIM.buttonInteractable("E", true);
             }
@@ -277,7 +277,7 @@ public class BaseChampion : NetworkBehaviour
             return null; // Return null if no player ID is found
         }
     }
-    
+
     //Also will track consecutive attacks based if the dmg type is AD or AP
     public void TakeDamage(float AD, float AP, float armorPen, float magicPen){
         if (!IsServer) return;
