@@ -117,8 +117,8 @@ public class ADRange2 : BaseChampion
             0f  // No range
         );
 
-        ability1.icon = Resources.Load<Sprite>("Sprites/Ashe_Ranger27s_Focus"); // Load the icon for the ability from Resources folder
-        ability1.icon2 = Resources.Load<Sprite>("Sprites/Ashe_Ranger27s_Focus"); // Load the icon for the ability from Resources folder
+        ability1.icon = Resources.Load<Sprite>("Sprites/Ashe_RangerFocus_Default"); // Load the icon for the ability from Resources folder
+        ability1.icon2 = Resources.Load<Sprite>("Sprites/Ashe_RangerFocus_Empowered"); // Load the icon for the ability from Resources folder
         
         ability2 = new Ability(
             "Ranger's Focus",
@@ -129,7 +129,8 @@ public class ADRange2 : BaseChampion
             
         );
 
-        ability2.icon = Resources.Load<Sprite>("Sprites/Ashe_Crystal_Arrow"); // Load the icon for the ability from Resources folder
+        ability2.icon = Resources.Load<Sprite>("Sprites/Ashe_Enchanted_Crystal_Arrow"); // Load the icon for the ability from Resources folder
+
         ability3 = new Ability(
             "Volley",
             "Next arrow applies critical Frost and deals extra physical damage.",

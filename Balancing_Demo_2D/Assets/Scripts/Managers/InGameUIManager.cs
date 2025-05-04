@@ -9,7 +9,6 @@ using UnityEngine.EventSystems; // Import EventSystems for event handling
 public class InGameUIManager : NetworkBehaviour
 {
     public List<Button> abilityIcons = new List<Button>(); // List to hold ability icons
-    public Dictionary<string, Ability> abilityDict = new Dictionary<string, Ability>(); // Dictionary to hold abilities by name
     [SerializeField] private TextMeshProUGUI timerText; // Reference to the TextMeshProUGUI component for displaying the timer
 
     private GameManager GM;
@@ -84,7 +83,7 @@ public class InGameUIManager : NetworkBehaviour
 
     public void AsheEmpowerIcon(bool isEmpowered)
     {
-        abilityIcons[0].GetComponent<Image>().sprite = isEmpowered ? abilityDict["Q"].icon2 : abilityDict["Q"].icon; // Set the icon based on empowerment
+        abilityIcons[0].GetComponent<Image>().sprite = isEmpowered ? abilityIcons[0].GetComponent<HoverButton>().ability.icon : abilityIcons[0].GetComponent<HoverButton>().ability.icon; // Set the icon for the button based on empowerment
     }
 
     public void buttonInteractable(string position, bool isInteractable){

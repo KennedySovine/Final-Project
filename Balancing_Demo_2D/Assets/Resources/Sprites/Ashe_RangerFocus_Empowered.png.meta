@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 17ce5fe80e1fc46408a0afb07f481003
+guid: b37c238b4715ce74487285755cceeee7
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2469192833482034644
-    second: Ashe_Ranger 27s_Focus_0
+      213: 4256012368186100880
+    second: Ashe_RangerFocus_Empowered_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Ashe_Ranger 27s_Focus_0
+      name: Ashe_RangerFocus_Empowered_0
       rect:
         serializedVersion: 2
         x: 0
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 4dd03a9bcc5544220800000000000000
-      internalID: 2469192833482034644
+      spriteID: 09cc66513b4601b30800000000000000
+      internalID: 4256012368186100880
       vertices: []
       indices: 
       edges: []
