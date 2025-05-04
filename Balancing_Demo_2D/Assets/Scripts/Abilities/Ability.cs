@@ -59,5 +59,9 @@ public class Ability
     {
         this.duration = duration;
     }
+
+    public bool checkIfAvailable(float mana){
+        return (cooldown == 0 || (mana >= manaCost && !isOnCooldown)); // Check if the ability is available based on mana and cooldown
+    }
     
 }

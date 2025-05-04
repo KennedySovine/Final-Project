@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5529780649511139312}
   - component: {fileID: 7283584346613323515}
-  - component: {fileID: 479571641050879420}
   - component: {fileID: 5572880182677895893}
+  - component: {fileID: 479571641050879420}
   - component: {fileID: 5221310434119250730}
   - component: {fileID: 1182713526884703607}
   - component: {fileID: 752664424059945664}
@@ -93,27 +93,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &479571641050879420
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3316088473501965052}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d00a172e8f24f9c40bf2d028c86a4919, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  mousePosition: {x: 0, y: 0}
-  dashSpeed: 0
-  targetPositionNet:
-    m_InternalValue: {x: 0, y: 0, z: 0}
-  isDashing:
-    m_InternalValue: 0
-  personalCamera: {fileID: 4986339328056519817}
-  champion: {fileID: 5572880182677895893}
 --- !u!114 &5572880182677895893
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,6 +106,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  IGUIM: {fileID: 0}
   championType: 
   maxHealth:
     m_InternalValue: 600
@@ -191,6 +171,8 @@ MonoBehaviour:
   mana:
     m_InternalValue: 300
   autoAttack:
+    icon: {fileID: 0}
+    icon2: {fileID: 0}
     name: Auto Attack
     description: Basic attack
     cooldown: 0
@@ -206,6 +188,8 @@ MonoBehaviour:
       gameTime: 0
     timeOfCast: 0
   passive:
+    icon: {fileID: 0}
+    icon2: {fileID: 0}
     name: 
     description: 
     cooldown: 0
@@ -221,6 +205,8 @@ MonoBehaviour:
       gameTime: 0
     timeOfCast: 0
   ability1:
+    icon: {fileID: 0}
+    icon2: {fileID: 0}
     name: 
     description: 
     cooldown: 0
@@ -236,6 +222,8 @@ MonoBehaviour:
       gameTime: 0
     timeOfCast: 0
   ability2:
+    icon: {fileID: 0}
+    icon2: {fileID: 0}
     name: 
     description: 
     cooldown: 0
@@ -251,6 +239,8 @@ MonoBehaviour:
       gameTime: 0
     timeOfCast: 0
   ability3:
+    icon: {fileID: 0}
+    icon2: {fileID: 0}
     name: 
     description: 
     cooldown: 0
@@ -273,6 +263,28 @@ MonoBehaviour:
     m_InternalValue: 0
   bulletPrefab: {fileID: 2169341123581716514, guid: 66c025e1f784eb2478380fa1d8dd1de2, type: 3}
   PN: {fileID: 479571641050879420}
+  iconsSet: 0
+--- !u!114 &479571641050879420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3316088473501965052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d00a172e8f24f9c40bf2d028c86a4919, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  mousePosition: {x: 0, y: 0}
+  dashSpeed: 0
+  targetPositionNet:
+    m_InternalValue: {x: 0, y: 0, z: 0}
+  isDashing:
+    m_InternalValue: 0
+  personalCamera: {fileID: 4986339328056519817}
+  champion: {fileID: 5572880182677895893}
 --- !u!114 &5221310434119250730
 MonoBehaviour:
   m_ObjectHideFlags: 0

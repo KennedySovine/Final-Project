@@ -154,30 +154,31 @@ public class ADRange2 : BaseChampion
     public override void abilityIconCooldownManaChecks()
     {
         // CHECK FOR PASSIVE
-        if (IsOwner) // Only the owner should check cooldowns and mana
+        if (IsOwner && iconsSet) // Only the owner should check cooldowns and mana
         {
+            Debug.Log("Checking cooldowns and mana for abilities.");
             IGUIM.buttonInteractable("Q", true); // Disable the button by default
-            if (ability1 != null && isMaxStacks && ability1.manaCost <= mana.Value && !ability1.isOnCooldown) // Check if ability 1 is not on cooldown and enough mana is available
+            if (ability1 != null && isMaxStacks && ability1.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
             {
                 IGUIM.AsheEmpowerIcon(true); // Set empowered icon for Ashe
             }
-            else if (ability1 == null || !isMaxStacks|| ability1.manaCost > mana.Value || ability1.isOnCooldown) // Check if ability 1 is on cooldown or not enough mana is available
+            else if (ability1 == null || !isMaxStacks|| !ability1.checkIfAvailable(mana.Value)) // Check if ability 1 is on cooldown or not enough mana is available
             {
                 IGUIM.AsheEmpowerIcon(false); // Set the normal icon for Ashe
             }
-            if ((ability2.cooldown == 0) || (ability2 != null && !(ability2.isOnCooldown) && ability2.manaCost <= mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            if ((ability2.cooldown == 0) || (ability2 != null && ability2.checkIfAvailable(mana.Value))) // Check if ability 1 is not on cooldown and enough mana is available
             {
                 IGUIM.buttonInteractable("W", true);
             }
-            else if (ability2 == null || ability2.isOnCooldown || ability2.manaCost > mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            else if (ability2 == null || !ability2.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
             {
                 IGUIM.buttonInteractable("W", false); // Disable the button if ability 1 is on cooldown or not enough mana
             }
-            if ((ability3.cooldown == 0) || (ability3 != null && !(ability3.isOnCooldown) && ability3.manaCost <= mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            if ((ability3.cooldown == 0) || (ability3 != null && ability3.checkIfAvailable(mana.Value))) // Check if ability 1 is not on cooldown and enough mana is available
             {
                 IGUIM.buttonInteractable("E", true);
             }
-            else if (ability3 == null || ability3.isOnCooldown || ability3.manaCost > mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            else if (ability3 == null || !ability3.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
             {
                 IGUIM.buttonInteractable("E", false); // Disable the button if ability 1 is on cooldown or not enough mana
             }
