@@ -139,11 +139,11 @@ public class ADRange2 : BaseChampion
             IGUIM.buttonInteractable("Q", true); // Disable the button by default
             if (ability1 != null && isMaxStacks && ability1.manaCost <= mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
             {
-                IGUIM.AsherEmpowerIcon(true); // Set empowered icon for Ashe
+                IGUIM.AsheEmpowerIcon(true); // Set empowered icon for Ashe
             }
             else if (ability1 == null || !isMaxStacks|| ability1.manaCost > mana.Value) // Check if ability 1 is on cooldown or not enough mana is available
             {
-                IGUIM.AsherEmpowerIcon(false); // Set the normal icon for Ashe
+                IGUIM.AsheEmpowerIcon(false); // Set the normal icon for Ashe
             }
             else if (ability2 != null && !(ability2.isOnCooldown) && ability2.manaCost <= mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
             {

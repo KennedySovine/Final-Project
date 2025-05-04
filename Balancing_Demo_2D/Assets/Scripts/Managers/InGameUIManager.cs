@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using Unity.Netcode;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro; // Import TextMeshPro for text handling
+using UnityEngine.EventSystems; // Import EventSystems for event handling
 
 public class InGameUIManager : NetworkBehaviour
 {
@@ -10,6 +12,8 @@ public class InGameUIManager : NetworkBehaviour
     public List<Sprite> abilityIconsADRange2 = new List<Sprite>(); // List to hold ability icons for AP range
 
     public List<Button> abilityIcons = new List<Button>(); // List to hold ability icons
+
+    [SerializeField] private TextMeshProUGUI timerText; // Reference to the TextMeshProUGUI component for displaying the timer
 
     private GameManager GM;
     private InGameManager IGM;
@@ -48,7 +52,9 @@ public class InGameUIManager : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        int minutes = Mathf.FloorToInt(GM.gameTime / 60); // Calculate the minutes
+        int seconds = Mathf.FloorToInt(GM.gameTime % 60); // Calculate the seconds
+        string formattedTime = string.Format("{0:00}:{1:00}", minutes, seconds); // Format the time as MM:SS
     }
 
     public void UpdateHealthSlider(float previousValue, float newValue)
