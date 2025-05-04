@@ -81,9 +81,16 @@ public class InGameUIManager : NetworkBehaviour
         manaSlider.maxValue = newValue; // Update the max mana slider in the UI
     }
 
-    public void AsheEmpowerIcon(bool isEmpowered)
+    public void AsheEmpowerIcon(bool isEmpowered, Ability ability)
     {
-        abilityIcons[0].GetComponent<Image>().sprite = isEmpowered ? abilityIcons[0].GetComponent<HoverButton>().ability.icon : abilityIcons[0].GetComponent<HoverButton>().ability.icon; // Set the icon for the button based on empowerment
+        if (isEmpowered)
+        {
+            abilityIcons[0].GetComponent<Image>().sprite = ability.icon2; // Change the color of the Q ability icon to yellow
+        }
+        else
+        {
+            abilityIcons[0].GetComponent<Image>().sprite = ability.icon; // Reset the color of the Q ability icon to white
+        }
     }
 
     public void buttonInteractable(string position, bool isInteractable){

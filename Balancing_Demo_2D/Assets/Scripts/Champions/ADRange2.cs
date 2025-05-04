@@ -156,15 +156,16 @@ public class ADRange2 : BaseChampion
         // CHECK FOR PASSIVE
         if (IsOwner && iconsSet) // Only the owner should check cooldowns and mana
         {
-            Debug.Log("Checking cooldowns and mana for abilities.");
-            IGUIM.buttonInteractable("Q", true); // Disable the button by default
+            //Debug.Log("Checking cooldowns and mana for abilities.");
             if (ability1 != null && isMaxStacks && ability1.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
             {
-                IGUIM.AsheEmpowerIcon(true); // Set empowered icon for Ashe
+                IGUIM.buttonInteractable("Q", true); // Enable button for ability 1
+                IGUIM.AsheEmpowerIcon(true, ability1); // Set empowered icon for Ashe
             }
             else if (ability1 == null || !isMaxStacks|| !ability1.checkIfAvailable(mana.Value)) // Check if ability 1 is on cooldown or not enough mana is available
             {
-                IGUIM.AsheEmpowerIcon(false); // Set the normal icon for Ashe
+                IGUIM.buttonInteractable("Q", false); // Disable the button if ability 1 is on cooldown or not enough mana
+                IGUIM.AsheEmpowerIcon(false, ability1); // Set the normal icon for Ashe
             }
             if ((ability2.cooldown == 0) || (ability2 != null && ability2.checkIfAvailable(mana.Value))) // Check if ability 1 is not on cooldown and enough mana is available
             {
