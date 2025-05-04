@@ -146,6 +146,7 @@ public class PlayerNetwork : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     public void ChampionDashRpc(Vector2 mousePos, float maxRange, float speed)
     {
+        if (!IsServer) return; // Ensure this is only executed on the server
         Vector2 dashDirection = (mousePos - (Vector2)transform.position).normalized;
         float distance = Vector2.Distance(transform.position, mousePos);
         distance = Mathf.Min(distance, maxRange);
