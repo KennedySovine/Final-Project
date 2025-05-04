@@ -13,6 +13,9 @@ public class InGameManager : NetworkBehaviour
     [SerializeField] private TMP_Dropdown champSelectDropdown;
     [SerializeField] private GameObject ChampSelectUI;
     [SerializeField] private AugmentManager AM; // Reference to the AugmentManager
+
+    [SerializeField] private InGameUIManager IGUIM; // Reference to the InGameUIManager
+
     
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

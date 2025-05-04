@@ -447,7 +447,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -1.8425903, y: -4.4177856}
+  m_AnchoredPosition: {x: -1.8425293, y: -4.4177246}
   m_SizeDelta: {x: 742.7379, y: 176.8158}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &216432612
@@ -930,6 +930,8 @@ MonoBehaviour:
   player2: {fileID: 0}
   player2Controller: {fileID: 0}
   player1AbilityUsed:
+    icon: {fileID: 0}
+    icon2: {fileID: 0}
     name: 
     description: 
     cooldown: 0
@@ -945,6 +947,8 @@ MonoBehaviour:
       gameTime: 0
     timeOfCast: 0
   player2AbilityUsed:
+    icon: {fileID: 0}
+    icon2: {fileID: 0}
     name: 
     description: 
     cooldown: 0
@@ -965,11 +969,14 @@ MonoBehaviour:
   ServerID: 0
   player1ID: 0
   player2ID: 0
+  playersSpawned:
+    m_InternalValue: 0
   playerCount: 0
   maxPlayers: 2
   gamePaused:
     m_InternalValue: 0
-  gameTime: 60
+  gameTime:
+    m_InternalValue: 60
   augmentBuffer: 0
   augmentChoosing:
     m_InternalValue: 0
@@ -979,6 +986,7 @@ MonoBehaviour:
   - {fileID: 0}
   AM: {fileID: 0}
   IGM: {fileID: 0}
+  IGUIM: {fileID: 0}
 --- !u!4 &566942286
 Transform:
   m_ObjectHideFlags: 0
@@ -1053,7 +1061,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.008605957, y: 0}
+  m_AnchoredPosition: {x: 0.008544922, y: 0}
   m_SizeDelta: {x: 1607.1721, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &570261405
@@ -1754,7 +1762,7 @@ MonoBehaviour:
   m_MaxConnectAttempts: 60
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
-    Address: 127.0.0.1
+    Address: 192.168.1.237
     Port: 7777
     ServerListenAddress: 0.0.0.0
   DebugSimulator:
@@ -4001,7 +4009,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 6.6, y: -8.299988}
+  m_AnchoredPosition: {x: 6.6, y: -8.300049}
   m_SizeDelta: {x: 251, y: 67.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2038823340
@@ -4347,7 +4355,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0.0000019073, y: 10.799988}
+  m_AnchoredPosition: {x: 0.0000019073, y: 10.800049}
   m_SizeDelta: {x: 195.5823, y: 62.6083}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2128061379

@@ -153,7 +153,9 @@ public class PlayerNetwork : NetworkBehaviour
         Vector2 targetPosition = (Vector2)transform.position + dashDirection * distance;
         targetPositionNet.Value = targetPosition;
         dashSpeed = speed;
-        isDashing.Value = true;
+        if (IsServer){
+            isDashing.Value = true;
+        }
 
         StartCoroutine(DashToTarget(targetPosition));
     }

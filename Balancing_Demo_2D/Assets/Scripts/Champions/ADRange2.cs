@@ -13,17 +13,21 @@ public class ADRange2 : BaseChampion
         base.Start();
         UpdateStats();
         AddAbilities();
+
+        if (IsOwner){
+            attackSpeed.OnValueChanged += (previousValue, newValue) => { // Update the attack speed value
+                updateAbility1CooldownRpc(newValue); // Update the ability cooldown based on attack speed
+            };
+
+        }
     }
 
     //Based on Ashe from LOL
     private void UpdateStats()
     {
-        if (!IsServer){
-            Debug.LogWarning("UpdateStats can only be called on the server.");
-            return;
-        }
+        if (!IsServer) return;
         
-        championType = "AD Range";
+        championType = "AD Range2";
         maxHealth.Value = 610f;
         healthRegen.Value = 0.7f;
         AD.Value = 59f;
@@ -55,6 +59,8 @@ public class ADRange2 : BaseChampion
 
         updateIsEmpoweredRpc(true);
         // Ashe is always 'empowered' so she can always apply frost.
+
+        //Ashe's ranger's focus cooldown is dependent on attackspeed
     }
 
     public override void stackManager(){
@@ -105,12 +111,15 @@ public class ADRange2 : BaseChampion
 
         ability1 = new Ability(
             "Rapid Frost",
-            "ACTIVE: For 6 seconds, gain 25 bonus attack speed and fire 5 shots rapidly. Applies 21 AD per arrow. Cannot cast unless there are 4 stacks of Focus",
+            "ACTIVE: For 6 seconds, gain <i>25% bonus attack speed<i> and fire 5 shots rapidly. Applies <i>21<i> AD per arrow. Cannot cast unless there are 4 stacks of Focus",
             0f, // Cooldown in seconds
             30f, // Mana cost
             0f  // No range
         );
 
+        ability1.icon = Resources.Load<Sprite>("Sprites/Ashe_RangerFocus_Default"); // Load the icon for the ability from Resources folder
+        ability1.icon2 = Resources.Load<Sprite>("Sprites/Ashe_RangerFocus_Empowered"); // Load the icon for the ability from Resources folder
+        
         ability2 = new Ability(
             "Ranger's Focus",
             "PASSIVE: Basic attacks generate a stack of Focus for 4 seconds, which refreshes on additional attacks and stacks up to 4, expriring after a second.",
@@ -120,6 +129,8 @@ public class ADRange2 : BaseChampion
             
         );
 
+        ability2.icon = Resources.Load<Sprite>("Sprites/Ashe_Enchanted_Crystal_Arrow"); // Load the icon for the ability from Resources folder
+
         ability3 = new Ability(
             "Volley",
             "Next arrow applies critical Frost and deals extra physical damage.",
@@ -128,8 +139,55 @@ public class ADRange2 : BaseChampion
             0f // Range
         );
 
+        ability3.icon = Resources.Load<Sprite>("Sprites/Ashe_Volley"); // Load the icon for the ability from Resources folder
+
         ability1.setDuration(6f);
 
+        abilityDict.Add("Q", ability1); // Add the ability to the UI manager
+        abilityDict.Add("W", ability2); // Add the ability to the UI manager
+        abilityDict.Add("E", ability3); // Add the ability to the UI manager
+
+        SendToUI();
+
+    }
+
+    public override void abilityIconCooldownManaChecks()
+    {
+        // CHECK FOR PASSIVE
+        if (IsOwner && iconsSet) // Only the owner should check cooldowns and mana
+        {
+            //Debug.Log("Checking cooldowns and mana for abilities.");
+            if (ability1 != null && isMaxStacks && ability1.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("Q", true); // Enable button for ability 1
+                IGUIM.AsheEmpowerIcon(true, ability1); // Set empowered icon for Ashe
+            }
+            else if (ability1 == null || !isMaxStacks|| !ability1.checkIfAvailable(mana.Value)) // Check if ability 1 is on cooldown or not enough mana is available
+            {
+                IGUIM.buttonInteractable("Q", false); // Disable the button if ability 1 is on cooldown or not enough mana
+                IGUIM.AsheEmpowerIcon(false, ability1); // Set the normal icon for Ashe
+            }
+            if ((ability2.cooldown == 0) || (ability2 != null && ability2.checkIfAvailable(mana.Value))) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("W", true);
+            }
+            else if (ability2 == null || !ability2.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("W", false); // Disable the button if ability 1 is on cooldown or not enough mana
+            }
+            if ((ability3.cooldown == 0) || (ability3 != null && ability3.checkIfAvailable(mana.Value))) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("E", true);
+            }
+            else if (ability3 == null || !ability3.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("E", false); // Disable the button if ability 1 is on cooldown or not enough mana
+            }
+            else{
+                return; // No ability is available for use
+            }
+            
+        }
     }
 
     public virtual GameObject ability3Logic(GameObject bullet){
@@ -161,9 +219,10 @@ public class ADRange2 : BaseChampion
         // Check for mana
 
         if (!IsServer) return; // Ensure this is only executed on the server
-        if (mana.Value < ability1.manaCost && !isMaxStacks) return; // Check if enough mana and stacks are present
+        if (mana.Value < ability1.manaCost && !isMaxStacks && ability1.isOnCooldown) return; // Check if enough mana and stacks are present
         
         updateRapidFireRpc(5);
+        ability1.timeOfCast = Time.time; // Set the time of cast for cooldown tracking
         StartCoroutine(RapidFireCoroutine(ability1.duration)); // Start the rapid fire coroutine
 
         updateManaRpc(-ability1.manaCost); // Deduct the mana cost
@@ -213,5 +272,36 @@ public class ADRange2 : BaseChampion
         attackSpeed.Value = tempAS; // Reset attack speed to original value
         AD.Value = tempAD; // Reset AD to original value
         Debug.Log("Rapid Fire state reset.");
+    }
+
+    [Rpc(SendTo.Server)]
+    public void updateAbility1CooldownRpc(float attackSpeed)
+    {
+        if (!IsServer) return; // Ensure this is only executed on the server
+        
+        if (attackSpeed < 0.75f){
+            ability1.setCooldown(6.08f);
+        }
+        else if (attackSpeed < 1f){
+            ability1.setCooldown(5.33f);
+        }
+        else if (attackSpeed < 1.25f){
+            ability1.setCooldown(4f);
+        }
+        else if (attackSpeed < 1.5f){
+            ability1.setCooldown(3.2f);
+        }
+        else if (attackSpeed < 1.75f){
+            ability1.setCooldown(2.67f);
+        }
+        else if (attackSpeed < 2f){
+            ability1.setCooldown(2.29f);
+        }
+        else if (attackSpeed < 2.25f){
+            ability1.setCooldown(1.78f);
+        }
+        else if (attackSpeed < 2.5f){
+            ability1.setCooldown(1.6f);
+        }
     }
 }
