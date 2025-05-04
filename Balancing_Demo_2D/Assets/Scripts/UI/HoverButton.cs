@@ -8,6 +8,7 @@ using System;
 public class HoverButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public Ability ability; // Reference to the Ability class (assuming it's defined elsewhere in your project)
+    private InGameUIManager IGUIM; // Reference to the InGameUIManager class
     [SerializeField] private GameObject infoBox; 
     [SerializeField] private TextMeshProUGUI infoBoxText;
     public string abilityDescription = null; // Variable to hold the ability description

@@ -152,6 +152,7 @@ public class ADRange2 : BaseChampion
 
     public override void abilityIconCooldownManaChecks()
     {
+        // CHECK FOR PASSIVE
         if (IsOwner) // Only the owner should check cooldowns and mana
         {
             IGUIM.buttonInteractable("Q", true); // Disable the button by default
@@ -163,7 +164,7 @@ public class ADRange2 : BaseChampion
             {
                 IGUIM.AsheEmpowerIcon(false); // Set the normal icon for Ashe
             }
-            else if (ability2 != null && !(ability2.isOnCooldown) && ability2.manaCost <= mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            if ((ability2.cooldown == 0) || (ability2 != null && !(ability2.isOnCooldown) && ability2.manaCost <= mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
             {
                 IGUIM.buttonInteractable("W", true);
             }
@@ -171,7 +172,7 @@ public class ADRange2 : BaseChampion
             {
                 IGUIM.buttonInteractable("W", false); // Disable the button if ability 1 is on cooldown or not enough mana
             }
-            else if (ability3 != null && !(ability3.isOnCooldown) && ability3.manaCost <= mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            if ((ability3.cooldown == 0) || (ability3 != null && !(ability3.isOnCooldown) && ability3.manaCost <= mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
             {
                 IGUIM.buttonInteractable("E", true);
             }

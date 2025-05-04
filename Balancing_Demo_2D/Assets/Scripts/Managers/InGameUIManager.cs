@@ -117,12 +117,15 @@ public class InGameUIManager : NetworkBehaviour
                 button.GetComponent<Image>().sprite = ability.icon; // Set the icon for the button
                 button.GetComponent<HoverButton>().ability = ability; // Set the ability reference in the HoverButton component
                 button.GetComponent<HoverButton>().addAbilityInfo(); // Add ability info to the button
+                //button.GetComponent<HoverButton>().IGUIM = this; // Set the InGameUIManager reference in the HoverButton component
             }
             else{
                 Debug.LogWarning($"Ability not found for position: {position}. No action taken.");
             }
         }
     }
+
+    
     
 
 }
