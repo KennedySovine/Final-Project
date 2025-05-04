@@ -168,7 +168,6 @@ public class GameManager : NetworkBehaviour
             if (playersSpawned.Value)
             {
 
-
             }
         }
     }

@@ -13,6 +13,10 @@ public class ADRange2 : BaseChampion
         base.Start();
         UpdateStats();
         AddAbilities();
+
+        attackSpeed.OnValueChanged += (value) => { // Update the attack speed value
+            updateAbility1CooldownRpc(value); // Update the ability cooldown based on attack speed
+        };
     }
 
     //Based on Ashe from LOL
@@ -55,6 +59,8 @@ public class ADRange2 : BaseChampion
 
         updateIsEmpoweredRpc(true);
         // Ashe is always 'empowered' so she can always apply frost.
+
+        //Ashe's ranger's focus cooldown is dependent on attackspeed
     }
 
     public override void stackManager(){
@@ -105,7 +111,7 @@ public class ADRange2 : BaseChampion
 
         ability1 = new Ability(
             "Rapid Frost",
-            "ACTIVE: For 6 seconds, gain 25 bonus attack speed and fire 5 shots rapidly. Applies 21 AD per arrow. Cannot cast unless there are 4 stacks of Focus",
+            "ACTIVE: For 6 seconds, gain <i>25% bonus attack speed<i> and fire 5 shots rapidly. Applies <i>21<i> AD per arrow. Cannot cast unless there are 4 stacks of Focus",
             0f, // Cooldown in seconds
             30f, // Mana cost
             0f  // No range
@@ -197,9 +203,10 @@ public class ADRange2 : BaseChampion
         // Check for mana
 
         if (!IsServer) return; // Ensure this is only executed on the server
-        if (mana.Value < ability1.manaCost && !isMaxStacks) return; // Check if enough mana and stacks are present
+        if (mana.Value < ability1.manaCost && !isMaxStacks && ability1.isOnCooldown) return; // Check if enough mana and stacks are present
         
         updateRapidFireRpc(5);
+        ability1.timeOfCast = Time.time; // Set the time of cast for cooldown tracking
         StartCoroutine(RapidFireCoroutine(ability1.duration)); // Start the rapid fire coroutine
 
         updateManaRpc(-ability1.manaCost); // Deduct the mana cost
@@ -249,5 +256,36 @@ public class ADRange2 : BaseChampion
         attackSpeed.Value = tempAS; // Reset attack speed to original value
         AD.Value = tempAD; // Reset AD to original value
         Debug.Log("Rapid Fire state reset.");
+    }
+
+    [Rpc(SendTo.Server)]
+    public void updateAbility1CooldownRpc(float attackSpeed)
+    {
+        if (!IsServer) return; // Ensure this is only executed on the server
+        
+        if (attackSpeed.Value < 0.75f){
+            ability1.setCooldown(6.08f);
+        }
+        else if (attackSpeed.Value < 1f){
+            ability1.setCooldown(5.33f);
+        }
+        else if (attackSpeed.Value < 1.25f){
+            ability1.setCooldown(4f);
+        }
+        else if (attackSpeed.Value < 1.5f){
+            ability1.setCooldown(3.2f);
+        }
+        else if (attackSpeed.Value < 1.75f){
+            ability1.setCooldown(2.67f);
+        }
+        else if (attackSpeed.Value < 2f){
+            ability1.setCooldown(2.29f);
+        }
+        else if (attackSpeed.Value < 2.25f){
+            ability1.setCooldown(1.78f);
+        }
+        else if (attackSpeed.Value < 2.5f){
+            ability1.setCooldown(1.6f);
+        }
     }
 }
