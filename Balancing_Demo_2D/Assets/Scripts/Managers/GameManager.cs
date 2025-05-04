@@ -416,7 +416,6 @@ public class GameManager : NetworkBehaviour
         IGUIM.inGameUI.SetActive(true); // Activate the in-game UI
         Debug.Log("In-game UI initialized and activated.");
     }
-    
 
 
 }

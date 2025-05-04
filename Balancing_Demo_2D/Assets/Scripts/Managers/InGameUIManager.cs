@@ -53,8 +53,6 @@ public class InGameUIManager : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-
-
     }
 
     public void UpdateHealthSlider(float previousValue, float newValue)
@@ -80,6 +78,7 @@ public class InGameUIManager : NetworkBehaviour
         Debug.Log($"Updating max mana slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
         manaSlider.maxValue = newValue; // Update the max mana slider in the UI
     }
+
 
     public void AsheEmpowerIcon(bool isEmpowered, Ability ability)
     {
@@ -130,8 +129,5 @@ public class InGameUIManager : NetworkBehaviour
             }
         }
     }
-
-    
-    
 
 }
