@@ -22,6 +22,7 @@ public class HoverButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             if (abilityDescription == null){
                 abilityDescription = ability.description; // Get the ability description from the Ability class
                 abilityName = ability.name; // Get the ability name from the Ability class
+                formatInfoBox(); // Format the info box text with ability name and description
             }
         }
     }
@@ -42,6 +43,6 @@ public class HoverButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     }
 
     private void formatInfoBox(){
-        infoBoxText.text = $"<b>{abilityName}</b>\n" + abilityDescription; // Format the info box text with ability name and description
+        infoBoxText.text = string.Format("<b>{0}</b>\n{1}", abilityName, abilityDescription); // Format the info box text with ability name and description
     }
 }
