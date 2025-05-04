@@ -116,6 +116,7 @@ public class InGameUIManager : NetworkBehaviour
                 Ability ability = abilityDict[position]; // Get the ability from the dictionary
                 button.GetComponent<Image>().sprite = ability.icon; // Set the icon for the button
                 button.GetComponent<HoverButton>().ability = ability; // Set the ability reference in the HoverButton component
+                button.GetComponent<HoverButton>().addAbilityInfo(); // Add ability info to the button
             }
             else{
                 Debug.LogWarning($"Ability not found for position: {position}. No action taken.");

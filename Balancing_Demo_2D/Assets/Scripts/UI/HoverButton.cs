@@ -25,16 +25,13 @@ public class HoverButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     }
 
     void Update(){
-        if (ability == null)
-        {
-            Debug.LogError("Ability reference is not set in the inspector.");
-        }
-        else if (abilityDescription == null){
-            abilityDescription = ability.description; // Get the ability description from the Ability class
-            abilityName = ability.name; // Get the ability name from the Ability class
-            formatInfoBox(); // Format the info box text with ability name and description
-            
-        }
+        
+    }
+
+    public void addAbilityInfo(){
+        abilityDescription = ability.description; // Get the ability description from the Ability class
+        abilityName = ability.name; // Get the ability name from the Ability class
+        formatInfoBox(); // Format the info box text with ability name and description
     }
 
     public void OnPointerEnter(PointerEventData eventData)
