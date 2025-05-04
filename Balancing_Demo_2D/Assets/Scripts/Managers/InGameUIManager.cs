@@ -12,7 +12,7 @@ public class InGameUIManager : NetworkBehaviour
     public List<Sprite> abilityIconsADRange2 = new List<Sprite>(); // List to hold ability icons for AP range
 
     public List<Button> abilityIcons = new List<Button>(); // List to hold ability icons
-    public Dictionary<string, Ability> abilityDict = new Dictionary<string, Ability>(); // Dictionary to hold abilities by name
+
     [SerializeField] private TextMeshProUGUI timerText; // Reference to the TextMeshProUGUI component for displaying the timer
 
     private GameManager GM;
@@ -52,13 +52,9 @@ public class InGameUIManager : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-
-        //Timer Stuff
         int minutes = Mathf.FloorToInt(GM.gameTime / 60); // Calculate the minutes
         int seconds = Mathf.FloorToInt(GM.gameTime % 60); // Calculate the seconds
         string formattedTime = string.Format("{0:00}:{1:00}", minutes, seconds); // Format the time as MM:SS
-
-
     }
 
     public void UpdateHealthSlider(float previousValue, float newValue)
@@ -137,24 +133,5 @@ public class InGameUIManager : NetworkBehaviour
                 break;
         }
     }
-
-    public void setAbilityToButton(string position, Ability ability){
-        // Set the ability to the button based on the position
-        switch (position){
-            case "Q":
-                abilityIcons[0].GetComponent<HoverButton>().ability = ability; // Set the Q ability
-                break;
-            case "W":
-                abilityIcons[1].GetComponent<HoverButton>().ability = ability; // Set the W ability
-                break;
-            case "E":
-                abilityIcons[2].GetComponent<HoverButton>().ability = ability; // Set the E ability
-                break;
-            default:
-                Debug.LogWarning($"Unknown button position: {position}. No action taken.");
-                break;
-        }
-    }
-    
 
 }

@@ -57,7 +57,7 @@ public class ADRange : BaseChampion
 
         ability1 = new Ability(
             "Tumble",
-            "Dash forward and empower next attack within 3 seconds. Deal bonus AD damage <i>(75 + 50% AP)<i>",
+            "Dash forward and empower next attack",
             6f, // Cooldown in seconds
             30f, // Mana cost
             10f  // Range
@@ -65,7 +65,7 @@ public class ADRange : BaseChampion
 
         ability2 = new Ability(
             "Silver Bolts",
-            "Basic attacks apply a stack and at 3 stacks, deal bonus true damage based on <i>6% of the target's max health<i>. Deals minimum <i>50<i> bonus damage.",
+            "Basic attacks apply a stack and at 3 stacks, deal bonus true damage",
             0f, // Cooldown in seconds
             0f, // Mana cost
             0f   // No range
@@ -73,7 +73,7 @@ public class ADRange : BaseChampion
 
         ability3 = new Ability(
             "Condemn",
-            "Fire an extra heavy bolt that deals extra physical damage <i>(50 + 50% AD)<i>.",
+            "Fire an extra heavy bolt that deals extra physical damage.",
             20f, // Cooldown in seconds
             90f, // Mana cost
             5f   // Range

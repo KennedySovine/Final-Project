@@ -161,13 +161,6 @@ public class BaseChampion : NetworkBehaviour
             IGUIM.iconsSet = true; // Set the flag to true to avoid setting icons again
         }
 
-        if (!IsOwner) return; // Only the owner should execute this logic
-        if (GM.playersSpawned.Value){
-            IGUIM.setAbilityToButton("Q", ability1); // Set ability 1 to the Q button
-            IGUIM.setAbilityToButton("W", ability2); // Set ability 2 to the W button
-            IGUIM.setAbilityToButton("E", ability3); // Set ability 3 to the E button
-        }
-
         abilityIconCooldownManaChecks(); // Check cooldowns and mana for abilities
 
         stackManager(); // Call the stack manager logic
@@ -264,6 +257,7 @@ public class BaseChampion : NetworkBehaviour
         }
     }
 
+
     public Ability getAbilityUsedRpc(){
         if (NetworkManager.Singleton.LocalClientId == GM.player1ID){
             return GM.player1AbilityUsed; // Get the ability used for player 1
@@ -278,14 +272,6 @@ public class BaseChampion : NetworkBehaviour
         }
     }
 
-    public void setAbilitiesToButtons(){
-        if (IsOwner) // Only the owner should set abilities to buttons
-        {
-            IGUIM.abilityDict.Add("Q", ability1); // Add ability 1 to the button dictionary
-            IGUIM.abilityDict.Add("W", ability2); // Add ability 2 to the button dictionary
-            IGUIM.abilityDict.Add("E", ability3); // Add ability 3 to the button dictionary
-        }
-    }
     //Also will track consecutive attacks based if the dmg type is AD or AP
     public void TakeDamage(float AD, float AP, float armorPen, float magicPen){
         if (!IsServer) return;
