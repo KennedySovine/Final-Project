@@ -341,9 +341,11 @@ public class BaseChampion : NetworkBehaviour
         {
             float tempH = maxHealth.Value * healthChange;
             maxHealth.Value += tempH;
+            health.Value += tempH; // Update the health value based on the new max health
             return;
         }
         maxHealth.Value += healthChange;
+        health.Value += healthChange; // Update the health value based on the new max health
     }
 
     [Rpc(SendTo.Server)]
