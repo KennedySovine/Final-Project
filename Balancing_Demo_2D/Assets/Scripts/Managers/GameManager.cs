@@ -41,7 +41,7 @@ public class GameManager : NetworkBehaviour
     public int playerCount = 0; // Number of players connected
     public int maxPlayers = 2;
     public NetworkVariable<bool> gamePaused = new NetworkVariable<bool>(false); // Flag to pause the game time
-    public float gameTime = 120f; // Game duration in seconds
+    public NetworkVariable<float> gameTime = new NetworkVariable<float>(60f); // Game time in seconds
     public float augmentBuffer = 20f; //Choose aug every 40 seconds
     public NetworkVariable<bool> augmentChoosing = new NetworkVariable<bool>(false); //If the player is choosing an augment, dont countdown the game time
     private Camera serverCamera; // Reference to the server camera
@@ -136,9 +136,9 @@ public class GameManager : NetworkBehaviour
                     gamePaused.Value = true;
                 }
 
-                if (gameTime > 0 && !gamePaused.Value)
+                if (gameTime.Value > 0 && !gamePaused.Value)
                 {
-                    gameTime -= Time.deltaTime;
+                    gameTime.Value -= Time.deltaTime;
                 }
 
                 if (augmentBuffer > 0 && !augmentChoosing.Value && !gamePaused.Value) // If Augment buffer is greater than 0, players are not choosing augments, and the game isn't paused.
@@ -156,7 +156,7 @@ public class GameManager : NetworkBehaviour
                     augmentBuffer = 30f; // Reset the augment buffer for the next cycle
                 }
             }
-            if (gameTime <= 0 && !gameEnded) // Check if the game time has expired
+            if (gameTime.Value <= 0 && !gameEnded) // Check if the game time has expired
             {
                 gamePaused.Value = true; // Pause the game
                 gameEnded = true; // Set the game ended flag to true

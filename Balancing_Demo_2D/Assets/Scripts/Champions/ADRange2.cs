@@ -14,9 +14,12 @@ public class ADRange2 : BaseChampion
         UpdateStats();
         AddAbilities();
 
-        attackSpeed.OnValueChanged += (previousValue, newValue) => { // Update the attack speed value
-            updateAbility1CooldownRpc(newValue); // Update the ability cooldown based on attack speed
-        };
+        if (IsOwner){
+            attackSpeed.OnValueChanged += (previousValue, newValue) => { // Update the attack speed value
+                updateAbility1CooldownRpc(newValue); // Update the ability cooldown based on attack speed
+            };
+
+        }
     }
 
     //Based on Ashe from LOL
@@ -117,6 +120,9 @@ public class ADRange2 : BaseChampion
             0f  // No range
         );
 
+        ability1.icon = Resources.Load<Sprite>("Sprites/Ashe_Ranger27s_Focus"); // Load the icon for the ability from Resources folder
+        ability1.icon2 = Resources.Load<Sprite>("Sprites/Ashe_Ranger27s_Focus"); // Load the icon for the ability from Resources folder
+        
         ability2 = new Ability(
             "Ranger's Focus",
             "PASSIVE: Basic attacks generate a stack of Focus for 4 seconds, which refreshes on additional attacks and stacks up to 4, expriring after a second.",
@@ -126,6 +132,7 @@ public class ADRange2 : BaseChampion
             
         );
 
+        ability2.icon = Resources.Load<Sprite>("Sprites/Ashe_Crystal_Arrow"); // Load the icon for the ability from Resources folder
         ability3 = new Ability(
             "Volley",
             "Next arrow applies critical Frost and deals extra physical damage.",
@@ -133,6 +140,8 @@ public class ADRange2 : BaseChampion
             75f, // Mana cost
             0f // Range
         );
+
+        ability3.icon = Resources.Load<Sprite>("Sprites/Ashe_Volley"); // Load the icon for the ability from Resources folder
 
         ability1.setDuration(6f);
 
@@ -143,11 +152,11 @@ public class ADRange2 : BaseChampion
         if (IsOwner) // Only the owner should check cooldowns and mana
         {
             IGUIM.buttonInteractable("Q", true); // Disable the button by default
-            if (ability1 != null && isMaxStacks && ability1.manaCost <= mana.Value) // Check if ability 1 is not on cooldown and enough mana is available
+            if (ability1 != null && isMaxStacks && ability1.manaCost <= mana.Value && !ability1.isOnCooldown) // Check if ability 1 is not on cooldown and enough mana is available
             {
                 IGUIM.AsheEmpowerIcon(true); // Set empowered icon for Ashe
             }
-            else if (ability1 == null || !isMaxStacks|| ability1.manaCost > mana.Value) // Check if ability 1 is on cooldown or not enough mana is available
+            else if (ability1 == null || !isMaxStacks|| ability1.manaCost > mana.Value || ability1.isOnCooldown) // Check if ability 1 is on cooldown or not enough mana is available
             {
                 IGUIM.AsheEmpowerIcon(false); // Set the normal icon for Ashe
             }

@@ -63,6 +63,8 @@ public class ADRange : BaseChampion
             10f  // Range
         );
 
+        ability1.icon = Resources.Load<Sprite>("Sprites/Vayne_Tumble"); // Load the icon for the ability from Resources folder
+
         ability2 = new Ability(
             "Silver Bolts",
             "Basic attacks apply a stack and at 3 stacks, deal bonus true damage based on <i>6% of the target's max health<i>. Deals minimum <i>50<i> bonus damage.",
@@ -71,6 +73,8 @@ public class ADRange : BaseChampion
             0f   // No range
         );
 
+        ability2.icon = Resources.Load<Sprite>("Sprites/Vayne_Silver_Bolts"); // Load the icon for the ability from Resources folder
+
         ability3 = new Ability(
             "Condemn",
             "Fire an extra heavy bolt that deals extra physical damage <i>(50 + 50% AD)<i>.",
@@ -78,6 +82,8 @@ public class ADRange : BaseChampion
             90f, // Mana cost
             5f   // Range
         );
+
+        ability3.icon = Resources.Load<Sprite>("Sprites/Vayne_Condemn"); // Load the icon for the ability from Resources folder
 
         ability3.setDuration(8f);
     }

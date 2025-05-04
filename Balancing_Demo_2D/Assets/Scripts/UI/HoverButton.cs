@@ -10,22 +10,33 @@ public class HoverButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public Ability ability; // Reference to the Ability class (assuming it's defined elsewhere in your project)
     [SerializeField] private GameObject infoBox; 
     [SerializeField] private TextMeshProUGUI infoBoxText;
-    private string abilityDescription; // Variable to hold the ability description
-    private string abilityName; // Variable to hold the ability name
+    public string abilityDescription = null; // Variable to hold the ability description
+    public string abilityName; // Variable to hold the ability name
 
     void Start(){
         if (ability == null)
         {
             Debug.LogError("Ability reference is not set in the inspector.");
         }
-        else{
-            if (abilityDescription == null){
-                abilityDescription = ability.description; // Get the ability description from the Ability class
-                abilityName = ability.name; // Get the ability name from the Ability class
-                formatInfoBox(); // Format the info box text with ability name and description
-            }
+        abilityDescription = ability.description; // Get the ability description from the Ability class
+        abilityName = ability.name; // Get the ability name from the Ability class
+        formatInfoBox(); // Format the info box text with ability name and description
+        
+    }
+
+    void Update(){
+        if (ability == null)
+        {
+            Debug.LogError("Ability reference is not set in the inspector.");
+        }
+        else if (abilityDescription == null){
+            abilityDescription = ability.description; // Get the ability description from the Ability class
+            abilityName = ability.name; // Get the ability name from the Ability class
+            formatInfoBox(); // Format the info box text with ability name and description
+            
         }
     }
+
     public void OnPointerEnter(PointerEventData eventData)
     {
         // Code to execute when the mouse enters the button

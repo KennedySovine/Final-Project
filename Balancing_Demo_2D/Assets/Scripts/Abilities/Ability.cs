@@ -3,6 +3,8 @@ using UnityEngine;
 [System.Serializable]
 public class Ability
 {
+    public Sprite icon; // Icon for the ability
+    public Sprite icon2;
     public string name; // Name of the ability
     public string description; // Description of the ability
     public float cooldown = 0f; // Cooldown time in seconds
@@ -57,4 +59,5 @@ public class Ability
     {
         this.duration = duration;
     }
+    
 }

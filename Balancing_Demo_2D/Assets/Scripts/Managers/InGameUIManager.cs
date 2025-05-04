@@ -8,9 +8,6 @@ using UnityEngine.EventSystems; // Import EventSystems for event handling
 
 public class InGameUIManager : NetworkBehaviour
 {
-    public List<Sprite> abilityIconsADRange = new List<Sprite>(); // List to hold ability icons for AD range
-    public List<Sprite> abilityIconsADRange2 = new List<Sprite>(); // List to hold ability icons for AP range
-
     public List<Button> abilityIcons = new List<Button>(); // List to hold ability icons
     public Dictionary<string, Ability> abilityDict = new Dictionary<string, Ability>(); // Dictionary to hold abilities by name
     [SerializeField] private TextMeshProUGUI timerText; // Reference to the TextMeshProUGUI component for displaying the timer
@@ -43,20 +40,20 @@ public class InGameUIManager : NetworkBehaviour
             Debug.LogError("InGameManager instance is null. Ensure the InGameManager is active in the scene.");
         }
 
-        if (!IsClient) return; // Only run this for clients
+        GM.gameTime.OnValueChanged += (previousValue, newValue) =>
+        {
+            int minutes = Mathf.FloorToInt(newValue / 60); // Calculate the minutes
+            int seconds = Mathf.FloorToInt(newValue % 60); // Calculate the seconds
+            string formattedTime = string.Format("{0:00}:{1:00}", minutes, seconds); // Format the time as MM:SS
+            timerText.text = formattedTime; // Update the timer text in the UI
+        };
 
-    
-        
+        if (!IsClient) return; // Only run this for clients
     }
 
     // Update is called once per frame
     void Update()
     {
-
-        //Timer Stuff
-        int minutes = Mathf.FloorToInt(GM.gameTime / 60); // Calculate the minutes
-        int seconds = Mathf.FloorToInt(GM.gameTime % 60); // Calculate the seconds
-        string formattedTime = string.Format("{0:00}:{1:00}", minutes, seconds); // Format the time as MM:SS
 
 
     }
@@ -85,40 +82,9 @@ public class InGameUIManager : NetworkBehaviour
         manaSlider.maxValue = newValue; // Update the max mana slider in the UI
     }
 
-
-    public void SetIconImages(string championType){
-        // Set the ability icons based on the champion type
-        if (championType == "AD Range")
-        {
-            for (int i = 0; i < abilityIcons.Count; i++)
-            {
-                abilityIcons[i].GetComponent<Image>().sprite = abilityIconsADRange[i]; // Set the icon image for each ability
-            }
-        }
-        else if (championType == "AD Range2")
-        {
-            for (int i = 0; i < abilityIcons.Count; i++)
-            {
-                abilityIcons[i].GetComponent<Image>().sprite = abilityIconsADRange2[i]; // Set the icon image for each ability
-            }
-        }
-        else
-        {
-            Debug.LogWarning($"Unknown champion type: {championType}. No icons set.");
-        }
-    }
-
     public void AsheEmpowerIcon(bool isEmpowered)
     {
-        // Set the empowered icon for Ashe
-        if (isEmpowered)
-        {
-            abilityIcons[0].GetComponent<Image>().sprite = abilityIconsADRange[3]; // Set the empowered icon
-        }
-        else
-        {
-            abilityIcons[0].GetComponent<Image>().sprite = abilityIconsADRange[0]; // Set the normal icon
-        }
+        abilityIcons[0].GetComponent<Image>().sprite = isEmpowered ? abilityDict["Q"].icon2 : abilityDict["Q"].icon; // Set the icon based on empowerment
     }
 
     public void buttonInteractable(string position, bool isInteractable){
@@ -138,21 +104,22 @@ public class InGameUIManager : NetworkBehaviour
         }
     }
 
-    public void setAbilityToButton(string position, Ability ability){
+    public void setAbilityToButtons(){
         // Set the ability to the button based on the position
-        switch (position){
-            case "Q":
-                abilityIcons[0].GetComponent<HoverButton>().ability = ability; // Set the Q ability
-                break;
-            case "W":
-                abilityIcons[1].GetComponent<HoverButton>().ability = ability; // Set the W ability
-                break;
-            case "E":
-                abilityIcons[2].GetComponent<HoverButton>().ability = ability; // Set the E ability
-                break;
-            default:
-                Debug.LogWarning($"Unknown button position: {position}. No action taken.");
-                break;
+        foreach (Button button in abilityIcons){
+            if (button == null){
+                Debug.LogError("Button reference is null. Ensure the button is assigned in the inspector.");
+                continue; // Skip to the next button if the current one is null
+            }
+            string position = button.name; // Get the name of the button to determine its position
+            if (abilityDict.ContainsKey(position)){
+                Ability ability = abilityDict[position]; // Get the ability from the dictionary
+                button.GetComponent<Image>().sprite = ability.icon; // Set the icon for the button
+                button.GetComponent<HoverButton>().ability = ability; // Set the ability reference in the HoverButton component
+            }
+            else{
+                Debug.LogWarning($"Ability not found for position: {position}. No action taken.");
+            }
         }
     }
     
