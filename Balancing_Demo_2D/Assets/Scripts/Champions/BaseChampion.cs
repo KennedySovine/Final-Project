@@ -1,11 +1,12 @@
 using UnityEngine;
 using Unity.Netcode;
+using System.Collections.Generic;
 
 public class BaseChampion : NetworkBehaviour
 {
     public static GameManager GM; // Reference to the GameManager
 
-    private InGameUIManager IGUIM; // Reference to the InGameUIManager
+    public InGameUIManager IGUIM; // Reference to the InGameUIManager
     [Header("Champion Stats")]
     public string championType = "";
 
@@ -57,6 +58,8 @@ public class BaseChampion : NetworkBehaviour
     public Ability ability2;
     public Ability ability3;
 
+    public Dictionary<string, Ability> abilityDict = new Dictionary<string, Ability>(); // Dictionary to hold abilities by name
+
     public NetworkVariable<float> lastAutoAttackTime = new NetworkVariable<float>(0f); // Time of the last auto-attack
 
     [Header("Champion Settings")]
@@ -68,6 +71,8 @@ public class BaseChampion : NetworkBehaviour
     public GameObject bulletPrefab; // Prefab for the bullet to be fired
 
     public PlayerNetwork PN; // Reference to the PlayerNetwork script
+
+    public bool iconsSet = false; // Flag to check if icons are set
 
     public void Start()
     {
@@ -88,25 +93,25 @@ public class BaseChampion : NetworkBehaviour
         {
             health.OnValueChanged += (previousValue, newValue) =>
             {
-                Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Health changed from {previousValue} to {newValue}");
+                //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Health changed from {previousValue} to {newValue}");
                 IGUIM.UpdateHealthSlider(previousValue, newValue);
             };
 
             mana.OnValueChanged += (previousValue, newValue) =>
             {
-                Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Mana changed from {previousValue} to {newValue}");
+                //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Mana changed from {previousValue} to {newValue}");
                 IGUIM.UpdateManaSlider(previousValue, newValue);
             };
 
             maxHealth.OnValueChanged += (previousValue, newValue) =>
             {
-                Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Health changed from {previousValue} to {newValue}");
+                //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Health changed from {previousValue} to {newValue}");
                 IGUIM.UpdateMaxHealthSlider(previousValue, newValue); // Update the health slider when max health changes
             };
 
             maxMana.OnValueChanged += (previousValue, newValue) =>
             {
-                Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Mana changed from {previousValue} to {newValue}");
+                //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Mana changed from {previousValue} to {newValue}");
                 IGUIM.UpdateMaxManaSlider(previousValue, newValue); // Update the mana slider when max mana changes
             };
         }
@@ -138,6 +143,9 @@ public class BaseChampion : NetworkBehaviour
         {
             passiveAbilityRpc(); // Call the passive ability logic
         }
+        if (IsOwner){
+            abilityIconCooldownManaChecks(); // Check cooldowns and mana for abilities
+        }
 
         if (!IsServer) return; // Only the server should execute this logic
         //Timer for stacks
@@ -156,8 +164,65 @@ public class BaseChampion : NetworkBehaviour
             applySlowRpc(0f, 0f); // Reset the slow effect on the client
         }
 
+
         stackManager(); // Call the stack manager logic
 
+    }
+    
+
+    public virtual void abilityIconCooldownManaChecks()
+    {
+        // The first or statement in the set true is to check if the ability is a passive as passives dont have a cooldown
+        if (IsOwner && iconsSet) // Only the owner should check cooldowns and mana
+        {
+            //Debug.Log("Checking cooldowns and mana for abilities.");
+            if ((ability1.cooldown == 0) || (ability1 != null && ability1.checkIfAvailable(mana.Value)))// Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("Q", true);
+            }
+            else if (ability1 == null || !ability1.checkIfAvailable(mana.Value))// Check if ability 1 is on cooldown or not enough mana is available
+            {
+                IGUIM.buttonInteractable("Q", false); // Disable the button if ability 1 is on cooldown or not enough mana
+            }
+            if ((ability2.cooldown == 0) || (ability2 != null && ability1.checkIfAvailable(mana.Value))) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("W", true);
+            }
+            else if (ability2 == null || !ability2.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("W", false); // Disable the button if ability 1 is on cooldown or not enough mana
+            }
+            if ((ability3.cooldown == 0) || (ability3 != null && ability3.checkIfAvailable(mana.Value))) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("E", true);
+            }
+            else if (ability3 == null || !ability3.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            {
+                IGUIM.buttonInteractable("E", false); // Disable the button if ability 1 is on cooldown or not enough mana
+            }
+            else{
+                return; // No ability is available for use
+            }
+            
+        }
+    }
+
+    public void SendToUI()
+    {
+        if (!IsOwner) return;
+        while (!iconsSet){
+            if (abilityDict.ContainsKey("E")) // Check if the abilities are not null and icons are not set
+            {
+                Debug.Log("Setting abilities to buttons for player " + NetworkManager.Singleton.LocalClientId);
+                IGUIM.setAbilityToButtons(abilityDict); // Set the abilities to the buttons in the UI
+                iconsSet = true; // Set the flag to true to indicate icons are set
+            }
+            else
+            {
+                Debug.LogWarning("Ability dictionary is empty or abilities are not set yet.");
+                return; // Exit the loop if the abilities are not set
+            }
+        }
     }
 
     private void HealthandManaRegen()
@@ -535,6 +600,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         isEmpowered.Value = value;
+        
     }
 
     [Rpc(SendTo.Server)]

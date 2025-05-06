@@ -34,6 +34,7 @@ public class GameManager : NetworkBehaviour
     public ulong ServerID = 3; // ID of the server
     public ulong player1ID = 0; // ID of player 1
     public ulong player2ID = 0; // ID of player 2
+    public NetworkVariable<bool> playersSpawned = new NetworkVariable<bool>(false); // Flag to indicate if player 1 is ready
 
     [Header("Game Settings")]
     private bool gameEnded = false; // Flag to indicate if the game has ended
@@ -41,7 +42,7 @@ public class GameManager : NetworkBehaviour
     public int maxPlayers = 2;
     public NetworkVariable<bool> gamePaused = new NetworkVariable<bool>(false); // Flag to pause the game time
     [SerializeField] private float maxGameTime;
-    public float gameTime = 120f; // Game duration in seconds
+    public NetworkVariable<float> gameTime = new NetworkVariable<float>(60f); // Game time in seconds
     public float augmentBuffer = 20f; //Choose aug every 40 seconds
     public NetworkVariable<bool> augmentChoosing = new NetworkVariable<bool>(false); //If the player is choosing an augment, dont countdown the game time
     private Camera serverCamera; // Reference to the server camera
@@ -137,9 +138,9 @@ public class GameManager : NetworkBehaviour
                     gamePaused.Value = true;
                 }
 
-                if (gameTime > 0 && !gamePaused.Value)
+                if (gameTime.Value > 0 && !gamePaused.Value)
                 {
-                    gameTime -= Time.deltaTime;
+                    gameTime.Value -= Time.deltaTime;
                 }
 
                 if (augmentBuffer > 0 && !augmentChoosing.Value && !gamePaused.Value) // If Augment buffer is greater than 0, players are not choosing augments, and the game isn't paused.
@@ -157,12 +158,18 @@ public class GameManager : NetworkBehaviour
                     augmentBuffer = 30f; // Reset the augment buffer for the next cycle
                 }
             }
-            if (gameTime <= 0 && !gameEnded) // Check if the game time has expired
+            if (gameTime.Value <= 0 && !gameEnded) // Check if the game time has expired
             {
                 gamePaused.Value = true; // Pause the game
                 gameEnded = true; // Set the game ended flag to true
                 if (!IsServer) return; // Ensure this runs only on the server
                 EndGame(); // Call the EndGame function to handle game over logic
+            }
+
+            //Basicially all calls to the server need to be done here to do anything that is done at the 'start'
+            if (playersSpawned.Value)
+            {
+
             }
         }
     }
@@ -232,6 +239,7 @@ public class GameManager : NetworkBehaviour
 
             if (player1 != null && player2 != null) // Check if both players have been spawned
             {
+                playersSpawned.Value = true; // Set the flag to indicate both players have spawned
                 Debug.Log("Both players have been spawned. Starting the game.");
                 // Add any additional logic to start the game here
                 player1Controller.GetComponent<BaseChampion>().enemyChampion = player2Controller;
@@ -295,6 +303,7 @@ public class GameManager : NetworkBehaviour
                 player1Aug.Add(augment); // Add the augment to player 1's list
             }
         }
+        
         foreach (int augmentID in player2Augments)
         {
             Augment augment = AM.augmentFromID(augmentID);
@@ -474,6 +483,7 @@ public class GameManager : NetworkBehaviour
         IGUIM.inGameUI.SetActive(true); // Activate the in-game UI
         Debug.Log("In-game UI initialized and activated.");
     }
+    
 
 
 }

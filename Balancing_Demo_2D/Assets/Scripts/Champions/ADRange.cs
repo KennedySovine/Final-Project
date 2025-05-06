@@ -14,10 +14,7 @@ public class ADRange : BaseChampion
     // Based on Vayne from LOL
     private void UpdateStats()
     {
-        if (!IsServer){
-            Debug.LogWarning("UpdateStats can only be called on the server.");
-            return;
-        }
+        if (!IsServer) return;
 
         championType = "AD Range";
         maxHealth.Value = 550f;
@@ -57,31 +54,43 @@ public class ADRange : BaseChampion
 
         ability1 = new Ability(
             "Tumble",
-            "Dash forward and empower next attack",
+            "Dash forward and empower next attack within 3 seconds. Deal bonus AD damage <i>(75 + 50% AP)<i>",
             6f, // Cooldown in seconds
             30f, // Mana cost
             10f  // Range
         );
 
+        ability1.icon = Resources.Load<Sprite>("Sprites/Vayne_Tumble"); // Load the icon for the ability from Resources folder
+
         ability2 = new Ability(
             "Silver Bolts",
-            "Basic attacks apply a stack and at 3 stacks, deal bonus true damage",
+            "Basic attacks apply a stack and at 3 stacks, deal bonus true damage based on <i>6% of the target's max health<i>. Deals minimum <i>50<i> bonus damage.",
             0f, // Cooldown in seconds
             0f, // Mana cost
             0f   // No range
         );
 
+        ability2.icon = Resources.Load<Sprite>("Sprites/Vayne_Silver_Bolts"); // Load the icon for the ability from Resources folder
+
         ability3 = new Ability(
             "Condemn",
-            "Fire an extra heavy bolt that deals extra physical damage.",
+            "Fire an extra heavy bolt that deals extra physical damage <i>(50 + 50% AD)<i>.",
             20f, // Cooldown in seconds
             90f, // Mana cost
             5f   // Range
         );
 
+        ability3.icon = Resources.Load<Sprite>("Sprites/Vayne_Condemn"); // Load the icon for the ability from Resources folder
+
         ability3.setDuration(8f);
 
         passive.Stats.championType = championType; // Set the champion type for the passive ability
+
+        abilityDict.Add("Q", ability1); // Add the ability to the UI manager
+        abilityDict.Add("W", ability2); // Add the ability to the UI manager
+        abilityDict.Add("E", ability3); // Add the ability to the UI manager
+
+        SendToUI();
     }
 
     public override GameObject empowerLogic(GameObject bullet)

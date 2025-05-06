@@ -37,7 +37,7 @@ public class AbilityStats
         this.chosenAugments = chosenAugments; // Assign the chosen augments to the class variable
         damageTotal = damageValues.Sum(); // Calculate the total damage from the list of damage values
         damageOverTime = gameTime > 0 ? damageTotal / gameTime : 0f; // Calculate damage over time
-        costToDamage = damageTotal > 0 ? totalManaSpent / damageTotal : 0f; // Calculate cost to damage ratio
+        costToDamage = damageTotal > 0 ? damageTotal / totalManaSpent : 0f; // Calculate cost to damage ratio
 
         SaveToFile(); // Save the ability stats to a JSON file
     }
