@@ -297,6 +297,7 @@ public class GameManager : NetworkBehaviour
                 player1Aug.Add(augment); // Add the augment to player 1's list
             }
         }
+        
         foreach (int augmentID in player2Augments)
         {
             Augment augment = AM.augmentFromID(augmentID);
