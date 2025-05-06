@@ -179,43 +179,41 @@ public class BaseChampion : NetworkBehaviour
         stackManager(); // Call the stack manager logic
 
     }
-    
+
 
     public virtual void abilityIconCooldownManaChecks()
     {
-        // The first or statement in the set true is to check if the ability is a passive as passives dont have a cooldown
         if (IsOwner && iconsSet) // Only the owner should check cooldowns and mana
         {
-            Debug.Log("Checking cooldowns and mana for abilities.");
-            Debug.Log((ability1.cooldown == 0) || (ability1 != null && ability1.checkIfAvailable(mana.Value)));
-            if ((ability1.cooldown == 0) || (ability1 != null && ability1.checkIfAvailable(mana.Value)))// Check if ability 1 is not on cooldown and enough mana is available
+            // Check ability 1
+            if (ability1 != null && !ability1.isOnCooldown && mana.Value >= ability1.manaCost)
             {
-                IGUIM.buttonInteractable("Q", true);
+                IGUIM.buttonInteractable("Q", true); // Enable the button if ability 1 is available
             }
-            else if (ability1 == null || !ability1.checkIfAvailable(mana.Value))// Check if ability 1 is on cooldown or not enough mana is available
+            else
             {
                 IGUIM.buttonInteractable("Q", false); // Disable the button if ability 1 is on cooldown or not enough mana
             }
-            if ((ability2.cooldown == 0) || (ability2 != null && ability1.checkIfAvailable(mana.Value))) // Check if ability 1 is not on cooldown and enough mana is available
+
+            // Check ability 2
+            if (ability2 != null && !ability2.isOnCooldown && mana.Value >= ability2.manaCost)
             {
-                IGUIM.buttonInteractable("W", true);
+                IGUIM.buttonInteractable("W", true); // Enable the button if ability 2 is available
             }
-            else if (ability2 == null || !ability2.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            else
             {
-                IGUIM.buttonInteractable("W", false); // Disable the button if ability 1 is on cooldown or not enough mana
+                IGUIM.buttonInteractable("W", false); // Disable the button if ability 2 is on cooldown or not enough mana
             }
-            if ((ability3.cooldown == 0) || (ability3 != null && ability3.checkIfAvailable(mana.Value))) // Check if ability 1 is not on cooldown and enough mana is available
+
+            // Check ability 3
+            if (ability3 != null && !ability3.isOnCooldown && mana.Value >= ability3.manaCost)
             {
-                IGUIM.buttonInteractable("E", true);
+                IGUIM.buttonInteractable("E", true); // Enable the button if ability 3 is available
             }
-            else if (ability3 == null || !ability3.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            else
             {
-                IGUIM.buttonInteractable("E", false); // Disable the button if ability 1 is on cooldown or not enough mana
+                IGUIM.buttonInteractable("E", false); // Disable the button if ability 3 is on cooldown or not enough mana
             }
-            else{
-                return; // No ability is available for use
-            }
-            
         }
     }
 
@@ -644,5 +642,23 @@ public class BaseChampion : NetworkBehaviour
         GM.recievedCalcs++; // Increment the count of received stats
 
         Debug.Log($"Received stats from client {OwnerClientId}");
+    }
+
+    [Rpc(SendTo.NotServer)]
+    public void SetAbilityTimeOfCastRpc(string abilityKey, float castTime)
+    {
+        Debug.Log($"Setting time of cast for ability {abilityKey} to {castTime}");
+        if (abilityKey == "Q")
+        {
+            ability1.timeOfCast = castTime;
+        }
+        else if (abilityKey == "W")
+        {
+            ability2.timeOfCast = castTime;
+        }
+        else if (abilityKey == "E")
+        {
+            ability3.timeOfCast = castTime;
+        }
     }
 }

@@ -220,11 +220,10 @@ public class ADRange2 : BaseChampion
         // Check for stacks of focus and if they are present, consume them
         // Check for mana
 
-        if (!IsServer) return; // Ensure this is only executed on the server
         if (mana.Value < ability1.manaCost && !isMaxStacks && ability1.isOnCooldown) return; // Check if enough mana and stacks are present
-        
-        updateRapidFireRpc(5);
         ability1.timeOfCast = Time.time; // Set the time of cast for cooldown tracking
+        if (!IsServer) return; // Ensure this is only executed on the server
+        updateRapidFireRpc(5);
         StartCoroutine(RapidFireCoroutine(ability1.duration)); // Start the rapid fire coroutine
 
         updateManaRpc(-ability1.manaCost); // Deduct the mana cost
@@ -245,7 +244,6 @@ public class ADRange2 : BaseChampion
     public override void UseAbility3Rpc(){
         // Check mana and cooldown
         // Crit frost and deal 20 + 100% AD damage
-        if (!IsServer) return; // Ensure this is only executed on the server
         if (ability3.isOnCooldown)
         {
             Debug.Log("Ability is on cooldown!");
@@ -256,6 +254,7 @@ public class ADRange2 : BaseChampion
             Debug.Log("Not enough mana!");
             return;
         }
+        if (!IsServer) return; // Ensure this is only executed on the server
         updateAbility3UsedRpc(true); // Update the ability range
         updateManaRpc(-ability3.manaCost); // Deduct mana cost
         ability3.Stats.totalManaSpent += ability3.manaCost; // Update the total mana spent for the ability

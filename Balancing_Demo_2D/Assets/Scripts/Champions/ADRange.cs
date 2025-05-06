@@ -92,7 +92,7 @@ public class ADRange : BaseChampion
 
         SendToUI();
     }
-
+    
     public override GameObject empowerLogic(GameObject bullet)
     {
         var bulletComponent = bullet.GetComponent<Bullet>();
@@ -178,7 +178,7 @@ public class ADRange : BaseChampion
     public override void UseAbility1Rpc()
     {
         if (!IsServer) return; // Only the server can execute this logic
-    
+        
         if (ability1.isOnCooldown)
         {
             Debug.Log("Ability is on cooldown!");
@@ -190,21 +190,19 @@ public class ADRange : BaseChampion
             return;
         }
 
-        float newMoveSpeed = movementSpeed.Value + 17f; // Increase movement speed by 1 unit
+        // Record the time of cast and synchronize it with clients
+        float castTime = Time.time;
+        SetAbilityTimeOfCastRpc("Q", castTime);
 
-        // Set the cooldown timer for the ability
-        ability1.timeOfCast = Time.time; // Record the time when the ability was used
+        float newMoveSpeed = movementSpeed.Value + 17f; // Increase movement speed by 1 unit
         updateManaRpc(-ability1.manaCost); // Deduct mana cost
         ability1.Stats.totalManaSpent += ability1.manaCost; // Update total mana spent for the ability
-        //logAbilityUsedRpc(ability1); // Log the ability used
         Debug.Log("Tumble ability used. Player dashed towards the target position.");
-    
+
         // Empower the next attack
         updateIsEmpoweredRpc(true); // Set the empowered state to true
 
         PN.ChampionDashRpc(PN.mousePosition, ability1.range, newMoveSpeed); // Call the dash function on the player network object
-
-        // Put messages up on screen if the ability is on cooldown or not enough mana??? Maybe
     }
 
     [Rpc(SendTo.Server)]
@@ -239,6 +237,14 @@ public class ADRange : BaseChampion
             Debug.Log("Not enough mana!");
             return;
         }
+        else if (ability3Used.Value)
+        {
+            Debug.Log("Ability 3 has already been used!");
+            return;
+        }
+
+        SetAbilityTimeOfCastRpc("E", Time.time); // Record the time of cast and synchronize it with clients
+
         updateManaRpc(-ability3.manaCost); // Update the mana on the server
         ability3.Stats.totalManaSpent += ability3.manaCost; // Update the total mana spent for the ability
         logAbilityUsedRpc(ability3); // Log the ability used
