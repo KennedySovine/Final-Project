@@ -179,7 +179,7 @@ public class ADRange : BaseChampion
     {
         if (!IsServer) return; // Only the server can execute this logic
     
-        if (ability1.isOnCooldown.Value)
+        if (ability1.isOnCooldown)
         {
             Debug.Log("Ability is on cooldown!");
             return;
@@ -193,7 +193,7 @@ public class ADRange : BaseChampion
         float newMoveSpeed = movementSpeed.Value + 17f; // Increase movement speed by 1 unit
 
         // Set the cooldown timer for the ability
-        ability1.timeOfCast.Value = Time.time; // Record the time when the ability was used
+        ability1.timeOfCast = Time.time; // Record the time when the ability was used
         updateManaRpc(-ability1.manaCost); // Deduct mana cost
         ability1.Stats.totalManaSpent += ability1.manaCost; // Update total mana spent for the ability
         //logAbilityUsedRpc(ability1); // Log the ability used
@@ -229,7 +229,7 @@ public class ADRange : BaseChampion
     {
         if (!IsServer) return; // Only the owner can use this ability
         // Check if ability is off cooldown and if theres enough mana
-        if (ability3.isOnCooldown.Value)
+        if (ability3.isOnCooldown)
         {
             Debug.Log("Ability is on cooldown!");
             return;

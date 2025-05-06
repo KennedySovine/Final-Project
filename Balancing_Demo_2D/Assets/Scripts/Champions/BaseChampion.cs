@@ -599,7 +599,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         ability3Used.Value = value;
-        ability3.timeOfCast.Value = Time.time; // Record the time when the ability was used
+        ability3.timeOfCast = Time.time; // Record the time when the ability was used
     }
     [Rpc(SendTo.Server)]
     public void updateRapidFireRpc(int value)

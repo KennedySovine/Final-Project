@@ -2,7 +2,7 @@ using UnityEngine;
 using Unity.Netcode; // Required for NetworkVariable
 
 [System.Serializable]
-public class Ability : NetworkBehaviour
+public class Ability
 {
     public Sprite icon; // Icon for the ability
     public Sprite icon2;
@@ -14,8 +14,17 @@ public class Ability : NetworkBehaviour
     public float duration; // Duration of the ability effect (if applicable)
     public AbilityStats Stats; // Reference to the ability stats object
 
-    public NetworkVariable<float> timeOfCast = new NetworkVariable<float>(0f); // Network variable for the time of cast
-    public NetworkVariable<bool> isOnCooldown = new NetworkVariable<bool>(false); // Network variable for cooldown state
+    public float timeOfCast; // Time when the ability was cast
+
+    public bool isOnCooldown // Flag to check if the ability is on cooldown
+    {
+        get {
+            if (cooldown == 0f){
+                return false; // No cooldown, ability is available
+            }
+            return timeOfCast > 0f && Time.time - timeOfCast < cooldown; 
+        }
+    }
 
     public Ability(string name, string description, float cooldown, float manaCost, float range)
     {
@@ -30,14 +39,9 @@ public class Ability : NetworkBehaviour
 
     public void Update()
     {
-        if (timeOfCast.Value > 0f && Time.time - timeOfCast.Value >= cooldown)
+        if (timeOfCast > 0f && Time.time - timeOfCast >= cooldown)
         {
-            timeOfCast.Value = 0f; // Reset the time of cast when cooldown is over
-            isOnCooldown.Value = false; // Update the network variable
-        }
-        else if (timeOfCast.Value > 0f && Time.time - timeOfCast.Value < cooldown)
-        {
-            isOnCooldown.Value = true; // Update the network variable
+            timeOfCast = 0f; // Reset the time of cast when cooldown is over
         }
     }
 
@@ -60,6 +64,6 @@ public class Ability : NetworkBehaviour
 
     public bool checkIfAvailable(float mana)
     {
-        return (cooldown == 0 || (mana >= manaCost && !isOnCooldown.Value)); // Check if the ability is available based on mana and cooldown
+        return (cooldown == 0 || (mana >= manaCost && !isOnCooldown)); // Check if the ability is available based on mana and cooldown
     }
 }
