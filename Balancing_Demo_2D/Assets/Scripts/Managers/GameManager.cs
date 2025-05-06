@@ -483,6 +483,13 @@ public class GameManager : NetworkBehaviour
         IGUIM.inGameUI.SetActive(true); // Activate the in-game UI
         Debug.Log("In-game UI initialized and activated.");
     }
+
+    [Rpc(SendTo.SpecifiedInParams)]
+    public void endGameUIRpc(RpcParams rpcParams)
+    {
+        IGM.endGameUI.SetActive(true); // Activate the end game UI
+        Debug.Log("End game UI initialized and activated.");
+    }
     
 
 
