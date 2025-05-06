@@ -644,7 +644,7 @@ public class BaseChampion : NetworkBehaviour
         Debug.Log($"Received stats from client {OwnerClientId}");
     }
 
-    [Rpc(SendTo.NotServer)]
+    [Rpc(SendTo.Everyone)]
     public void SetAbilityTimeOfCastRpc(string abilityKey, float castTime)
     {
         Debug.Log($"Setting time of cast for ability {abilityKey} to {castTime}");
