@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Ashe_Volley_0: 369642101712960974
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Ashe_RangerFocus_Default_0: 939903436776523639
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Vayne_Condemn_0: 5704037568580154711
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
