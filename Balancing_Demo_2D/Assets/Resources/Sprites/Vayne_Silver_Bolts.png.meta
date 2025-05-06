@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Vayne_Silver_Bolts_0: -39635067797618163
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

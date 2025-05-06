@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Ashe_Enchanted_Crystal_Arrow_0: 6954262402359484480
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

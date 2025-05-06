@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Vayne_Tumble_0: -1313469873337875234
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

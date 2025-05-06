@@ -6,7 +6,6 @@ public class BaseChampion : NetworkBehaviour
 {
     public static GameManager GM; // Reference to the GameManager
 
-
     public InGameUIManager IGUIM; // Reference to the InGameUIManager
     [Header("Champion Stats")]
     public string championType = "";
@@ -95,31 +94,24 @@ public class BaseChampion : NetworkBehaviour
             health.OnValueChanged += (previousValue, newValue) =>
             {
                 //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Health changed from {previousValue} to {newValue}");
-
                 IGUIM.UpdateHealthSlider(previousValue, newValue);
             };
 
             mana.OnValueChanged += (previousValue, newValue) =>
             {
-
                 //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Mana changed from {previousValue} to {newValue}");
-
                 IGUIM.UpdateManaSlider(previousValue, newValue);
             };
 
             maxHealth.OnValueChanged += (previousValue, newValue) =>
             {
-
                 //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Health changed from {previousValue} to {newValue}");
-
                 IGUIM.UpdateMaxHealthSlider(previousValue, newValue); // Update the health slider when max health changes
             };
 
             maxMana.OnValueChanged += (previousValue, newValue) =>
             {
-
                 //Debug.Log($"Client {NetworkManager.Singleton.LocalClientId}: Max Mana changed from {previousValue} to {newValue}");
-
                 IGUIM.UpdateMaxManaSlider(previousValue, newValue); // Update the mana slider when max mana changes
             };
         }
@@ -341,11 +333,9 @@ public class BaseChampion : NetworkBehaviour
         {
             float tempH = maxHealth.Value * healthChange;
             maxHealth.Value += tempH;
-            health.Value += tempH; // Update the health value based on the new max health
             return;
         }
         maxHealth.Value += healthChange;
-        health.Value += healthChange; // Update the health value based on the new max health
     }
 
     [Rpc(SendTo.Server)]
