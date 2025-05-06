@@ -9,6 +9,8 @@ using Unity.Collections;
 public class EndGameUI : MonoBehaviour
 {
     private static GameManager GM;
+    [SerializeField] private GameObject IGUI;
+    [SerializeField] private GameObject augUI;
     [SerializeField] private GameObject endGameUI; // Reference to the end game UI GameObject
     [SerializeField] private GameObject player1Stats; // Reference to the player stats GameObject
     [SerializeField] private GameObject player2Stats; // Reference to the player stats GameObject
@@ -18,6 +20,8 @@ public class EndGameUI : MonoBehaviour
 
     public NetworkList<FixedString64Bytes> player1StatsText = new NetworkList<FixedString64Bytes>();
     public NetworkList<FixedString64Bytes> player2StatsText = new NetworkList<FixedString64Bytes>();
+
+    public NetworkVariable<bool> statsAssigned = new NetworkVariable<bool>(false); // Flag to check if stats are assigned
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -29,62 +33,48 @@ public class EndGameUI : MonoBehaviour
         }
     }
 
-    private List<GameObject> findAllChildren(GameObject parent, List<GameObject> children)
-    {
-        foreach (Transform child in parent.transform)
-        {
-            children.Add(child.gameObject);
-        }
-        return children; // Return the list of child GameObjects
-    }
 
-    public void displayEndGameUI(ulong p1, ulong p2)
-    {
-        endGameUI.SetActive(true); // Activate the end game UI
-        player1Stats.SetActive(false); // Deactivate player 1 stats
-        player2Stats.SetActive(false); // Deactivate player 2 stats
-
-        foreach (GameObject stat in player1StatsList)
-        {
-            stat.GetComponent<TextMeshProUGUI>().text = ""; // Clear the text for player 1 stats
-            stat.SetActive(false); // Deactivate player 1 stats
-        }
-        foreach (GameObject stat in player2StatsList)
-        {
-            stat.GetComponent<TextMeshProUGUI>().text = ""; // Clear the text for player 2 stats
-            stat.SetActive(false); // Deactivate player 2 stats
-        }
+    public void statsToList(){
+        List<StatBlock> p1Stats = new List<StatBlock>();
+        List<StatBlock> p2Stats = new List<StatBlock>();
 
         if (NetworkManager.Singleton.IsServer)
         {
-            List<string> p1StatsRaw = findStats(p1);
-            List<string> p2StatsRaw = findStats(p2);
-
-            List<StatBlock> p1Stats = new List<StatBlock>();
-            List<StatBlock> p2Stats = new List<StatBlock>();
+            List<string> p1StatsRaw = findStats(GM.player1ID);
+            List<string> p2StatsRaw = findStats(GM.player2ID);
 
             foreach (var stat in p1StatsRaw)
                 p1Stats.Add(new StatBlock(stat));
             foreach (var stat in p2StatsRaw)
                 p2Stats.Add(new StatBlock(stat));
 
-            updateStatsUIRpc(p1Stats, p2Stats);
-
+            updateStatsUI(p1Stats, p2Stats); // Update the stats UI with the lists of stats
         }
     }
 
-    [Rpc(SendTo.Everyone)]
-    public void updateStatsUIRpc(List<StatBlock> stats1, List<StatBlock> stats2)
+    public void displayEndGameUI(ulong p1, ulong p2)
+    {
+        HIDEALLOTHERUI(); // Hide all other UI elements
+        endGameUI.SetActive(true); // Activate the end game UI
+        player1Stats.SetActive(false); // Deactivate player 1 stats
+        player2Stats.SetActive(false); // Deactivate player 2 stats
+
+        StartCoroutine(displayStats()); // Start the coroutine to display stats
+    }
+
+    private void HIDEALLOTHERUI(){
+        IGUI.SetActive(false); // Deactivate the in-game UI
+        augUI.SetActive(false); // Deactivate the augment UI
+    }
+
+    public void updateStatsUI(List<StatBlock> stats1, List<StatBlock> stats2)
     {
         for (int i = 0; i < 7; i++)
         {
             player1StatsList[i].GetComponent<TextMeshProUGUI>().text = stats1[i].value.ToString();
             player2StatsList[i].GetComponent<TextMeshProUGUI>().text = stats2[i].value.ToString();
         }
-
-        player1Stats.SetActive(true);
-        player2Stats.SetActive(true);
-        StartCoroutine(displayStats());
+        statsAssigned.Value = true; // Set the flag to true after assigning stats
     }
 
     public List<string> findStats(ulong playerId)
@@ -149,6 +139,10 @@ public class EndGameUI : MonoBehaviour
 
     private IEnumerator displayStats()
     {
+        yield return new WaitUntil(() => statsAssigned.Value); // Wait until stats are assigned
+        player1Stats.SetActive(true);
+        player2Stats.SetActive(true);
+
         for (int i = 0; i < player1StatsList.Count; i++)
         {
             player1StatsList[i].SetActive(true); // Activate the current stat UI element for player 1

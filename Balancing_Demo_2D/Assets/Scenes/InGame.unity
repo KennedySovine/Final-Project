@@ -1757,6 +1757,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 404606da3d6283d4f98fa987f5fb6d45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IGUI: {fileID: 1056698707}
+  augUI: {fileID: 1582487672}
   endGameUI: {fileID: 356187477}
   player1Stats: {fileID: 378929865}
   player2Stats: {fileID: 975533892}
@@ -1868,6 +1870,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 404606da3d6283d4f98fa987f5fb6d45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IGUI: {fileID: 0}
+  augUI: {fileID: 0}
   endGameUI: {fileID: 0}
   player1Stats: {fileID: 0}
   player2Stats: {fileID: 0}

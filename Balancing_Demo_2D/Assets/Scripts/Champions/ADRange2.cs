@@ -221,10 +221,10 @@ public class ADRange2 : BaseChampion
         // Check for mana
 
         if (!IsServer) return; // Ensure this is only executed on the server
-        if (mana.Value < ability1.manaCost && !isMaxStacks && ability1.isOnCooldown) return; // Check if enough mana and stacks are present
+        if (mana.Value < ability1.manaCost && !isMaxStacks && ability1.isOnCooldown.Value) return; // Check if enough mana and stacks are present
         
         updateRapidFireRpc(5);
-        ability1.timeOfCast = Time.time; // Set the time of cast for cooldown tracking
+        ability1.timeOfCast.Value = Time.time; // Set the time of cast for cooldown tracking
         StartCoroutine(RapidFireCoroutine(ability1.duration)); // Start the rapid fire coroutine
 
         updateManaRpc(-ability1.manaCost); // Deduct the mana cost
@@ -246,7 +246,7 @@ public class ADRange2 : BaseChampion
         // Check mana and cooldown
         // Crit frost and deal 20 + 100% AD damage
         if (!IsServer) return; // Ensure this is only executed on the server
-        if (ability3.isOnCooldown)
+        if (ability3.isOnCooldown.Value)
         {
             Debug.Log("Ability is on cooldown!");
             return;

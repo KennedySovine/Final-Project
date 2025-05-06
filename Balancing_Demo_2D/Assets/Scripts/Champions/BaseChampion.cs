@@ -187,6 +187,7 @@ public class BaseChampion : NetworkBehaviour
         if (IsOwner && iconsSet) // Only the owner should check cooldowns and mana
         {
             Debug.Log("Checking cooldowns and mana for abilities.");
+            Debug.Log((ability1.cooldown == 0) || (ability1 != null && ability1.checkIfAvailable(mana.Value)));
             if ((ability1.cooldown == 0) || (ability1 != null && ability1.checkIfAvailable(mana.Value)))// Check if ability 1 is not on cooldown and enough mana is available
             {
                 IGUIM.buttonInteractable("Q", true);
@@ -598,7 +599,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         ability3Used.Value = value;
-        ability3.timeOfCast = Time.time; // Record the time when the ability was used
+        ability3.timeOfCast.Value = Time.time; // Record the time when the ability was used
     }
     [Rpc(SendTo.Server)]
     public void updateRapidFireRpc(int value)
