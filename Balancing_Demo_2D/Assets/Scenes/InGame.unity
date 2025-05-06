@@ -1676,7 +1676,8 @@ MonoBehaviour:
   champSelectDropdown: {fileID: 1687810906}
   ChampSelectUI: {fileID: 883854503}
   AM: {fileID: 349277511}
-  IGUIM: {fileID: 0}
+  IGUIM: {fileID: 349277512}
+  endGameUI: {fileID: 349277513}
 --- !u!114 &349277510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1793,7 +1794,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &356187478
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2156,7 +2157,10 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
+      damageTotal: 0
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   infoBox: {fileID: 1318944143}
   infoBoxText: {fileID: 988421145}
@@ -2310,7 +2314,10 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
+      damageTotal: 0
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   infoBox: {fileID: 154399124}
   infoBoxText: {fileID: 1897885864}
@@ -4386,7 +4393,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &883854504
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7945,7 +7952,10 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
+      damageTotal: 0
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   infoBox: {fileID: 830900750}
   infoBoxText: {fileID: 81075439}

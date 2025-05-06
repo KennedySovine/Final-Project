@@ -48,14 +48,14 @@ public class EndGameUI : MonoBehaviour
         return children; // Return the list of child GameObjects
     }
 
-    public void displayEndGameUI(ulong playerId)
+    public void displayEndGameUI()
     {
         endGameUI.SetActive(true); // Activate the end game UI
         player1Stats.SetActive(false); // Deactivate player 1 stats
         player2Stats.SetActive(false); // Deactivate player 2 stats
 
-        List<string> p1stats = findStats(GM.player1Id); // Get player 1 stats
-        List<string> p2stats = findStats(GM.player2Id); // Get player 2 stats
+        List<string> p1stats = findStats(GM.player1ID); // Get player 1 stats
+        List<string> p2stats = findStats(GM.player2ID); // Get player 2 stats
 
         updateStatsUIRpc(p1stats, p2stats); // Update the stats UI for both players
 
@@ -75,35 +75,45 @@ public class EndGameUI : MonoBehaviour
     [Rpc(SendTo.Everyone)]
     public void updateStatsUIRpc(List<string> stats1, List<string> stats2){
         for (int i = 0; i < 7; i++){
-            player1StatsList[i].GetComponent<TextMeshProUGUI>().text = GM.player1Stats[i]; // Update player 1 stats text
-            player2StatsList[i].GetComponent<TextMeshProUGUI>().text = GM.player2Stats[i]; // Update player 2 stats text
+            player1StatsList[i].GetComponent<TextMeshProUGUI>().text = stats1[i]; // Update player 1 stats text
+            player2StatsList[i].GetComponent<TextMeshProUGUI>().text = stats2[i]; // Update player 2 stats text
         }
         player1Stats.SetActive(true); // Activate player 1 stats UI
         player2Stats.SetActive(true); // Activate player 2 stats UI
-        displayStats(); // Call the coroutine to display stats
+        StartCoroutine(displayStats());
     }
 
     public List<string> findStats(ulong playerId){
         List<string> stats = new List<string>(); // Create a list to hold stats as strings
-        BaseChampion champion;
-        if (playerId == GM.player1Id)
+        BaseChampion champion = null; // Initialize the BaseChampion variable
+        if (playerId == GM.player1ID)
         {
             champion = GM.player1Controller.GetComponent<BaseChampion>(); // Get the BaseChampion component from player 1 controller
+            if (champion == null)
+            {
+                Debug.LogError("Champion not found for player 1 controller."); // Log an error if champion is not found
+                return stats; // Return empty stats list
+            }
             stats.Add(champion.championType); // Add champion type to stats list
-            stats.Add(GM.player1Augments[0].augmentName); // Add first augment name to stats list
-            stats.Add(GM.player1Augments[1].augmentName); // Add second augment name to stats list
-            stats.Add(GM.player1Augments[2].augmentName); // Add third augment name to stats list
+            stats.Add(GM.AM.augmentFromID(GM.player1Augments[0]).name); // Add first augment name to stats list
+            stats.Add(GM.AM.augmentFromID(GM.player1Augments[1]).name); // Add second augment name to stats list
+            stats.Add(GM.AM.augmentFromID(GM.player1Augments[2]).name); // Add third augment name to stats list
             stats.Add(champion.passive.Stats.damageTotal.ToString()); // Add passive damage total to stats list
             stats.Add(champion.passive.Stats.damageOverTime.ToString()); // Add passive damage over time to stats list
             stats.Add(champion.passive.Stats.costToDamage.ToString()); // Add passive cost to damage to stats list
         }
-        else if (playerId == GM.player2Id)
+        else if (playerId == GM.player2ID)
         {
             champion = GM.player2Controller.GetComponent<BaseChampion>(); // Get the BaseChampion component from player 2 controller
+            if (champion == null)
+            {
+                Debug.LogError("Champion not found for player 2 controller."); // Log an error if champion is not found
+                return stats; // Return empty stats list
+            }
             stats.Add(champion.championType); // Add champion type to stats list
-            stats.Add(GM.player2Augments[0].augmentName); // Add first augment name to stats list
-            stats.Add(GM.player2Augments[1].augmentName); // Add second augment name to stats list
-            stats.Add(GM.player2Augments[2].augmentName); // Add third augment name to stats list
+            stats.Add(GM.AM.augmentFromID(GM.player2Augments[0]).name); // Add first augment name to stats list
+            stats.Add(GM.AM.augmentFromID(GM.player2Augments[1]).name); // Add second augment name to stats list
+            stats.Add(GM.AM.augmentFromID(GM.player2Augments[2]).name); // Add third augment name to stats list
             stats.Add(champion.passive.Stats.damageTotal.ToString()); // Add passive damage total to stats list
             stats.Add(champion.passive.Stats.damageOverTime.ToString()); // Add passive damage over time to stats list
             stats.Add(champion.passive.Stats.costToDamage.ToString()); // Add passive cost to damage to stats list
@@ -116,12 +126,13 @@ public class EndGameUI : MonoBehaviour
         return stats; // Return the list of stats as strings
     }
 
-    private IEnumerator displayStats(){
-        yield return new WaitForSeconds (1f); // Wait for 1 second before displaying stats
-
-        for (int i = 0; i < player1StatsList.Count; i++){
-            player1StatsList[i].SetActive(true); // Activate each stat UI element for player 1
-            player2StatsList[i].SetActive(true); // Activate each stat UI element for player 2
+    private IEnumerator displayStats()
+    {
+        for (int i = 0; i < player1StatsList.Count; i++)
+        {
+            player1StatsList[i].SetActive(true); // Activate the current stat UI element for player 1
+            player2StatsList[i].SetActive(true); // Activate the current stat UI element for player 2
+            yield return new WaitForSeconds(1f); // Wait for 1 second before displaying the next stat
         }
     }
 }

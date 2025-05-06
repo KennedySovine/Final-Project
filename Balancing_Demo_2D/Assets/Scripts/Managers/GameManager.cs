@@ -101,7 +101,7 @@ public class GameManager : NetworkBehaviour
     private void Start()
     {
         Debug.Log("Game Manager Initialized");
-        maxGameTime = gameTime; // Set the maximum game time
+        maxGameTime = gameTime.Value; // Set the maximum game time
     }
 
     private void Update()
@@ -487,8 +487,9 @@ public class GameManager : NetworkBehaviour
     [Rpc(SendTo.SpecifiedInParams)]
     public void endGameUIRpc(RpcParams rpcParams)
     {
-        IGM.endGameUI.SetActive(true); // Activate the end game UI
+        IGM.endGameUI.displayEndGameUI(); // Display the end game UI
         Debug.Log("End game UI initialized and activated.");
+        
     }
     
 

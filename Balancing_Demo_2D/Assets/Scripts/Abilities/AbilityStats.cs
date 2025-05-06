@@ -16,7 +16,7 @@ public class AbilityStats
 
     public string championType = ""; // Type of champion using the ability
 
-    private float damageTotal = 0f; // Total damage calculated from the list of damage values
+    public float damageTotal = 0f; // Total damage calculated from the list of damage values
     public float gameTime = 0f; // Game time value
 
     public List<Augment> chosenAugments = new List<Augment>(); // List of chosen augments for the ability
