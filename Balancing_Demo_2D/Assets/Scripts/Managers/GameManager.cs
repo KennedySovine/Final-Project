@@ -507,6 +507,7 @@ public class GameManager : NetworkBehaviour
         while (!recievedEndGameCalculations){
             yield return null; // Wait for the end game calculations to be received
         }
+        endGameUIRpc(player1ID, player2ID, RpcTarget.Single(ServerID, RpcTargetUse.Temp)); // Call the end game UI RPC to show the end game UI
         endGameUIRpc(player1ID, player2ID, RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Show the end game UI for player 1
         endGameUIRpc(player1ID, player2ID, RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Show the end game UI for player 2
     }

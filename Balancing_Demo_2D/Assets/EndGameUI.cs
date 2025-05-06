@@ -4,6 +4,7 @@ using Unity.Netcode;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
+using Unity.Collections;
 
 public class EndGameUI : MonoBehaviour
 {
@@ -15,8 +16,8 @@ public class EndGameUI : MonoBehaviour
     [SerializeField] private List<GameObject> player1StatsList;
     [SerializeField] private List<GameObject> player2StatsList;
 
-    public NetworkList<NetworkString> player1StatsText = new NetworkList<NetworkString>();
-    public NetworkList<NetworkString> player2StatsText = new NetworkList<NetworkString>();
+    public NetworkList<FixedString64Bytes> player1StatsText = new NetworkList<FixedString64Bytes>();
+    public NetworkList<FixedString64Bytes> player2StatsText = new NetworkList<FixedString64Bytes>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -43,7 +44,18 @@ public class EndGameUI : MonoBehaviour
         player1Stats.SetActive(false); // Deactivate player 1 stats
         player2Stats.SetActive(false); // Deactivate player 2 stats
 
-        if (IsServer)
+        foreach (GameObject stat in player1StatsList)
+        {
+            stat.GetComponent<TextMeshProUGUI>().text = ""; // Clear the text for player 1 stats
+            stat.SetActive(false); // Deactivate player 1 stats
+        }
+        foreach (GameObject stat in player2StatsList)
+        {
+            stat.GetComponent<TextMeshProUGUI>().text = ""; // Clear the text for player 2 stats
+            stat.SetActive(false); // Deactivate player 2 stats
+        }
+
+        if (NetworkManager.Singleton.IsServer)
         {
             List<string> p1StatsRaw = findStats(p1);
             List<string> p2StatsRaw = findStats(p2);
@@ -56,22 +68,9 @@ public class EndGameUI : MonoBehaviour
             foreach (var stat in p2StatsRaw)
                 p2Stats.Add(new StatBlock(stat));
 
-        }
+            updateStatsUIRpc(p1Stats, p2Stats);
 
-
-        // Deactivate all stats
-        foreach (GameObject stat in player1StatsList)
-        {
-            stat.GetComponent<TextMeshProUGUI>().text = ""; // Clear the text for player 1 stats
-            stat.SetActive(false); // Deactivate player 1 stats
         }
-        foreach (GameObject stat in player2StatsList)
-        {
-            stat.GetComponent<TextMeshProUGUI>().text = ""; // Clear the text for player 2 stats
-            stat.SetActive(false); // Deactivate player 2 stats
-        }
-
-        updateStatsUIRpc(p1Stats, p2Stats);
     }
 
     [Rpc(SendTo.Everyone)]
