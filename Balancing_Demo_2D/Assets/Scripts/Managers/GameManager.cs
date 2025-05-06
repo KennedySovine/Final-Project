@@ -320,7 +320,7 @@ public class GameManager : NetworkBehaviour
         }
 
         if (!IsServer) return; // Ensure this runs only on the server
-        StartCoroutine(waitForEndGameStats()); // Start the coroutine to wait for end game stats
+        //StartCoroutine(waitForEndGameStats()); // Start the coroutine to wait for end game stats
 
         //Call all end game calculations for the champions and abilities
         player1Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's champion
@@ -423,6 +423,67 @@ public class GameManager : NetworkBehaviour
         Debug.Log($"Applied augment {newAugment.name} to player {playerID} with adjustment {randomAdjustment}.");
     }
 
+    public List<string> findStats(ulong playerId)
+    {
+        List<string> stats = new List<string>(); // Create a list to hold stats as strings
+        BaseChampion champion = null; // Initialize the BaseChampion variable
+        if (playerId == player1ID)
+        {
+            champion = player1Controller.GetComponent<BaseChampion>(); // Get the BaseChampion component from player 1 controller
+            if (champion == null)
+            {
+                Debug.LogError("Champion not found for player 1 controller."); // Log an error if champion is not found
+                return stats; // Return empty stats list
+            }
+            stats.Add(champion.championType); // Add champion type to stats list
+            for (int i = 0; i < player1Augments.Count; i++)
+            {
+                try
+                {
+                    stats.Add(AM.augmentFromID(player1Augments[i]).name); // Add augment name to stats list
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError("Error retrieving augments: " + e.Message); // Log an error if there is an issue retrieving augments
+                }
+            }
+            stats.Add(champion.passive.Stats.damageTotal.ToString()); // Add passive damage total to stats list
+            stats.Add(champion.passive.Stats.damageOverTime.ToString()); // Add passive damage over time to stats list
+            stats.Add(champion.passive.Stats.costToDamage.ToString()); // Add passive cost to damage to stats list
+        }
+        else if (playerId == player2ID)
+        {
+            champion = player2Controller.GetComponent<BaseChampion>(); // Get the BaseChampion component from player 2 controller
+            if (champion == null)
+            {
+                Debug.LogError("Champion not found for player 2 controller."); // Log an error if champion is not found
+                return stats; // Return empty stats list
+            }
+            stats.Add(champion.championType); // Add champion type to stats list
+            for (int i = 0; i < player2Augments.Count; i++)
+            {
+                try
+                {
+                    stats.Add(AM.augmentFromID(player2Augments[i]).name); // Add augment name to stats list
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError("Error retrieving augments: " + e.Message); // Log an error if there is an issue retrieving augments
+                }
+            }
+            stats.Add(champion.passive.Stats.damageTotal.ToString()); // Add passive damage total to stats list
+            stats.Add(champion.passive.Stats.damageOverTime.ToString()); // Add passive damage over time to stats list
+            stats.Add(champion.passive.Stats.costToDamage.ToString()); // Add passive cost to damage to stats list
+        }
+
+        if (champion == null)
+        {
+            Debug.LogError("Champion not found for player ID: " + playerId); // Log an error if champion is not found
+        }
+        return stats; // Return the list of stats as strings
+    }
+
+
     //Add Augments to UI for Choosing
     // Send to specified clients only
     [Rpc(SendTo.SpecifiedInParams)]
@@ -494,7 +555,7 @@ public class GameManager : NetworkBehaviour
         Debug.Log("In-game UI initialized and activated.");
     }
 
-    [Rpc(SendTo.SpecifiedInParams)]
+    /*[Rpc(SendTo.SpecifiedInParams)]
     public void endGameUIRpc(ulong p1, ulong p2, RpcParams rpcParams)
     {
         IGM.endGameUI.displayEndGameUI(p1, p2); // Display the end game UI
@@ -511,5 +572,5 @@ public class GameManager : NetworkBehaviour
         endGameUIRpc(player1ID, player2ID, RpcTarget.Single(ServerID, RpcTargetUse.Temp)); // Call the end game UI RPC to show the end game UI
         endGameUIRpc(player1ID, player2ID, RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Show the end game UI for player 1
         endGameUIRpc(player1ID, player2ID, RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Show the end game UI for player 2
-    }
+    }*/
 }

@@ -3,157 +3,136 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using TMPro;
 using UnityEngine.UI;
-using System.Collections;
 using Unity.Collections;
+using System;
+using System.Collections;
 
-public class EndGameUI : MonoBehaviour
+public class EndGameUI : NetworkBehaviour
 {
     private static GameManager GM;
+
     [SerializeField] private GameObject IGUI;
     [SerializeField] private GameObject augUI;
-    [SerializeField] private GameObject endGameUI; // Reference to the end game UI GameObject
-    [SerializeField] private GameObject player1Stats; // Reference to the player stats GameObject
-    [SerializeField] private GameObject player2Stats; // Reference to the player stats GameObject
+    [SerializeField] private GameObject endGameUI;
+    [SerializeField] private GameObject player1Stats;
+    [SerializeField] private GameObject player2Stats;
 
     [SerializeField] private List<GameObject> player1StatsList;
     [SerializeField] private List<GameObject> player2StatsList;
 
-    public NetworkList<FixedString64Bytes> player1StatsText = new NetworkList<FixedString64Bytes>();
-    public NetworkList<FixedString64Bytes> player2StatsText = new NetworkList<FixedString64Bytes>();
+    public NetworkVariable<bool> statsAssigned = new NetworkVariable<bool>(false);
 
-    public NetworkVariable<bool> statsAssigned = new NetworkVariable<bool>(false); // Flag to check if stats are assigned
+    public NetworkList<StatBlock> p1Stats = new NetworkList<StatBlock>();
+    public NetworkList<StatBlock> p2Stats = new NetworkList<StatBlock>();
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private void Awake()
+    {
+        p1Stats.OnListChanged += OnStatsChanged;
+        p2Stats.OnListChanged += OnStatsChanged;
+        statsAssigned.OnValueChanged += OnStatsAssignedChanged;
+    }
+
     void Start()
     {
-        GM = GameManager.Instance; // Get the GameManager instance
+        GM = GameManager.Instance;
         if (GM == null)
         {
-            Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
+            Debug.LogError("GameManager instance is null.");
         }
     }
 
+    public void StatsToList()
+    {
+        if (!IsServer) return;
 
-    public void statsToList(){
-        List<StatBlock> p1Stats = new List<StatBlock>();
-        List<StatBlock> p2Stats = new List<StatBlock>();
+        List<string> p1StatsRaw = GM.findStats(GM.player1ID);
+        List<string> p2StatsRaw = GM.findStats(GM.player2ID);
 
-        if (NetworkManager.Singleton.IsServer)
+        p1Stats.Clear();
+        p2Stats.Clear();
+
+        foreach (var stat in p1StatsRaw)
+            p1Stats.Add(new StatBlock(stat));
+        foreach (var stat in p2StatsRaw)
+            p2Stats.Add(new StatBlock(stat));
+
+        statsAssigned.Value = true;  // Triggers OnValueChanged on all clients
+    }
+
+    public void DisplayEndGameUI(ulong p1, ulong p2)
+    {
+        HIDEALLOTHERUI();
+        endGameUI.SetActive(true);
+        player1Stats.SetActive(false);
+        player2Stats.SetActive(false);
+
+        StartCoroutine(DisplayStats());
+    }
+
+    private void HIDEALLOTHERUI()
+    {
+        IGUI.SetActive(false);
+        augUI.SetActive(false);
+    }
+
+    private void OnStatsChanged(NetworkListEvent<StatBlock> change)
+    {
+        if (statsAssigned.Value)
         {
-            List<string> p1StatsRaw = findStats(GM.player1ID);
-            List<string> p2StatsRaw = findStats(GM.player2ID);
+            List<StatBlock> p1 = new List<StatBlock>();
+            List<StatBlock> p2 = new List<StatBlock>();
 
-            foreach (var stat in p1StatsRaw)
-                p1Stats.Add(new StatBlock(stat));
-            foreach (var stat in p2StatsRaw)
-                p2Stats.Add(new StatBlock(stat));
+            foreach (var s in p1Stats) p1.Add(s);
+            foreach (var s in p2Stats) p2.Add(s);
 
-            updateStatsUI(p1Stats, p2Stats); // Update the stats UI with the lists of stats
+            UpdateStatsUI(p1, p2);
         }
     }
 
-    public void displayEndGameUI(ulong p1, ulong p2)
+    private void OnStatsAssignedChanged(bool previousValue, bool newValue)
     {
-        HIDEALLOTHERUI(); // Hide all other UI elements
-        endGameUI.SetActive(true); // Activate the end game UI
-        player1Stats.SetActive(false); // Deactivate player 1 stats
-        player2Stats.SetActive(false); // Deactivate player 2 stats
+        if (newValue)
+        {
+            List<StatBlock> p1 = new List<StatBlock>();
+            List<StatBlock> p2 = new List<StatBlock>();
 
-        StartCoroutine(displayStats()); // Start the coroutine to display stats
+            foreach (var s in p1Stats) p1.Add(s);
+            foreach (var s in p2Stats) p2.Add(s);
+
+            UpdateStatsUI(p1, p2);
+        }
     }
 
-    private void HIDEALLOTHERUI(){
-        IGUI.SetActive(false); // Deactivate the in-game UI
-        augUI.SetActive(false); // Deactivate the augment UI
-    }
-
-    public void updateStatsUI(List<StatBlock> stats1, List<StatBlock> stats2)
+    public void UpdateStatsUI(IReadOnlyList<StatBlock> stats1, IReadOnlyList<StatBlock> stats2)
     {
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 7 && i < stats1.Count && i < stats2.Count; i++)
         {
             player1StatsList[i].GetComponent<TextMeshProUGUI>().text = stats1[i].value.ToString();
             player2StatsList[i].GetComponent<TextMeshProUGUI>().text = stats2[i].value.ToString();
+
+            player1StatsList[i].SetActive(false);
+            player2StatsList[i].SetActive(false);
         }
-        statsAssigned.Value = true; // Set the flag to true after assigning stats
     }
 
-    public List<string> findStats(ulong playerId)
+    private IEnumerator DisplayStats()
     {
-        List<string> stats = new List<string>(); // Create a list to hold stats as strings
-        BaseChampion champion = null; // Initialize the BaseChampion variable
-        if (playerId == GM.player1ID)
-        {
-            champion = GM.player1Controller.GetComponent<BaseChampion>(); // Get the BaseChampion component from player 1 controller
-            if (champion == null)
-            {
-                Debug.LogError("Champion not found for player 1 controller."); // Log an error if champion is not found
-                return stats; // Return empty stats list
-            }
-            stats.Add(champion.championType); // Add champion type to stats list
-            for (int i = 0; i < GM.player1Augments.Count; i++)
-            {
-                try
-                {
-                    stats.Add(GM.AM.augmentFromID(GM.player1Augments[i]).name); // Add augment name to stats list
-                }
-                catch (System.Exception e)
-                {
-                    Debug.LogError("Error retrieving augments: " + e.Message); // Log an error if there is an issue retrieving augments
-                }
-            }
-            stats.Add(champion.passive.Stats.damageTotal.ToString()); // Add passive damage total to stats list
-            stats.Add(champion.passive.Stats.damageOverTime.ToString()); // Add passive damage over time to stats list
-            stats.Add(champion.passive.Stats.costToDamage.ToString()); // Add passive cost to damage to stats list
-        }
-        else if (playerId == GM.player2ID)
-        {
-            champion = GM.player2Controller.GetComponent<BaseChampion>(); // Get the BaseChampion component from player 2 controller
-            if (champion == null)
-            {
-                Debug.LogError("Champion not found for player 2 controller."); // Log an error if champion is not found
-                return stats; // Return empty stats list
-            }
-            stats.Add(champion.championType); // Add champion type to stats list
-            for (int i = 0; i < GM.player2Augments.Count; i++)
-            {
-                try
-                {
-                    stats.Add(GM.AM.augmentFromID(GM.player2Augments[i]).name); // Add augment name to stats list
-                }
-                catch (System.Exception e)
-                {
-                    Debug.LogError("Error retrieving augments: " + e.Message); // Log an error if there is an issue retrieving augments
-                }
-            }
-            stats.Add(champion.passive.Stats.damageTotal.ToString()); // Add passive damage total to stats list
-            stats.Add(champion.passive.Stats.damageOverTime.ToString()); // Add passive damage over time to stats list
-            stats.Add(champion.passive.Stats.costToDamage.ToString()); // Add passive cost to damage to stats list
-        }
+        yield return new WaitUntil(() => statsAssigned.Value);
 
-        if (champion == null)
-        {
-            Debug.LogError("Champion not found for player ID: " + playerId); // Log an error if champion is not found
-        }
-        return stats; // Return the list of stats as strings
-    }
-
-    private IEnumerator displayStats()
-    {
-        yield return new WaitUntil(() => statsAssigned.Value); // Wait until stats are assigned
         player1Stats.SetActive(true);
         player2Stats.SetActive(true);
 
         for (int i = 0; i < player1StatsList.Count; i++)
         {
-            player1StatsList[i].SetActive(true); // Activate the current stat UI element for player 1
-            player2StatsList[i].SetActive(true); // Activate the current stat UI element for player 2
-            yield return new WaitForSeconds(1f); // Wait for 1 second before displaying the next stat
+            player1StatsList[i].SetActive(true);
+            player2StatsList[i].SetActive(true);
+            yield return new WaitForSeconds(1f);
         }
     }
 }
 
 [System.Serializable]
-public struct StatBlock : INetworkSerializable
+public struct StatBlock : INetworkSerializable, IEquatable<StatBlock>
 {
     public FixedString64Bytes value;
 
@@ -162,5 +141,20 @@ public struct StatBlock : INetworkSerializable
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref value);
+    }
+
+    public bool Equals(StatBlock other)
+    {
+        return value.Equals(other.value);
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is StatBlock other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return value.GetHashCode();
     }
 }
