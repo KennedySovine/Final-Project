@@ -945,6 +945,7 @@ MonoBehaviour:
       costToDamage: 0
       totalManaSpent: 0
       championType: 
+      damageTotal: 0
       gameTime: 0
       chosenAugments: []
     timeOfCast: 0
@@ -964,6 +965,7 @@ MonoBehaviour:
       costToDamage: 0
       totalManaSpent: 0
       championType: 
+      damageTotal: 0
       gameTime: 0
       chosenAugments: []
     timeOfCast: 0
@@ -980,14 +982,16 @@ MonoBehaviour:
   gamePaused:
     m_InternalValue: 0
   maxGameTime: 60
-  gameTime: 60
-  augmentBuffer: 30
+  gameTime:
+    m_InternalValue: 60
+  augmentBuffer: 10
   augmentChoosing:
     m_InternalValue: 0
   championPrefab: {fileID: 0}
   spawnPoints:
   - {fileID: 0}
   - {fileID: 0}
+  recievedCalcs: 0
   AM: {fileID: 0}
   IGM: {fileID: 0}
   IGUIM: {fileID: 0}

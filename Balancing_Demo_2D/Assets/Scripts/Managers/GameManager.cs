@@ -50,6 +50,12 @@ public class GameManager : NetworkBehaviour
     [Header("Champion Management")]
     public GameObject championPrefab; // Prefab for spawning champions
     public Transform[] spawnPoints; // Array of spawn points for champions
+    private bool recievedEndGameCalculations {
+        get{
+            return recievedCalcs >= 2; // Check if both players have received end game calculations
+        }
+    }
+    public int recievedCalcs = 0;
 
     [Header("Managers")]
     public AugmentManager AM; // Reference to the AugmentManager
@@ -313,6 +319,10 @@ public class GameManager : NetworkBehaviour
             }
         }
 
+        if (!IsServer) return; // Ensure this runs only on the server
+        StartCoroutine(waitForEndGameStats()); // Start the coroutine to wait for end game stats
+
+        //Call all end game calculations for the champions and abilities
         player1Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's champion
         player2Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's champion
 
@@ -322,6 +332,9 @@ public class GameManager : NetworkBehaviour
         player2Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's ability
         player1Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's ability
         player2Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's ability
+
+        endGameUIRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Show the end game UI for player 1
+        endGameUIRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Show the end game UI for player 2
     }
     public void applyAugments(ulong playerID)
     {
@@ -493,5 +506,11 @@ public class GameManager : NetworkBehaviour
     }
     
 
-
+    private IEnumerator waitForEndGameStats(){
+        while (!recievedEndGameCalculations){
+            yield return null; // Wait for the end game calculations to be received
+        }
+        endGameUIRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Show the end game UI for player 1
+        endGameUIRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Show the end game UI for player 2
+    }
 }

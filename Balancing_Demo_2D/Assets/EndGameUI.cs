@@ -95,9 +95,15 @@ public class EndGameUI : MonoBehaviour
                 return stats; // Return empty stats list
             }
             stats.Add(champion.championType); // Add champion type to stats list
-            stats.Add(GM.AM.augmentFromID(GM.player1Augments[0]).name); // Add first augment name to stats list
-            stats.Add(GM.AM.augmentFromID(GM.player1Augments[1]).name); // Add second augment name to stats list
-            stats.Add(GM.AM.augmentFromID(GM.player1Augments[2]).name); // Add third augment name to stats list
+            for (int i = 0; i < GM.player1Augments.Count; i++)
+            {
+                try{
+                    stats.Add(GM.AM.augmentFromID(GM.player1Augments[i]).name); // Add augment name to stats list
+                }
+                catch (System.Exception e){
+                    Debug.LogError("Error retrieving augments: " + e.Message); // Log an error if there is an issue retrieving augments
+                }
+            }
             stats.Add(champion.passive.Stats.damageTotal.ToString()); // Add passive damage total to stats list
             stats.Add(champion.passive.Stats.damageOverTime.ToString()); // Add passive damage over time to stats list
             stats.Add(champion.passive.Stats.costToDamage.ToString()); // Add passive cost to damage to stats list
@@ -111,9 +117,15 @@ public class EndGameUI : MonoBehaviour
                 return stats; // Return empty stats list
             }
             stats.Add(champion.championType); // Add champion type to stats list
-            stats.Add(GM.AM.augmentFromID(GM.player2Augments[0]).name); // Add first augment name to stats list
-            stats.Add(GM.AM.augmentFromID(GM.player2Augments[1]).name); // Add second augment name to stats list
-            stats.Add(GM.AM.augmentFromID(GM.player2Augments[2]).name); // Add third augment name to stats list
+            for (int i = 0; i < GM.player2Augments.Count; i++)
+            {
+                try{
+                    stats.Add(GM.AM.augmentFromID(GM.player2Augments[i]).name); // Add augment name to stats list
+                }
+                catch (System.Exception e){
+                    Debug.LogError("Error retrieving augments: " + e.Message); // Log an error if there is an issue retrieving augments
+                }
+            }
             stats.Add(champion.passive.Stats.damageTotal.ToString()); // Add passive damage total to stats list
             stats.Add(champion.passive.Stats.damageOverTime.ToString()); // Add passive damage over time to stats list
             stats.Add(champion.passive.Stats.costToDamage.ToString()); // Add passive cost to damage to stats list

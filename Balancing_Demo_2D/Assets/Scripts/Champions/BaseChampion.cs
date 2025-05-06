@@ -6,6 +6,8 @@ public class BaseChampion : NetworkBehaviour
 {
     public static GameManager GM; // Reference to the GameManager
 
+    [SerializeField] private AbilityStatsData AbilityStatsData;
+
     public InGameUIManager IGUIM; // Reference to the InGameUIManager
     [Header("Champion Stats")]
     public string championType = "";
@@ -74,6 +76,8 @@ public class BaseChampion : NetworkBehaviour
 
     public bool iconsSet = false; // Flag to check if icons are set
 
+    private bool gameEndStuff = false;
+
     public void Start()
     {
         GM = GameManager.Instance; // Get the instance of the GameManager
@@ -134,9 +138,14 @@ public class BaseChampion : NetworkBehaviour
     
     public virtual void Update()
     {
-        if (IsServer) // Only the server should modify NetworkVariables
-        {
-            HealthandManaRegen();
+        if (!gameEndStuff && GM.gameTime.Value <= 0f){
+            gameEndStuff = true; // Set the flag to true to prevent multiple calls
+            SubmitFinalAbilityStatsServerRpc(
+                AbilityStatsData.FromAbilityStats(ability1.Stats),
+                AbilityStatsData.FromAbilityStats(ability2.Stats),
+                AbilityStatsData.FromAbilityStats(ability3.Stats),
+                AbilityStatsData.FromAbilityStats(passive.Stats)
+            );
         }
 
         if (passive != null)
@@ -149,6 +158,7 @@ public class BaseChampion : NetworkBehaviour
 
         if (!IsServer) return; // Only the server should execute this logic
         //Timer for stacks
+        HealthandManaRegen();
 
         if (isEmpowered.Value){
             if (Time.time > empowerStartTime.Value + empowerDuration.Value)
@@ -615,5 +625,22 @@ public class BaseChampion : NetworkBehaviour
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         stackCount.Value = 0; // Reset the stack count
+    }
+
+    [Rpc(SendTo.Server)]
+    public void SubmitFinalAbilityStatsServerRpc(AbilityStatsData ability1, AbilityStatsData ability2, AbilityStatsData ability3, AbilityStatsData passive)
+    {
+        if (!IsServer) return; // Ensure this is only executed on the server
+
+        var champ = GetComponent<BaseChampion>();
+
+        ability1.ApplyTo(champ.ability1.Stats);
+        ability2.ApplyTo(champ.ability2.Stats);
+        ability3.ApplyTo(champ.ability3.Stats);
+        passive.ApplyTo(champ.passive.Stats);
+
+        GM.recievedCalcs++; // Increment the count of received stats
+
+        Debug.Log($"Received stats from client {OwnerClientId}");
     }
 }
