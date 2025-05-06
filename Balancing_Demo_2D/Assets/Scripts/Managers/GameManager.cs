@@ -161,7 +161,7 @@ public class GameManager : NetworkBehaviour
                     loadAugmentsRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
 
                     augmentChoosing.Value = false;
-                    augmentBuffer = 30f; // Reset the augment buffer for the next cycle
+                    augmentBuffer = 15f; // Reset the augment buffer for the next cycle
                 }
             }
             if (gameTime.Value <= 0 && !gameEnded) // Check if the game time has expired
@@ -332,9 +332,6 @@ public class GameManager : NetworkBehaviour
         player2Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's ability
         player1Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's ability
         player2Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's ability
-
-        endGameUIRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Show the end game UI for player 1
-        endGameUIRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Show the end game UI for player 2
     }
     public void applyAugments(ulong playerID)
     {
@@ -498,9 +495,9 @@ public class GameManager : NetworkBehaviour
     }
 
     [Rpc(SendTo.SpecifiedInParams)]
-    public void endGameUIRpc(RpcParams rpcParams)
+    public void endGameUIRpc(ulong p1, ulong p2, RpcParams rpcParams)
     {
-        IGM.endGameUI.displayEndGameUI(); // Display the end game UI
+        IGM.endGameUI.displayEndGameUI(p1, p2); // Display the end game UI
         Debug.Log("End game UI initialized and activated.");
         
     }
@@ -510,7 +507,7 @@ public class GameManager : NetworkBehaviour
         while (!recievedEndGameCalculations){
             yield return null; // Wait for the end game calculations to be received
         }
-        endGameUIRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Show the end game UI for player 1
-        endGameUIRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Show the end game UI for player 2
+        endGameUIRpc(player1ID, player2ID, RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Show the end game UI for player 1
+        endGameUIRpc(player1ID, player2ID, RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Show the end game UI for player 2
     }
 }

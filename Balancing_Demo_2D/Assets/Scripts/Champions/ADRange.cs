@@ -64,7 +64,7 @@ public class ADRange : BaseChampion
 
         ability2 = new Ability(
             "Silver Bolts",
-            "Basic attacks apply a stack and at 3 stacks, deal bonus true damage based on <i>6% of the target's max health<i>. Deals minimum <i>50<i> bonus damage.",
+            "Basic attacks apply a stack and at 3 stacks, deal bonus true damage based on <i>6% of the target's max health</i>. Deals minimum <i>50</i> bonus damage.",
             0f, // Cooldown in seconds
             0f, // Mana cost
             0f   // No range
@@ -74,7 +74,7 @@ public class ADRange : BaseChampion
 
         ability3 = new Ability(
             "Condemn",
-            "Fire an extra heavy bolt that deals extra physical damage <i>(50 + 50% AD)<i>.",
+            "Fire an extra heavy bolt that deals extra physical damage <i>(50 + 50% AD)</i>.",
             20f, // Cooldown in seconds
             90f, // Mana cost
             5f   // Range

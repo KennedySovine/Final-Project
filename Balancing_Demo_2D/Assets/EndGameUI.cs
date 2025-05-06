@@ -15,7 +15,8 @@ public class EndGameUI : MonoBehaviour
     [SerializeField] private List<GameObject> player1StatsList;
     [SerializeField] private List<GameObject> player2StatsList;
 
-
+    public NetworkList<NetworkString> player1StatsText = new NetworkList<NetworkString>();
+    public NetworkList<NetworkString> player2StatsText = new NetworkList<NetworkString>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -25,18 +26,6 @@ public class EndGameUI : MonoBehaviour
         {
             Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
         }
-        
-    }
-
-    void OnEnable()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     private List<GameObject> findAllChildren(GameObject parent, List<GameObject> children)
@@ -48,18 +37,29 @@ public class EndGameUI : MonoBehaviour
         return children; // Return the list of child GameObjects
     }
 
-    public void displayEndGameUI()
+    public void displayEndGameUI(ulong p1, ulong p2)
     {
         endGameUI.SetActive(true); // Activate the end game UI
         player1Stats.SetActive(false); // Deactivate player 1 stats
         player2Stats.SetActive(false); // Deactivate player 2 stats
 
-        List<string> p1stats = findStats(GM.player1ID); // Get player 1 stats
-        List<string> p2stats = findStats(GM.player2ID); // Get player 2 stats
+        if (IsServer)
+        {
+            List<string> p1StatsRaw = findStats(p1);
+            List<string> p2StatsRaw = findStats(p2);
 
-        updateStatsUIRpc(p1stats, p2stats); // Update the stats UI for both players
+            List<StatBlock> p1Stats = new List<StatBlock>();
+            List<StatBlock> p2Stats = new List<StatBlock>();
 
-        //Deactivate all Stats
+            foreach (var stat in p1StatsRaw)
+                p1Stats.Add(new StatBlock(stat));
+            foreach (var stat in p2StatsRaw)
+                p2Stats.Add(new StatBlock(stat));
+
+        }
+
+
+        // Deactivate all stats
         foreach (GameObject stat in player1StatsList)
         {
             stat.GetComponent<TextMeshProUGUI>().text = ""; // Clear the text for player 1 stats
@@ -70,20 +70,26 @@ public class EndGameUI : MonoBehaviour
             stat.GetComponent<TextMeshProUGUI>().text = ""; // Clear the text for player 2 stats
             stat.SetActive(false); // Deactivate player 2 stats
         }
+
+        updateStatsUIRpc(p1Stats, p2Stats);
     }
 
     [Rpc(SendTo.Everyone)]
-    public void updateStatsUIRpc(List<string> stats1, List<string> stats2){
-        for (int i = 0; i < 7; i++){
-            player1StatsList[i].GetComponent<TextMeshProUGUI>().text = stats1[i]; // Update player 1 stats text
-            player2StatsList[i].GetComponent<TextMeshProUGUI>().text = stats2[i]; // Update player 2 stats text
+    public void updateStatsUIRpc(List<StatBlock> stats1, List<StatBlock> stats2)
+    {
+        for (int i = 0; i < 7; i++)
+        {
+            player1StatsList[i].GetComponent<TextMeshProUGUI>().text = stats1[i].value.ToString();
+            player2StatsList[i].GetComponent<TextMeshProUGUI>().text = stats2[i].value.ToString();
         }
-        player1Stats.SetActive(true); // Activate player 1 stats UI
-        player2Stats.SetActive(true); // Activate player 2 stats UI
+
+        player1Stats.SetActive(true);
+        player2Stats.SetActive(true);
         StartCoroutine(displayStats());
     }
 
-    public List<string> findStats(ulong playerId){
+    public List<string> findStats(ulong playerId)
+    {
         List<string> stats = new List<string>(); // Create a list to hold stats as strings
         BaseChampion champion = null; // Initialize the BaseChampion variable
         if (playerId == GM.player1ID)
@@ -97,10 +103,12 @@ public class EndGameUI : MonoBehaviour
             stats.Add(champion.championType); // Add champion type to stats list
             for (int i = 0; i < GM.player1Augments.Count; i++)
             {
-                try{
+                try
+                {
                     stats.Add(GM.AM.augmentFromID(GM.player1Augments[i]).name); // Add augment name to stats list
                 }
-                catch (System.Exception e){
+                catch (System.Exception e)
+                {
                     Debug.LogError("Error retrieving augments: " + e.Message); // Log an error if there is an issue retrieving augments
                 }
             }
@@ -119,10 +127,12 @@ public class EndGameUI : MonoBehaviour
             stats.Add(champion.championType); // Add champion type to stats list
             for (int i = 0; i < GM.player2Augments.Count; i++)
             {
-                try{
+                try
+                {
                     stats.Add(GM.AM.augmentFromID(GM.player2Augments[i]).name); // Add augment name to stats list
                 }
-                catch (System.Exception e){
+                catch (System.Exception e)
+                {
                     Debug.LogError("Error retrieving augments: " + e.Message); // Log an error if there is an issue retrieving augments
                 }
             }
@@ -146,5 +156,18 @@ public class EndGameUI : MonoBehaviour
             player2StatsList[i].SetActive(true); // Activate the current stat UI element for player 2
             yield return new WaitForSeconds(1f); // Wait for 1 second before displaying the next stat
         }
+    }
+}
+
+[System.Serializable]
+public struct StatBlock : INetworkSerializable
+{
+    public FixedString64Bytes value;
+
+    public StatBlock(string v) => value = v;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref value);
     }
 }

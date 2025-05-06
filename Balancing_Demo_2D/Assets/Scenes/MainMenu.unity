@@ -984,7 +984,7 @@ MonoBehaviour:
   maxGameTime: 60
   gameTime:
     m_InternalValue: 60
-  augmentBuffer: 10
+  augmentBuffer: 0
   augmentChoosing:
     m_InternalValue: 0
   championPrefab: {fileID: 0}

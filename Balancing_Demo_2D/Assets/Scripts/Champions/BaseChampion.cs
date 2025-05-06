@@ -6,7 +6,7 @@ public class BaseChampion : NetworkBehaviour
 {
     public static GameManager GM; // Reference to the GameManager
 
-    [SerializeField] private AbilityStatsData AbilityStatsData;
+    public AbilityStatsData AbilityStatsData;
 
     public InGameUIManager IGUIM; // Reference to the InGameUIManager
     [Header("Champion Stats")]
@@ -152,6 +152,7 @@ public class BaseChampion : NetworkBehaviour
         {
             passiveAbilityRpc(); // Call the passive ability logic
         }
+
         if (IsOwner){
             abilityIconCooldownManaChecks(); // Check cooldowns and mana for abilities
         }
@@ -185,7 +186,7 @@ public class BaseChampion : NetworkBehaviour
         // The first or statement in the set true is to check if the ability is a passive as passives dont have a cooldown
         if (IsOwner && iconsSet) // Only the owner should check cooldowns and mana
         {
-            //Debug.Log("Checking cooldowns and mana for abilities.");
+            Debug.Log("Checking cooldowns and mana for abilities.");
             if ((ability1.cooldown == 0) || (ability1 != null && ability1.checkIfAvailable(mana.Value)))// Check if ability 1 is not on cooldown and enough mana is available
             {
                 IGUIM.buttonInteractable("Q", true);
