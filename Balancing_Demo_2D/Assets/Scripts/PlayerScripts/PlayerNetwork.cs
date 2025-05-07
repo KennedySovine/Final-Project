@@ -123,10 +123,11 @@ public class PlayerNetwork : NetworkBehaviour
             Debug.Log("Raycast hit the enemy champion!");
 
             // Stop moving when auto attacking
-            SendMousePositionRpc(transform.position); // Send mouse position to the server
-            RequestMoveRpc(transform.position); // Request movement on the server
+            //SendMousePositionRpc(transform.position); // Send mouse position to the server
+            //RequestMoveRpc(transform.position); // Request movement on the server
             Vector3 direction = targetPositionNet.Value - transform.position;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            UpdateRotationRpc(angle); // Update rotation
             
             PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value); // Call the auto-attack function on the server
 
@@ -268,8 +269,9 @@ public class PlayerNetwork : NetworkBehaviour
             bulletComponent.targetPosition = targetPosition;
             bulletComponent.targetPlayer = enemyChampion;
             bulletComponent.speed = champion.missileSpeed.Value;
-            //bulletComponent.ownerID = transform.parent.GetComponent<NetworkObject>().clientId;
             bulletComponent.owner = this.gameObject; // Set the owner of the bullet
+
+            Debug.Log("Bullet properties set.");
 
             SpawnGhostBulletRpc(targetPosition, transform.position, champion.missileSpeed.Value); // Spawn the ghost
 
@@ -320,8 +322,14 @@ public class PlayerNetwork : NetworkBehaviour
     {
         GameObject ghostBullet = Instantiate(GM.ghostBulletPrefab, startPos, Quaternion.identity);
 
+        if (ghostBullet == null)
+        {
+            Debug.LogError("Ghost bullet prefab is null. Cannot instantiate.");
+            return; // Exit the coroutine if the ghost bullet prefab is null
+        }
+
         StartCoroutine(MoveGhostBullet(ghostBullet, targetPosition, speed));
-        
+
     }
 
     private IEnumerator MoveGhostBullet(GameObject GB, Vector3 targetPosition, float speed)
@@ -331,6 +339,7 @@ public class PlayerNetwork : NetworkBehaviour
             //Debug.Log("Moving ghost bullet towards target position.");
             //Debug.Log("Speed: " + speed);
             GB.transform.position = Vector3.MoveTowards(GB.transform.position, targetPosition, speed * Time.deltaTime);
+            Debug.Log("Ghost bullet position: " + GB.transform.position);
             yield return null;
         }
 
