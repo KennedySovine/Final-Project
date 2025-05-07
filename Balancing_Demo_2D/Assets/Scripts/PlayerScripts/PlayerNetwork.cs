@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using Unity.Netcode;
+using UnityEngine.InputSystem;
 
 public class PlayerNetwork : NetworkBehaviour
 {
@@ -14,6 +15,8 @@ public class PlayerNetwork : NetworkBehaviour
 
     public BaseChampion champion; // Reference to the champion script
     private GameManager GM; // Reference to the GameManager
+
+    private Mouse mouse;
     
 
     void Start()
@@ -32,6 +35,8 @@ public class PlayerNetwork : NetworkBehaviour
                 Debug.LogError("No camera found on the player's prefab!");
             }
 
+            mouse = Mouse.current; // Get the mouse input
+
             // Initialize mousePosition and targetPositionNet
             mousePosition = transform.position;
             dashSpeed = champion.movementSpeed.Value;
@@ -45,7 +50,7 @@ public class PlayerNetwork : NetworkBehaviour
         if (!IsOwner || GM.gamePaused.Value) return; // Only the owner can control the player and only if the game is not paused
 
         // Constantly update mouse position
-        mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition = personalCamera.ScreenToWorldPoint(mouse.position.ReadValue()); // Get the mouse position in world space
         checkInputs(); // Check for player inputs
 
         if (!isDashing.Value)
@@ -58,16 +63,7 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (isDashing.Value) return; // Ignore inputs if the player is dashing
 
-        /*if (Input.GetMouseButton(1)) // Right mouse button pressed
-        {
-            SendMousePositionRpc(mousePosition); // Send mouse position to the server
-            RequestMoveRpc(mousePosition); // Request movement on the server
-            Vector3 direction = targetPositionNet.Value - transform.position;
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            UpdateRotationRpc(angle); // Update rotation
-        }*/
-
-        if (Input.GetMouseButtonDown(1)) // Right Mouse Button Pressed
+        if (mouse.rightButton.isPressed) // Right Mouse Button Pressed
         {
             if (AttackOrMove())
             {
@@ -85,21 +81,21 @@ public class PlayerNetwork : NetworkBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Q)) // Q key pressed
+        if (Keyboard.current.qKey.wasPressedThisFrame) // Q key pressed
         {
             Debug.Log("Ability 1 key pressed.");
             GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "Q"); // Update ability 1 used state
             champion.UseAbility1Rpc();
         }
 
-        if (Input.GetKeyDown(KeyCode.W)) // W key pressed
+        if (Keyboard.current.qKey.wasPressedThisFrame) // W key pressed
         {
             Debug.Log("Ability 2 key pressed.");
             GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "W"); // Update ability 2 used state
             champion.UseAbility2Rpc();
         }
 
-        if (Input.GetKeyDown(KeyCode.E)) // E key pressed
+        if (Keyboard.current.qKey.wasPressedThisFrame) // E key pressed
         {
             Debug.Log("Ability 3 key pressed.");
             GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "E"); // Update ability 3 used state
@@ -114,11 +110,7 @@ public class PlayerNetwork : NetworkBehaviour
             // Attack
             return true; // Attack
         }
-        else
-        {
-            // Move
-            return false; // Move
-        }
+        return false; // Move
     }
 
     public void PerformAutoAttack()
@@ -177,15 +169,12 @@ public class PlayerNetwork : NetworkBehaviour
     public void ChampionDashRpc(Vector2 mousePos, float maxRange, float speed)
     {
         Vector2 dashDirection = (mousePos - (Vector2)transform.position).normalized;
-        float distance = Vector2.Distance(transform.position, mousePos);
-        distance = Mathf.Min(distance, maxRange);
+        float distance = Mathf.Min(Vector2.Distance(transform.position, mousePos), maxRange);
 
         Vector2 targetPosition = (Vector2)transform.position + dashDirection * distance;
         targetPositionNet.Value = targetPosition;
         dashSpeed = speed;
-        if (IsServer){
-            isDashing.Value = true;
-        }
+        if (IsServer) isDashing.Value = true;
 
         StartCoroutine(DashToTarget(targetPosition));
     }
@@ -231,12 +220,12 @@ public class PlayerNetwork : NetworkBehaviour
         if (Time.time < champion.lastAutoAttackTime.Value + (1f / champion.attackSpeed.Value))
         {
             Debug.Log("Auto-attack is on cooldown!");
-            Debug.Log($"Time: {Time.time}, Last Auto Attack Time: {champion.lastAutoAttackTime.Value}, Attack Speed: {champion.attackSpeed.Value}");
+            //Debug.Log($"Time: {Time.time}, Last Auto Attack Time: {champion.lastAutoAttackTime.Value}, Attack Speed: {champion.attackSpeed.Value}");
             return;
         }
 
         StartCoroutine(PerformAutoAttackCoroutine(targetPosition, enemyChampion, rapidFire));
-        Debug.Log("Auto-attack performed on the server.");
+        //Debug.Log("Auto-attack performed on the server.");
     }
 
     private IEnumerator PerformAutoAttackCoroutine(Vector3 targetPosition, GameObject enemyChampion, int rapidFire)
@@ -268,7 +257,6 @@ public class PlayerNetwork : NetworkBehaviour
             bulletComponent.targetPosition = targetPosition;
             bulletComponent.targetPlayer = enemyChampion;
             bulletComponent.speed = champion.missileSpeed.Value;
-            //bulletComponent.ownerID = transform.parent.GetComponent<NetworkObject>().clientId;
             bulletComponent.owner = this.gameObject; // Set the owner of the bullet
 
             SpawnGhostBulletRpc(targetPosition, transform.position, champion.missileSpeed.Value); // Spawn the ghost
@@ -293,24 +281,19 @@ public class PlayerNetwork : NetworkBehaviour
                 champion.updateAbility3UsedRpc(false); // Reset the ability 3 used state
             }
 
-            Debug.Log("Bullet spawned on the server.");
-            Debug.Log("Auto-attack performed.");
+            //Debug.Log("Bullet spawned on the server.");
+            //Debug.Log("Auto-attack performed.");
             // Update the last auto-attack time after firing each bullet
-            champion.updateStackCountRpc(1, champion.stackCount.Value, champion.maxStacks.Value); // Update the stack count
             
 
             // Wait for 0.1 seconds before firing the next bullet
             yield return new WaitForSeconds(0.1f);
         }
+        champion.updateStackCountRpc(1, champion.stackCount.Value, champion.maxStacks.Value); // Update the stack count
 
         // Reset rapid fire after all bullets are fired
         champion.lastAutoAttackTime.Value = Time.time; // Update the last auto-attack time
         rapidFire = 1;
-    }
-
-    private IEnumerator waitForSec(float seconds)
-    {
-        yield return new WaitForSeconds(seconds);
     }
 
 
@@ -321,7 +304,6 @@ public class PlayerNetwork : NetworkBehaviour
         GameObject ghostBullet = Instantiate(GM.ghostBulletPrefab, startPos, Quaternion.identity);
 
         StartCoroutine(MoveGhostBullet(ghostBullet, targetPosition, speed));
-        
     }
 
     private IEnumerator MoveGhostBullet(GameObject GB, Vector3 targetPosition, float speed)
