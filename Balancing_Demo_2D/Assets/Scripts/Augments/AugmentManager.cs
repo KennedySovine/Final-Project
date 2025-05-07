@@ -147,6 +147,8 @@ public class AugmentManager : NetworkBehaviour
             augmentName.text = augOptions[i].name; // Set the name text
             augmentDescription.text = augOptions[i].description; // Set the description text
         }
+
+        // TODO: Augment Time Limit
     }
 
     public Augment augmentFromID (int ID){

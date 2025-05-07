@@ -70,6 +70,7 @@ public class CameraController : MonoBehaviour
         }
     }
 
+    // TODO: Make this actually work.
     private void FaceTowardsYZero()
     {
         // Calculate the direction from the camera's position to Y = 0

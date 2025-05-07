@@ -120,9 +120,6 @@ public class GameManager : NetworkBehaviour
             //Debug.Log("Player Count: " + playerCount); // Debug log for player count
             if (playerCount == maxPlayers) // Check if the maximum number of players is reached
             {
-                // Start the game logic here
-                //Debug.Log("Game Starting with " + playerCount + " players.");
-
                 if (!playerSpawningStart) // Check if champions have not been spawned yet
                 {
                     Debug.Log("Spawning champions for players.");
@@ -185,12 +182,39 @@ public class GameManager : NetworkBehaviour
         Debug.Log($"Client {clientId} connected.");
     }
 
+    //TODO: Finish this function to handle player disconnects properly
+    private void OnClientDisconnect(ulong clientId)
+    {
+        Debug.Log($"Client {clientId} disconnected.");
+        if (playerChampions.ContainsKey(clientId))
+        {
+            playerChampions.Remove(clientId); // Remove the player from the dictionary
+            Debug.Log($"Removed player {clientId} from playerChampions.");
+            playerIDsSpawned.Remove(clientId); // Remove the player ID from the spawned list
+            Debug.Log($"Removed player {clientId} from playerIDsSpawned.");
+            playerCount--; // Decrease the player count
+            Debug.Log($"Player count decreased. Current count: {playerCount}.");
+            if (playerIDsSpawned.Count == 0) // Check if all players have disconnected
+            {
+                gameEnded = true; // Set the game ended flag to true
+                Debug.Log("All players disconnected. Ending game.");
+                EndGame(); // Call the EndGame function to handle game over logic
+            }
+            else if (playerIDsSpawned.Count == 1) // Check if only one player is left
+            {
+                gamePaused.Value = true; // Pause the game
+                // TODO: Pause game and do a pop up saying waiting for other player to reconnect.
+            }
+        }
+    }
+
     public void InitializeNetworkCallbacks()
     {
         if (NetworkManager.Singleton != null)
         {
             Debug.Log("Subscribing to NetworkManager callbacks.");
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect; // Subscribe to the client disconnect callback
         }
         else
         {
