@@ -66,7 +66,7 @@ public class CameraController : MonoBehaviour
             transform.position = target.position + offset;
 
             // Lock the camera's rotation
-            transform.rotation = Quaternion.Euler(0f, 0f, 180f);
+            transform.rotation = Quaternion.Euler(0f, 0f, 0f);
         }
     }
 

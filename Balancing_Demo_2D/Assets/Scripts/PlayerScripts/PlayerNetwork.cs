@@ -52,6 +52,8 @@ public class PlayerNetwork : NetworkBehaviour
         {
             MovePlayer(); // Move the player if not dashing
         }
+
+        //TODO: Check if colliding with terrain and if so stop moving
     }
 
     private void checkInputs()

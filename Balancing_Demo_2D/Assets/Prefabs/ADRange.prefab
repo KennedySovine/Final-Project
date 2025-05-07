@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 1182713526884703607}
   - component: {fileID: 752664424059945664}
   - component: {fileID: 1340520847739071468}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: PlayerController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -106,6 +106,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  AbilityStatsData:
+    damageOverTime: 0
+    damage: 0
+    costToDamage: 0
+    totalManaSpent: 0
+    damageTotal: 0
+    gameTime: 0
   IGUIM: {fileID: 0}
   championType: 
   maxHealth:
@@ -185,7 +192,10 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
+      damageTotal: 0
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   passive:
     icon: {fileID: 0}
@@ -202,7 +212,10 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
+      damageTotal: 0
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   ability1:
     icon: {fileID: 0}
@@ -219,7 +232,10 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
+      damageTotal: 0
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   ability2:
     icon: {fileID: 0}
@@ -236,7 +252,10 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
+      damageTotal: 0
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   ability3:
     icon: {fileID: 0}
@@ -253,7 +272,10 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
+      damageTotal: 0
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   lastAutoAttackTime:
     m_InternalValue: 0
@@ -343,7 +365,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 1
-  m_Mass: 1
+  m_Mass: 4
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 0
@@ -353,7 +375,7 @@ Rigidbody2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -391,7 +413,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -405,7 +427,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -433,7 +455,7 @@ GameObject:
   - component: {fileID: 1115304479915891273}
   - component: {fileID: 7235667429038699871}
   - component: {fileID: 8743134429531742974}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: ADRange
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -449,7 +471,7 @@ Transform:
   m_GameObject: {fileID: 4431904003385403123}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -586,7 +608,7 @@ GameObject:
   - component: {fileID: 4986339328056519817}
   - component: {fileID: 4939262339259533465}
   - component: {fileID: 9052366349326837282}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -681,3 +703,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 5529780649511139312}
   offset: {x: 0, y: 0, z: -10}
+  smallestSize: 10
+  largestSize: 30
