@@ -58,18 +58,31 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (isDashing.Value) return; // Ignore inputs if the player is dashing
 
-        if (Input.GetMouseButton(1)) // Right mouse button pressed
+        /*if (Input.GetMouseButton(1)) // Right mouse button pressed
         {
             SendMousePositionRpc(mousePosition); // Send mouse position to the server
             RequestMoveRpc(mousePosition); // Request movement on the server
             Vector3 direction = targetPositionNet.Value - transform.position;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             UpdateRotationRpc(angle); // Update rotation
-        }
+        }*/
 
-        if (Input.GetMouseButtonDown(0)) // Left mouse button pressed
+        if (Input.GetMouseButtonDown(1)) // Right Mouse Button Pressed
         {
-            PerformAutoAttack(); // Perform an auto-attack
+            if (AttackOrMove())
+            {
+                Debug.Log("Attack input detected.");
+                PerformAutoAttack(); // Perform auto-attack
+            }
+            else
+            {
+                Debug.Log("Move input detected.");
+                SendMousePositionRpc(mousePosition); // Send mouse position to the server
+                RequestMoveRpc(mousePosition); // Request movement on the server
+                Vector3 direction = targetPositionNet.Value - transform.position;
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                UpdateRotationRpc(angle); // Update rotation
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Q)) // Q key pressed
@@ -91,6 +104,20 @@ public class PlayerNetwork : NetworkBehaviour
             Debug.Log("Ability 3 key pressed.");
             GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "E"); // Update ability 3 used state
             champion.UseAbility3Rpc();
+        }
+    }
+
+    public bool AttackOrMove(){
+        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+        if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && (hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId))
+        {
+            // Attack
+            return true; // Attack
+        }
+        else
+        {
+            // Move
+            return false; // Move
         }
     }
 
