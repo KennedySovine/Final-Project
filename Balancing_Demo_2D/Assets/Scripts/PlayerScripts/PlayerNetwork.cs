@@ -14,6 +14,8 @@ public class PlayerNetwork : NetworkBehaviour
 
     public BaseChampion champion; // Reference to the champion script
     private GameManager GM; // Reference to the GameManager
+
+    private bool isCollidingWithTerrain = false; // Flag to check if colliding with terrain
     
 
     void Start()
@@ -48,12 +50,13 @@ public class PlayerNetwork : NetworkBehaviour
         mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition);
         checkInputs(); // Check for player inputs
 
-        if (!isDashing.Value)
+        if (!isDashing.Value && !isCollidingWithTerrain) // If not dashing and not colliding with terrain
         {
             MovePlayer(); // Move the player if not dashing
         }
 
         //TODO: Check if colliding with terrain and if so stop moving
+
     }
 
     private void checkInputs()
@@ -150,6 +153,18 @@ public class PlayerNetwork : NetworkBehaviour
         {
             champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
         }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Terrain"))
+        {
+            // Stop moving when colliding with terrain
+            champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+            Debug.Log("Collided with terrain. Stopping movement.");
+            isCollidingWithTerrain = true; // Set the flag to true
+        }
+        isCollidingWithTerrain = false; // Reset the flag when not colliding with terrain
     }
 
     [Rpc(SendTo.Server)]

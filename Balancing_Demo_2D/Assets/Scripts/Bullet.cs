@@ -81,5 +81,12 @@ public class Bullet : NetworkBehaviour
                 Debug.Log("Bullet despawned on the server.");
             }
         }
+        else if (collision.gameObject.CompareTag("Terrain"))
+        {
+            // Bullet hit the terrain, destroy it
+            Debug.Log("Bullet hit the terrain: " + collision.gameObject.name);
+            GetComponent<NetworkObject>().Despawn();
+            Debug.Log("Bullet despawned on the server.");
+        }
     }
 }

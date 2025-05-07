@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 5684603}
   m_Layer: 0
   m_Name: Map
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -30782,7 +30782,7 @@ GameObject:
   - component: {fileID: 83879448}
   m_Layer: 0
   m_Name: Obstacles
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -41621,7 +41621,7 @@ GameObject:
   - component: {fileID: 1984785028}
   m_Layer: 0
   m_Name: Walls
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -57001,7 +57001,7 @@ GameObject:
   - component: {fileID: 2072445480}
   m_Layer: 0
   m_Name: Decor
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

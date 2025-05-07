@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Projectile
   - Collidable
+  - Terrain
   layers:
   - Default
   - TransparentFX
