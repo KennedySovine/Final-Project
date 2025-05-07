@@ -106,14 +106,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  AbilityStatsData:
-    damageOverTime: 0
-    damage: 0
-    costToDamage: 0
-    totalManaSpent: 0
-    damageTotal: 0
-    gameTime: 0
-  IGUIM: {fileID: 0}
   championType: 
   maxHealth:
     m_InternalValue: 600
@@ -178,8 +170,6 @@ MonoBehaviour:
   mana:
     m_InternalValue: 300
   autoAttack:
-    icon: {fileID: 0}
-    icon2: {fileID: 0}
     name: Auto Attack
     description: Basic attack
     cooldown: 0
@@ -192,14 +182,9 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
-      championType: 
-      damageTotal: 0
       gameTime: 0
-      chosenAugments: []
     timeOfCast: 0
   passive:
-    icon: {fileID: 0}
-    icon2: {fileID: 0}
     name: 
     description: 
     cooldown: 0
@@ -212,14 +197,9 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
-      championType: 
-      damageTotal: 0
       gameTime: 0
-      chosenAugments: []
     timeOfCast: 0
   ability1:
-    icon: {fileID: 0}
-    icon2: {fileID: 0}
     name: 
     description: 
     cooldown: 0
@@ -232,14 +212,9 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
-      championType: 
-      damageTotal: 0
       gameTime: 0
-      chosenAugments: []
     timeOfCast: 0
   ability2:
-    icon: {fileID: 0}
-    icon2: {fileID: 0}
     name: 
     description: 
     cooldown: 0
@@ -252,14 +227,9 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
-      championType: 
-      damageTotal: 0
       gameTime: 0
-      chosenAugments: []
     timeOfCast: 0
   ability3:
-    icon: {fileID: 0}
-    icon2: {fileID: 0}
     name: 
     description: 
     cooldown: 0
@@ -272,10 +242,7 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
-      championType: 
-      damageTotal: 0
       gameTime: 0
-      chosenAugments: []
     timeOfCast: 0
   lastAutoAttackTime:
     m_InternalValue: 0
@@ -285,7 +252,6 @@ MonoBehaviour:
     m_InternalValue: 0
   bulletPrefab: {fileID: 2169341123581716514, guid: 66c025e1f784eb2478380fa1d8dd1de2, type: 3}
   PN: {fileID: 479571641050879420}
-  iconsSet: 0
   attackStacks: 0
 --- !u!114 &479571641050879420
 MonoBehaviour:
@@ -379,7 +345,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 1
+  m_CollisionDetection: 0
   m_Constraints: 0
 --- !u!114 &752664424059945664
 MonoBehaviour:
@@ -704,5 +670,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 5529780649511139312}
   offset: {x: 0, y: 0, z: -10}
-  smallestSize: 10
-  largestSize: 30
