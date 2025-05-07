@@ -7,6 +7,9 @@ public class CameraController : MonoBehaviour
     public Vector3 offset = new Vector3(0f, 10f, -10f); // Offset from the player
     private Camera personalCamera;
 
+    [SerializeField] private float smallestSize = 10f; // Furthest distance from the player
+    [SerializeField] private float largestSize = 30;  // Closest distance to the player
+
     void Start()
     {
         personalCamera = GetComponent<Camera>();
@@ -32,6 +35,25 @@ public class CameraController : MonoBehaviour
             {
                 personalCamera.enabled = false;
                 Debug.Log("Camera disabled for non-local player.");
+            }
+        }
+    }
+
+    void Update()
+    {
+        if (target != null && target.GetComponent<NetworkBehaviour>().IsOwner)
+        {
+            float scrollInput = Input.GetAxis("Mouse ScrollWheel");
+
+            if (scrollInput != 0f)
+            {
+                // Adjust the orthographic size based on scroll input
+                personalCamera.orthographicSize -= scrollInput * 5f; // Multiply by a factor to control zoom speed
+
+                // Clamp the orthographic size to stay within the smallest and largest sizes
+                personalCamera.orthographicSize = Mathf.Clamp(personalCamera.orthographicSize, smallestSize, largestSize);
+
+                Debug.Log($"Zoom updated: orthographicSize = {personalCamera.orthographicSize}");
             }
         }
     }
