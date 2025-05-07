@@ -123,14 +123,13 @@ public class PlayerNetwork : NetworkBehaviour
             Debug.Log("Raycast hit the enemy champion!");
 
             // Stop moving when auto attacking
-            //SendMousePositionRpc(transform.position); // Send mouse position to the server
-            //RequestMoveRpc(transform.position); // Request movement on the server
             Vector3 direction = targetPositionNet.Value - transform.position;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             UpdateRotationRpc(angle); // Update rotation
             
             PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value); // Call the auto-attack function on the server
-
+            SendMousePositionRpc(transform.position); // Send mouse position to the server
+            RequestMoveRpc(transform.position); // Request movement on the server
         }
         else
         {
