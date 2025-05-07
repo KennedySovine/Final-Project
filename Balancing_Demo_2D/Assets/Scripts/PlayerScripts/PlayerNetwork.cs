@@ -58,24 +58,18 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (isDashing.Value) return; // Ignore inputs if the player is dashing
 
-        /*if (Input.GetMouseButton(1)) // Right mouse button pressed
-        {
-            SendMousePositionRpc(mousePosition); // Send mouse position to the server
-            RequestMoveRpc(mousePosition); // Request movement on the server
-            Vector3 direction = targetPositionNet.Value - transform.position;
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            UpdateRotationRpc(angle); // Update rotation
-        }*/
-
-        if (Input.GetMouseButtonDown(1)) // Right Mouse Button Pressed
+        if (Input.GetMouseButtonDown(1)) // Right mouse button pressed
         {
             if (AttackOrMove())
             {
                 Debug.Log("Attack input detected.");
                 PerformAutoAttack(); // Perform auto-attack
             }
-            else
-            {
+        }
+
+        if (Input.GetMouseButton(1)) // Right Mouse Button Pressed
+        {
+            if (!AttackOrMove()){
                 Debug.Log("Move input detected.");
                 SendMousePositionRpc(mousePosition); // Send mouse position to the server
                 RequestMoveRpc(mousePosition); // Request movement on the server
