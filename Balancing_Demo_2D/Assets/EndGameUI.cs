@@ -52,7 +52,7 @@ public class EndGameUI : MonoBehaviour
         }
     }
 
-    public void displayEndGameUI(ulong p1, ulong p2)
+    public void displayEndGameUI()
     {
         HIDEALLOTHERUI(); // Hide all other UI elements
         endGameUI.SetActive(true); // Activate the end game UI

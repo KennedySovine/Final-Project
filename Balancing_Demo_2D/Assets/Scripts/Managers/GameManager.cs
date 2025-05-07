@@ -494,10 +494,10 @@ public class GameManager : NetworkBehaviour
         Debug.Log("In-game UI initialized and activated.");
     }
 
-    [Rpc(SendTo.SpecifiedInParams)]
-    public void endGameUIRpc(ulong p1, ulong p2, RpcParams rpcParams)
+    [Rpc(SendTo.Everyone)]
+    public void endGameUIRpc()
     {
-        IGM.endGameUI.displayEndGameUI(p1, p2); // Display the end game UI
+        IGM.endGameUI.displayEndGameUI(); // Display the end game UI
         Debug.Log("End game UI initialized and activated.");
         
     }
@@ -508,8 +508,6 @@ public class GameManager : NetworkBehaviour
             yield return null; // Wait for the end game calculations to be received
         }
         IGM.endGameUI.statsToList();
-        endGameUIRpc(player1ID, player2ID, RpcTarget.Single(ServerID, RpcTargetUse.Temp)); // Call the end game UI RPC to show the end game UI
-        endGameUIRpc(player1ID, player2ID, RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Show the end game UI for player 1
-        endGameUIRpc(player1ID, player2ID, RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Show the end game UI for player 2
+        endGameUIRpc();
     }
 }
