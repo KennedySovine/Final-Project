@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode; // Required for NetworkVariable
 
 [System.Serializable]
 public class Ability
@@ -12,6 +13,7 @@ public class Ability
     public float range; // Range of the ability
     public float duration; // Duration of the ability effect (if applicable)
     public AbilityStats Stats; // Reference to the ability stats object
+
     public float timeOfCast; // Time when the ability was cast
 
     public bool isOnCooldown // Flag to check if the ability is on cooldown
@@ -32,7 +34,7 @@ public class Ability
         this.manaCost = manaCost;
         this.range = range;
         this.duration = 0f; // Default duration to 0, can be set later if needed
-        this.Stats = new AbilityStats(this); // Initialize ability stats
+        this.Stats = new AbilityStats(); // Initialize ability stats
     }
 
     public void Update()
@@ -60,8 +62,8 @@ public class Ability
         this.duration = duration;
     }
 
-    public bool checkIfAvailable(float mana){
+    public bool checkIfAvailable(float mana)
+    {
         return (cooldown == 0 || (mana >= manaCost && !isOnCooldown)); // Check if the ability is available based on mana and cooldown
     }
-    
 }

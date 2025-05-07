@@ -6,6 +6,8 @@ public class BaseChampion : NetworkBehaviour
 {
     public static GameManager GM; // Reference to the GameManager
 
+    public AbilityStatsData AbilityStatsData;
+
     public InGameUIManager IGUIM; // Reference to the InGameUIManager
     [Header("Champion Stats")]
     public string championType = "";
@@ -74,6 +76,8 @@ public class BaseChampion : NetworkBehaviour
 
     public bool iconsSet = false; // Flag to check if icons are set
 
+    private bool gameEndStuff = false;
+
     public void Start()
     {
         GM = GameManager.Instance; // Get the instance of the GameManager
@@ -134,21 +138,28 @@ public class BaseChampion : NetworkBehaviour
     
     public virtual void Update()
     {
-        if (IsServer) // Only the server should modify NetworkVariables
-        {
-            HealthandManaRegen();
+        if (!gameEndStuff && GM.gameTime.Value <= 0f){
+            gameEndStuff = true; // Set the flag to true to prevent multiple calls
+            SubmitFinalAbilityStatsServerRpc(
+                AbilityStatsData.FromAbilityStats(ability1.Stats),
+                AbilityStatsData.FromAbilityStats(ability2.Stats),
+                AbilityStatsData.FromAbilityStats(ability3.Stats),
+                AbilityStatsData.FromAbilityStats(passive.Stats)
+            );
         }
 
         if (passive != null)
         {
             passiveAbilityRpc(); // Call the passive ability logic
         }
+
         if (IsOwner){
             abilityIconCooldownManaChecks(); // Check cooldowns and mana for abilities
         }
 
         if (!IsServer) return; // Only the server should execute this logic
         //Timer for stacks
+        HealthandManaRegen();
 
         if (isEmpowered.Value){
             if (Time.time > empowerStartTime.Value + empowerDuration.Value)
@@ -168,42 +179,41 @@ public class BaseChampion : NetworkBehaviour
         stackManager(); // Call the stack manager logic
 
     }
-    
+
 
     public virtual void abilityIconCooldownManaChecks()
     {
-        // The first or statement in the set true is to check if the ability is a passive as passives dont have a cooldown
         if (IsOwner && iconsSet) // Only the owner should check cooldowns and mana
         {
-            //Debug.Log("Checking cooldowns and mana for abilities.");
-            if ((ability1.cooldown == 0) || (ability1 != null && ability1.checkIfAvailable(mana.Value)))// Check if ability 1 is not on cooldown and enough mana is available
+            // Check ability 1
+            if (ability1 != null && !ability1.isOnCooldown && mana.Value >= ability1.manaCost)
             {
-                IGUIM.buttonInteractable("Q", true);
+                IGUIM.buttonInteractable("Q", true); // Enable the button if ability 1 is available
             }
-            else if (ability1 == null || !ability1.checkIfAvailable(mana.Value))// Check if ability 1 is on cooldown or not enough mana is available
+            else
             {
                 IGUIM.buttonInteractable("Q", false); // Disable the button if ability 1 is on cooldown or not enough mana
             }
-            if ((ability2.cooldown == 0) || (ability2 != null && ability1.checkIfAvailable(mana.Value))) // Check if ability 1 is not on cooldown and enough mana is available
+
+            // Check ability 2
+            if (ability2 != null && !ability2.isOnCooldown && mana.Value >= ability2.manaCost)
             {
-                IGUIM.buttonInteractable("W", true);
+                IGUIM.buttonInteractable("W", true); // Enable the button if ability 2 is available
             }
-            else if (ability2 == null || !ability2.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            else
             {
-                IGUIM.buttonInteractable("W", false); // Disable the button if ability 1 is on cooldown or not enough mana
+                IGUIM.buttonInteractable("W", false); // Disable the button if ability 2 is on cooldown or not enough mana
             }
-            if ((ability3.cooldown == 0) || (ability3 != null && ability3.checkIfAvailable(mana.Value))) // Check if ability 1 is not on cooldown and enough mana is available
+
+            // Check ability 3
+            if (ability3 != null && !ability3.isOnCooldown && mana.Value >= ability3.manaCost)
             {
-                IGUIM.buttonInteractable("E", true);
+                IGUIM.buttonInteractable("E", true); // Enable the button if ability 3 is available
             }
-            else if (ability3 == null || !ability3.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            else
             {
-                IGUIM.buttonInteractable("E", false); // Disable the button if ability 1 is on cooldown or not enough mana
+                IGUIM.buttonInteractable("E", false); // Disable the button if ability 3 is on cooldown or not enough mana
             }
-            else{
-                return; // No ability is available for use
-            }
-            
         }
     }
 
@@ -279,33 +289,51 @@ public class BaseChampion : NetworkBehaviour
         }
     }
 
-    public Ability getAbilityUsedRpc(){
-        if (NetworkManager.Singleton.LocalClientId == GM.player1ID){
-            return GM.player1AbilityUsed; // Get the ability used for player 1
-        }
-        else if (NetworkManager.Singleton.LocalClientId == GM.player2ID)
-        {
-            return GM.player2AbilityUsed; // Get the ability used for player 2
-        }
-        else{
-            Debug.LogError("No player ID found for the current client.");
-            return null; // Return null if no player ID is found
-        }
-    }
-
     //Also will track consecutive attacks based if the dmg type is AD or AP
-    public void TakeDamage(float AD, float AP, float armorPen, float magicPen){
+    public void TakeDamage(float AD, float AP, float armorPen, float magicPen)
+    {
         if (!IsServer) return;
 
+        // Calculate and apply damage
         float damage = 0f;
- 
         damage += AD / (1 + (armor.Value - armorPen) / 100); // Calculate damage with armor penetration
-
         damage += AP / (1 + (magicResist.Value - magicPen) / 100); // Calculate damage with magic penetration
 
         updateHealthRpc(-damage); // Update health with the calculated damage
-        Debug.Log("Damage taken: " + damage + " (AD: " + AD + ", AP: " + AP + ", Armor Pen: " + armorPen + ", Magic Pen: " + magicPen + ")");
+        Debug.Log($"Damage taken: {damage} (AD: {AD}, AP: {AP}, Armor Pen: {armorPen}, Magic Pen: {magicPen})");
 
+        // Assign damage to the ability stats of the enemy
+        switch (enemyChampionId.Value)
+        {
+            case var id when id == GM.player1ID:
+                AssignAbilityDamage(passive, damage);
+                break;
+
+            case var id when id == GM.player2ID:
+                AssignAbilityDamage(passive, damage);
+                break;
+
+            default:
+                Debug.LogError($"No valid player ID found for enemyChampionId: {enemyChampionId.Value}");
+                break;
+        }
+    }
+
+    private void AssignAbilityDamage(Ability ability, float damage)
+    {
+        if (ability != null)
+        {
+            if (ability.Stats == null)
+            {
+                ability.Stats = new AbilityStats();
+            }
+            ability.Stats.damage = damage;
+            Debug.Log($"Assigned damage: {damage} to ability: {ability.name}");
+        }
+        else
+        {
+            Debug.LogError("Ability used is null.");
+        }
     }
 
     [Rpc(SendTo.Server)]
@@ -450,6 +478,7 @@ public class BaseChampion : NetworkBehaviour
             mana.Value += maxMana.Value;
         }
     }
+    
     [Rpc(SendTo.Server)]
     public void updateManaRegenRpc(float manaRegenChange)
     {
@@ -596,5 +625,40 @@ public class BaseChampion : NetworkBehaviour
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         stackCount.Value = 0; // Reset the stack count
+    }
+
+    [Rpc(SendTo.Server)]
+    public void SubmitFinalAbilityStatsServerRpc(AbilityStatsData ability1, AbilityStatsData ability2, AbilityStatsData ability3, AbilityStatsData passive)
+    {
+        if (!IsServer) return; // Ensure this is only executed on the server
+
+        var champ = GetComponent<BaseChampion>();
+
+        ability1.ApplyTo(champ.ability1.Stats);
+        ability2.ApplyTo(champ.ability2.Stats);
+        ability3.ApplyTo(champ.ability3.Stats);
+        passive.ApplyTo(champ.passive.Stats);
+
+        GM.recievedCalcs++; // Increment the count of received stats
+
+        Debug.Log($"Received stats from client {OwnerClientId}");
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void SetAbilityTimeOfCastRpc(string abilityKey, float castTime)
+    {
+        Debug.Log($"Setting time of cast for ability {abilityKey} to {castTime}");
+        if (abilityKey == "Q")
+        {
+            ability1.timeOfCast = castTime;
+        }
+        else if (abilityKey == "W")
+        {
+            ability2.timeOfCast = castTime;
+        }
+        else if (abilityKey == "E")
+        {
+            ability3.timeOfCast = castTime;
+        }
     }
 }

@@ -41,6 +41,7 @@ public class GameManager : NetworkBehaviour
     public int playerCount = 0; // Number of players connected
     public int maxPlayers = 2;
     public NetworkVariable<bool> gamePaused = new NetworkVariable<bool>(false); // Flag to pause the game time
+    [SerializeField] private float maxGameTime;
     public NetworkVariable<float> gameTime = new NetworkVariable<float>(60f); // Game time in seconds
     public float augmentBuffer = 20f; //Choose aug every 40 seconds
     public NetworkVariable<bool> augmentChoosing = new NetworkVariable<bool>(false); //If the player is choosing an augment, dont countdown the game time
@@ -49,6 +50,12 @@ public class GameManager : NetworkBehaviour
     [Header("Champion Management")]
     public GameObject championPrefab; // Prefab for spawning champions
     public Transform[] spawnPoints; // Array of spawn points for champions
+    private bool recievedEndGameCalculations {
+        get{
+            return recievedCalcs >= 2; // Check if both players have received end game calculations
+        }
+    }
+    public int recievedCalcs = 0;
 
     [Header("Managers")]
     public AugmentManager AM; // Reference to the AugmentManager
@@ -100,6 +107,7 @@ public class GameManager : NetworkBehaviour
     private void Start()
     {
         Debug.Log("Game Manager Initialized");
+        maxGameTime = gameTime.Value; // Set the maximum game time
     }
 
     private void Update()
@@ -153,7 +161,7 @@ public class GameManager : NetworkBehaviour
                     loadAugmentsRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
 
                     augmentChoosing.Value = false;
-                    augmentBuffer = 30f; // Reset the augment buffer for the next cycle
+                    augmentBuffer = 15f; // Reset the augment buffer for the next cycle
                 }
             }
             if (gameTime.Value <= 0 && !gameEnded) // Check if the game time has expired
@@ -242,6 +250,10 @@ public class GameManager : NetworkBehaviour
                 // Add any additional logic to start the game here
                 player1Controller.GetComponent<BaseChampion>().enemyChampion = player2Controller;
                 player2Controller.GetComponent<BaseChampion>().enemyChampion = player1Controller; // Set the enemy champion reference for both players
+
+                player1Controller.GetComponent<BaseChampion>().enemyChampionId.Value = player2.GetComponent<NetworkObject>().OwnerClientId; // Set the player ID for player 1
+                player2Controller.GetComponent<BaseChampion>().enemyChampionId.Value = player1.GetComponent<NetworkObject>().OwnerClientId; // Set the player ID for player 2
+
                 initializeIGUIMRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 1
                 initializeIGUIMRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 2
             }
@@ -307,12 +319,19 @@ public class GameManager : NetworkBehaviour
             }
         }
 
-        player1Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player1Aug); // Call the endGameCalculations method for player 1's champion
-        player2Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player2Aug); // Call the endGameCalculations method for player 2's champion
-        player1Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player1Aug); // Call the endGameCalculations method for player 1's champion
-        player2Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player2Aug); // Call the endGameCalculations method for player 2's champion
-        player1Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player1Aug); // Call the endGameCalculations method for player 1's champion
-        player2Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player2Aug); // Call the endGameCalculations method for player 2's champion
+        if (!IsServer) return; // Ensure this runs only on the server
+        StartCoroutine(waitForEndGameStats()); // Start the coroutine to wait for end game stats
+
+        //Call all end game calculations for the champions and abilities
+        player1Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's champion
+        player2Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's champion
+
+        player1Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's ability
+        player2Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's ability
+        player1Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's ability
+        player2Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's ability
+        player1Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's ability
+        player2Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's ability
     }
     public void applyAugments(ulong playerID)
     {
@@ -334,6 +353,8 @@ public class GameManager : NetworkBehaviour
             Debug.LogWarning($"Player ID {playerID} not found. Cannot apply augments.");
             return;
         }
+
+        targetChampion.passive.Stats.saveBetweenAugments();
 
         // Get the last augment chosen by the player
         int augmentID = (playerID == player1ID) 
@@ -411,13 +432,82 @@ public class GameManager : NetworkBehaviour
         AM.augmentUISetup(AM.augmentSelector()); // Get the list of chosen augments
     }
 
+    [Rpc(SendTo.Server)]
+    public void updatePlayerAbilityUsedRpc(ulong playerID, string abilityKey)
+    {
+        if (!IsServer) return; // Ensure this runs only on the server
+
+        BaseChampion playerChampion = null;
+
+        // Determine which player's champion to update
+        if (playerID == player1ID)
+        {
+            playerChampion = player1Controller.GetComponent<BaseChampion>();
+        }
+        else if (playerID == player2ID)
+        {
+            playerChampion = player2Controller.GetComponent<BaseChampion>();
+        }
+        else
+        {
+            Debug.LogWarning($"Invalid player ID: {playerID}.");
+            return;
+        }
+
+        // Update the ability used based on the ability key
+        switch (abilityKey)
+        {
+            case "Q":
+                if (playerID == player1ID)
+                    player1AbilityUsed = playerChampion.ability1;
+                else
+                    player2AbilityUsed = playerChampion.ability1;
+                break;
+
+            case "W":
+                if (playerID == player1ID)
+                    player1AbilityUsed = playerChampion.ability2;
+                else
+                    player2AbilityUsed = playerChampion.ability2;
+                break;
+
+            case "E":
+                if (playerID == player1ID)
+                    player1AbilityUsed = playerChampion.ability3;
+                else
+                    player2AbilityUsed = playerChampion.ability3;
+                break;
+
+            default:
+                Debug.LogWarning($"Invalid ability key: {abilityKey} for player {playerID}.");
+                return;
+        }
+
+        // Log the ability used
+        Ability abilityUsed = (playerID == player1ID) ? player1AbilityUsed : player2AbilityUsed;
+        Debug.Log($"Player {playerID} used ability: {abilityUsed.name}");
+    }
     [Rpc(SendTo.SpecifiedInParams)]
     public void initializeIGUIMRpc(RpcParams rpcParams)
     {
         IGUIM.inGameUI.SetActive(true); // Activate the in-game UI
         Debug.Log("In-game UI initialized and activated.");
     }
+
+    [Rpc(SendTo.Everyone)]
+    public void endGameUIRpc()
+    {
+        IGM.endGameUI.displayEndGameUI(); // Display the end game UI
+        Debug.Log("End game UI initialized and activated.");
+        
+    }
     
 
-
+    private IEnumerator waitForEndGameStats(){
+        while (!recievedEndGameCalculations){
+            yield return null; // Wait for the end game calculations to be received
+        }
+        IGM.endGameUI.statsToList();
+        endGameUIRpc();
+    }
 }

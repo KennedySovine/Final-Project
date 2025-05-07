@@ -143,6 +143,8 @@ public class ADRange2 : BaseChampion
 
         ability1.setDuration(6f);
 
+        passive.Stats.championType = championType; // Set the champion type for the passive ability
+
         abilityDict.Add("Q", ability1); // Add the ability to the UI manager
         abilityDict.Add("W", ability2); // Add the ability to the UI manager
         abilityDict.Add("E", ability3); // Add the ability to the UI manager
@@ -153,40 +155,39 @@ public class ADRange2 : BaseChampion
 
     public override void abilityIconCooldownManaChecks()
     {
-        // CHECK FOR PASSIVE
         if (IsOwner && iconsSet) // Only the owner should check cooldowns and mana
         {
-            //Debug.Log("Checking cooldowns and mana for abilities.");
-            if (ability1 != null && isMaxStacks && ability1.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            // Check ability 1 (Rapid Frost)
+            if (ability1 != null && isMaxStacks && ability1.checkIfAvailable(mana.Value)) // Check if ability 1 is available and max stacks are present
             {
                 IGUIM.buttonInteractable("Q", true); // Enable button for ability 1
                 IGUIM.AsheEmpowerIcon(true, ability1); // Set empowered icon for Ashe
             }
-            else if (ability1 == null || !isMaxStacks|| !ability1.checkIfAvailable(mana.Value)) // Check if ability 1 is on cooldown or not enough mana is available
+            else
             {
-                IGUIM.buttonInteractable("Q", false); // Disable the button if ability 1 is on cooldown or not enough mana
-                IGUIM.AsheEmpowerIcon(false, ability1); // Set the normal icon for Ashe
+                IGUIM.buttonInteractable("Q", false); // Disable button for ability 1
+                IGUIM.AsheEmpowerIcon(false, ability1); // Set normal icon for Ashe
             }
-            if ((ability2.cooldown == 0) || (ability2 != null && ability2.checkIfAvailable(mana.Value))) // Check if ability 1 is not on cooldown and enough mana is available
+
+            // Check ability 2 (Ranger's Focus)
+            if (ability2 != null && ability2.checkIfAvailable(mana.Value)) // Check if ability 2 is available
             {
-                IGUIM.buttonInteractable("W", true);
+                IGUIM.buttonInteractable("W", true); // Enable button for ability 2
             }
-            else if (ability2 == null || !ability2.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            else
             {
-                IGUIM.buttonInteractable("W", false); // Disable the button if ability 1 is on cooldown or not enough mana
+                IGUIM.buttonInteractable("W", false); // Disable button for ability 2
             }
-            if ((ability3.cooldown == 0) || (ability3 != null && ability3.checkIfAvailable(mana.Value))) // Check if ability 1 is not on cooldown and enough mana is available
+
+            // Check ability 3 (Volley)
+            if (ability3 != null && ability3.checkIfAvailable(mana.Value)) // Check if ability 3 is available
             {
-                IGUIM.buttonInteractable("E", true);
+                IGUIM.buttonInteractable("E", true); // Enable button for ability 3
             }
-            else if (ability3 == null || !ability3.checkIfAvailable(mana.Value)) // Check if ability 1 is not on cooldown and enough mana is available
+            else
             {
-                IGUIM.buttonInteractable("E", false); // Disable the button if ability 1 is on cooldown or not enough mana
+                IGUIM.buttonInteractable("E", false); // Disable button for ability 3
             }
-            else{
-                return; // No ability is available for use
-            }
-            
         }
     }
 
@@ -218,14 +219,14 @@ public class ADRange2 : BaseChampion
         // Check for stacks of focus and if they are present, consume them
         // Check for mana
 
-        if (!IsServer) return; // Ensure this is only executed on the server
         if (mana.Value < ability1.manaCost && !isMaxStacks && ability1.isOnCooldown) return; // Check if enough mana and stacks are present
-        
-        updateRapidFireRpc(5);
         ability1.timeOfCast = Time.time; // Set the time of cast for cooldown tracking
+        if (!IsServer) return; // Ensure this is only executed on the server
+        updateRapidFireRpc(5);
         StartCoroutine(RapidFireCoroutine(ability1.duration)); // Start the rapid fire coroutine
 
         updateManaRpc(-ability1.manaCost); // Deduct the mana cost
+        ability1.Stats.totalManaSpent += ability1.manaCost; // Update the total mana spent for the ability
 
         resetStackCountRpc(); // Reset the stack count
     }
@@ -242,7 +243,6 @@ public class ADRange2 : BaseChampion
     public override void UseAbility3Rpc(){
         // Check mana and cooldown
         // Crit frost and deal 20 + 100% AD damage
-        if (!IsServer) return; // Ensure this is only executed on the server
         if (ability3.isOnCooldown)
         {
             Debug.Log("Ability is on cooldown!");
@@ -253,8 +253,10 @@ public class ADRange2 : BaseChampion
             Debug.Log("Not enough mana!");
             return;
         }
+        if (!IsServer) return; // Ensure this is only executed on the server
         updateAbility3UsedRpc(true); // Update the ability range
         updateManaRpc(-ability3.manaCost); // Deduct mana cost
+        ability3.Stats.totalManaSpent += ability3.manaCost; // Update the total mana spent for the ability
     }
 
     private IEnumerator RapidFireCoroutine(float duration)
@@ -263,7 +265,7 @@ public class ADRange2 : BaseChampion
         var tempAD = AD.Value; // Store the original AD
         Debug.Log("Rapid Fire started!");
         updateAttackSpeedRpc(0.25f); // Increase attack speed by 25
-        updateADRpc(21f); // Increase AD by 21
+        updateADRpc(.21f); // Increase AD by 21
         yield return new WaitForSeconds(duration); // Wait for the specified duration
         Debug.Log("Rapid Fire ended!");
 

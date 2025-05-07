@@ -26,7 +26,7 @@ public class ADRange : BaseChampion
         attackSpeed.Value = 0.685f;
         movementSpeed.Value = 11f; // Look at Base Champ for calculation
         maxMana.Value = 232f;
-        manaRegen.Value = 8f;
+        manaRegen.Value = 1.4f;
         abilityHaste.Value = 0f;
         critChance.Value = 0f;
         critDamage.Value = 1.75f; // 175% damage on crit
@@ -64,7 +64,7 @@ public class ADRange : BaseChampion
 
         ability2 = new Ability(
             "Silver Bolts",
-            "Basic attacks apply a stack and at 3 stacks, deal bonus true damage based on <i>6% of the target's max health<i>. Deals minimum <i>50<i> bonus damage.",
+            "Basic attacks apply a stack and at 3 stacks, deal bonus true damage based on <i>6% of the target's max health</i>. Deals minimum <i>50</i> bonus damage.",
             0f, // Cooldown in seconds
             0f, // Mana cost
             0f   // No range
@@ -74,7 +74,7 @@ public class ADRange : BaseChampion
 
         ability3 = new Ability(
             "Condemn",
-            "Fire an extra heavy bolt that deals extra physical damage <i>(50 + 50% AD)<i>.",
+            "Fire an extra heavy bolt that deals extra physical damage <i>(50 + 50% AD)</i>.",
             20f, // Cooldown in seconds
             90f, // Mana cost
             5f   // Range
@@ -84,13 +84,15 @@ public class ADRange : BaseChampion
 
         ability3.setDuration(8f);
 
+        passive.Stats.championType = championType; // Set the champion type for the passive ability
+
         abilityDict.Add("Q", ability1); // Add the ability to the UI manager
         abilityDict.Add("W", ability2); // Add the ability to the UI manager
         abilityDict.Add("E", ability3); // Add the ability to the UI manager
 
         SendToUI();
     }
-
+    
     public override GameObject empowerLogic(GameObject bullet)
     {
         var bulletComponent = bullet.GetComponent<Bullet>();
@@ -176,7 +178,7 @@ public class ADRange : BaseChampion
     public override void UseAbility1Rpc()
     {
         if (!IsServer) return; // Only the server can execute this logic
-    
+        
         if (ability1.isOnCooldown)
         {
             Debug.Log("Ability is on cooldown!");
@@ -188,21 +190,19 @@ public class ADRange : BaseChampion
             return;
         }
 
-        float newMoveSpeed = movementSpeed.Value + 17f; // Increase movement speed by 1 unit
+        // Record the time of cast and synchronize it with clients
+        float castTime = Time.time;
+        SetAbilityTimeOfCastRpc("Q", castTime);
 
-        // Set the cooldown timer for the ability
-        ability1.timeOfCast = Time.time; // Record the time when the ability was used
+        float newMoveSpeed = movementSpeed.Value + 17f; // Increase movement speed by 1 unit
         updateManaRpc(-ability1.manaCost); // Deduct mana cost
         ability1.Stats.totalManaSpent += ability1.manaCost; // Update total mana spent for the ability
-        logAbilityUsedRpc(ability1); // Log the ability used
         Debug.Log("Tumble ability used. Player dashed towards the target position.");
-    
+
         // Empower the next attack
         updateIsEmpoweredRpc(true); // Set the empowered state to true
 
         PN.ChampionDashRpc(PN.mousePosition, ability1.range, newMoveSpeed); // Call the dash function on the player network object
-
-        // Put messages up on screen if the ability is on cooldown or not enough mana??? Maybe
     }
 
     [Rpc(SendTo.Server)]
@@ -237,6 +237,14 @@ public class ADRange : BaseChampion
             Debug.Log("Not enough mana!");
             return;
         }
+        else if (ability3Used.Value)
+        {
+            Debug.Log("Ability 3 has already been used!");
+            return;
+        }
+
+        SetAbilityTimeOfCastRpc("E", Time.time); // Record the time of cast and synchronize it with clients
+
         updateManaRpc(-ability3.manaCost); // Update the mana on the server
         ability3.Stats.totalManaSpent += ability3.manaCost; // Update the total mana spent for the ability
         logAbilityUsedRpc(ability3); // Log the ability used
