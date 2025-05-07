@@ -22,7 +22,7 @@ public class CameraController : MonoBehaviour
                 Debug.Log($"Camera enabled for local player: {personalCamera.name}");
 
                 // Make the camera face toward Y = 0
-                FaceTowardsYZero();
+                //FaceTowardsYZero();
             }
             else
             {

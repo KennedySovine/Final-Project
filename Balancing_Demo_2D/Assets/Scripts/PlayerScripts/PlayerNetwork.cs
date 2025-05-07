@@ -4,21 +4,24 @@ using Unity.Netcode;
 
 public class PlayerNetwork : NetworkBehaviour
 {
-    public Vector2 mousePosition; // Mouse position in world space
+    public Vector2 mousePosition;
     public float dashSpeed;
 
-    public NetworkVariable<Vector3> targetPositionNet = new NetworkVariable<Vector3>(); // Network variable for target position
-    public NetworkVariable<bool> isDashing = new NetworkVariable<bool>(false); // Network variable for dash state
+    public NetworkVariable<Vector3> targetPositionNet = new NetworkVariable<Vector3>();
+    public NetworkVariable<bool> isDashing = new NetworkVariable<bool>(false);
 
     public Camera personalCamera;
 
-    public BaseChampion champion; // Reference to the champion script
-    private GameManager GM; // Reference to the GameManager
-    
+    public BaseChampion champion;
+    private GameManager GM;
+    private Rigidbody2D rb;
 
     void Start()
     {
-        GM = GameManager.Instance; // Get the GameManager instance
+        GM = GameManager.Instance;
+        rb = champion.GetComponent<Rigidbody2D>();
+        if (rb == null) Debug.LogError("No Rigidbody2D found on champion!");
+
         if (IsOwner)
         {
             Debug.Log("Local player spawned.");
@@ -32,87 +35,94 @@ public class PlayerNetwork : NetworkBehaviour
                 Debug.LogError("No camera found on the player's prefab!");
             }
 
-            // Initialize mousePosition and targetPositionNet
             mousePosition = transform.position;
             dashSpeed = champion.movementSpeed.Value;
-            //Set velocity 0
-            champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+            rb.velocity = Vector2.zero;
         }
     }
 
     void Update()
     {
-        if (!IsOwner || GM.gamePaused.Value) return; // Only the owner can control the player and only if the game is not paused
+        if (!IsOwner || GM.gamePaused.Value) return;
 
-        // Constantly update mouse position
         mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition);
-        checkInputs(); // Check for player inputs
+        checkInputs();
+    }
 
-        if (!isDashing.Value)
+    void FixedUpdate()
+    {
+        if (!IsOwner || GM.gamePaused.Value || isDashing.Value) return;
+
+        Vector2 target = targetPositionNet.Value;
+        Vector2 current = rb.position;
+        float speed = champion.movementSpeed.Value;
+
+        if (Vector2.Distance(current, target) > 0.05f)
         {
-            MovePlayer(); // Move the player if not dashing
+            Vector2 newPosition = Vector2.MoveTowards(current, target, speed * Time.fixedDeltaTime);
+            rb.MovePosition(newPosition);
+        }
+        else
+        {
+            rb.velocity = Vector2.zero;
         }
     }
 
     private void checkInputs()
     {
-        if (isDashing.Value) return; // Ignore inputs if the player is dashing
+        if (isDashing.Value) return;
 
-        if (Input.GetMouseButtonDown(1)) // Right mouse button pressed
+        if (Input.GetMouseButtonDown(1))
         {
             if (AttackOrMove())
             {
                 Debug.Log("Attack input detected.");
-                PerformAutoAttack(); // Perform auto-attack
+                PerformAutoAttack();
             }
         }
 
-        if (Input.GetMouseButton(1)) // Right Mouse Button Pressed
+        if (Input.GetMouseButton(1))
         {
             if (!AttackOrMove()){
                 Debug.Log("Move input detected.");
-                SendMousePositionRpc(mousePosition); // Send mouse position to the server
-                RequestMoveRpc(mousePosition); // Request movement on the server
+                SendMousePositionRpc(mousePosition);
+                RequestMoveRpc(mousePosition);
                 Vector3 direction = targetPositionNet.Value - transform.position;
                 float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                UpdateRotationRpc(angle); // Update rotation
+                UpdateRotationRpc(angle);
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Q)) // Q key pressed
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             Debug.Log("Ability 1 key pressed.");
-            GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "Q"); // Update ability 1 used state
+            GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "Q");
             champion.UseAbility1Rpc();
         }
 
-        if (Input.GetKeyDown(KeyCode.W)) // W key pressed
+        if (Input.GetKeyDown(KeyCode.W))
         {
             Debug.Log("Ability 2 key pressed.");
-            GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "W"); // Update ability 2 used state
+            GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "W");
             champion.UseAbility2Rpc();
         }
 
-        if (Input.GetKeyDown(KeyCode.E)) // E key pressed
+        if (Input.GetKeyDown(KeyCode.E))
         {
             Debug.Log("Ability 3 key pressed.");
-            GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "E"); // Update ability 3 used state
+            GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "E");
             champion.UseAbility3Rpc();
         }
     }
 
-    public bool AttackOrMove(){
+    public bool AttackOrMove()
+    {
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
         if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && (hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId))
         {
-            // Attack
-            return true; // Attack
+            return true;
         }
-        else
-        {
-            // Move
-            return false; // Move
-        }
+        return false;
     }
 
     public void PerformAutoAttack()
@@ -121,15 +131,13 @@ public class PlayerNetwork : NetworkBehaviour
         if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && (hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId))
         {
             Debug.Log("Raycast hit the enemy champion!");
-
-            // Stop moving when auto attacking
             Vector3 direction = targetPositionNet.Value - transform.position;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            UpdateRotationRpc(angle); // Update rotation
-            
-            PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value); // Call the auto-attack function on the server
-            SendMousePositionRpc(transform.position); // Send mouse position to the server
-            RequestMoveRpc(transform.position); // Request movement on the server
+            UpdateRotationRpc(angle);
+
+            PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value);
+            SendMousePositionRpc(transform.position);
+            RequestMoveRpc(transform.position);
         }
         else
         {
@@ -137,34 +145,18 @@ public class PlayerNetwork : NetworkBehaviour
         }
     }
 
-    private void MovePlayer()
-    {
-        float speed = champion.movementSpeed.Value;
-        if (Vector2.Distance(transform.position, targetPositionNet.Value) > 0.1f)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * speed);
-        }
-        else
-        {
-            champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
-        }
-    }
-
     [Rpc(SendTo.Server)]
     public void SendMousePositionRpc(Vector2 mousePos)
     {
         if (!IsServer) return;
-
-        // Update the server's copy of the mouse position
         mousePosition = mousePos;
-        //Debug.Log($"Mouse position received on server: {mousePosition}");
     }
 
     [Rpc(SendTo.Server)]
     public void RequestMoveRpc(Vector2 targetPosition)
     {
         if (!IsServer) return;
-        targetPositionNet.Value = targetPosition; // Update the target position on the server
+        targetPositionNet.Value = targetPosition;
     }
 
     [Rpc(SendTo.Everyone)]
@@ -176,14 +168,15 @@ public class PlayerNetwork : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     public void ChampionDashRpc(Vector2 mousePos, float maxRange, float speed)
     {
-        Vector2 dashDirection = (mousePos - (Vector2)transform.position).normalized;
-        float distance = Vector2.Distance(transform.position, mousePos);
+        Vector2 dashDirection = (mousePos - rb.position).normalized;
+        float distance = Vector2.Distance(rb.position, mousePos);
         distance = Mathf.Min(distance, maxRange);
 
-        Vector2 targetPosition = (Vector2)transform.position + dashDirection * distance;
+        Vector2 targetPosition = rb.position + dashDirection * distance;
         targetPositionNet.Value = targetPosition;
         dashSpeed = speed;
-        if (IsServer){
+        if (IsServer)
+        {
             isDashing.Value = true;
         }
 
@@ -192,17 +185,18 @@ public class PlayerNetwork : NetworkBehaviour
 
     private IEnumerator DashToTarget(Vector2 targetPosition)
     {
-        while (Vector2.Distance(transform.position, targetPositionNet.Value) > 0.1f)
+        while (Vector2.Distance(rb.position, targetPositionNet.Value) > 0.05f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * dashSpeed);
+            Vector2 newPosition = Vector2.MoveTowards(rb.position, targetPositionNet.Value, Time.deltaTime * dashSpeed);
+            rb.MovePosition(newPosition);
             yield return null;
         }
 
-        transform.position = targetPositionNet.Value; // Snap to the target position
-        isDashing.Value = false; // Reset the dash state
+        rb.MovePosition(targetPositionNet.Value);
+        isDashing.Value = false;
         Debug.Log("Dash completed.");
     }
-
+    
     [Rpc(SendTo.Server)]
     public void PerformAutoAttackRpc(Vector3 targetPosition, ulong targetNetworkObjectId, int rapidFire)
     {
