@@ -41,8 +41,6 @@ public class ADRange2 : BaseChampion
         abilityHaste.Value = 0f; 
         critChance.Value = 0f;
         critDamage.Value = 1f; // 175% damage on crit
-
-        autoAttack.setRange(20f); // Set the range of the auto attack ability
         health.Value = maxHealth.Value; // Initialize health to max health
         mana.Value = maxMana.Value; // Initialize mana to max mana
 
@@ -138,6 +136,8 @@ public class ADRange2 : BaseChampion
             75f, // Mana cost
             0f // Range
         );
+
+        autoAttack.setRange(20f); // Set the range of the auto attack ability
 
         ability3.icon = Resources.Load<Sprite>("Sprites/Ashe_Volley"); // Load the icon for the ability from Resources folder
 

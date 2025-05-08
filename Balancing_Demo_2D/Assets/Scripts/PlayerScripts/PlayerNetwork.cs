@@ -150,16 +150,13 @@ public class PlayerNetwork : NetworkBehaviour
     private IEnumerator MoveAndAttackCoroutine(GameObject enemyChampion)
     {
         cancelCurrentAction = false; // Reset the cancel flag
-        Vector3 direction = targetPositionNet.Value - transform.position;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        UpdateRotationRpc(angle); // Update rotation
 
         while (!cancelCurrentAction)
         {
             enemyPosition = enemyChampion.transform.position; // Update the enemy position
             float distance = Vector2.Distance(transform.position, enemyPosition); // Calculate distance to the enemy champion
-            Vector3 direction = enemyPosition - transform.position;
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            Vector3 direc = enemyPosition - transform.position;
+            float angle = Mathf.Atan2(direc.y, direc.x) * Mathf.Rad2Deg;
             UpdateRotationRpc(angle); // Update rotation
             
             if (distance <= champion.autoAttack.range)
@@ -169,8 +166,8 @@ public class PlayerNetwork : NetworkBehaviour
                 SendMousePositionRpc(transform.position);
                 RequestMoveRpc(transform.position);
 
-                Vector3 direction = targetPositionNet.Value - transform.position;
-                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                direc = targetPositionNet.Value - transform.position;
+                angle = Mathf.Atan2(direc.y, direc.x) * Mathf.Rad2Deg;
                 UpdateRotationRpc(angle); // Update rotation
 
                 // Perform the auto-attack
