@@ -22,6 +22,9 @@ public class PlayerNetwork : NetworkBehaviour
     private Vector3 clickPosition; // Click position in world space || Used specifically for moving the player into range of the enemy 
 
     private bool cancelCurrentAction = false; // Flag to cancel the current action
+    public NetworkVariable<Vector3> enemyPosition = new NetworkVariable<Vector3>(); // Network variable for enemy position
+
+    private GameObject enemyChampion; // Reference to the enemy champion
 
     void Start()
     {
@@ -49,6 +52,9 @@ public class PlayerNetwork : NetworkBehaviour
 
     void Update()
     {
+        if (IsServer && enemyChampion != null && enemyChampion.GetComponent<NetworkObject>() != null){
+            updateEnemyPosition(enemyChampion.transform.Find("PlayerController").position); // Update enemy position)
+        }
         if (!IsOwner || GM.gamePaused.Value) return; // Only the owner can control the player and only if the game is not paused
 
         // Constantly update mouse position
@@ -62,6 +68,12 @@ public class PlayerNetwork : NetworkBehaviour
 
         //TODO: Check if colliding with terrain and if so stop moving
 
+    }
+
+    private void updateEnemyPosition(Vector3 enemyPos)
+    {
+        if (!IsServer) return; // Only the server can update the enemy position
+        enemyPosition.Value = enemyChampion.transform.Find("PlayerController").position; // Update enemy position
     }
 
     private void checkInputs()
@@ -79,11 +91,11 @@ public class PlayerNetwork : NetworkBehaviour
             }
         }
 
-        if (Input.GetMouseButton(1)) // Right Mouse Button Pressed
+        if (Input.GetMouseButton(1)) // Right Mouse Button Pressed and Stay down
         {
             cancelCurrentAction = true;
             if (!AttackOrMove()){
-                Debug.Log("Move input detected.");
+                //Debug.Log("Move input detected.");
                 SendMousePositionRpc(mousePosition); // Send mouse position to the server
                 clickPosition = mousePosition; // Store the click position
                 RequestMoveRpc(mousePosition); // Request movement on the server
@@ -129,12 +141,10 @@ public class PlayerNetwork : NetworkBehaviour
 
     public void PerformAutoAttack()
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, (mousePosition - (Vector2)transform.position).normalized);
-
-        if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null &&
-            hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId)
+        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+        if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId)
         {
-            GameObject enemyChampion = hit.collider.GetComponentInParent<NetworkObject>().gameObject; // Get the enemy champion
+            enemyChampion = hit.collider.GetComponentInParent<NetworkObject>().gameObject; // Get the enemy champion
             Debug.Log("Raycast hit the enemy champion!");
 
             // Start the coroutine to handle movement and attack
@@ -152,7 +162,7 @@ public class PlayerNetwork : NetworkBehaviour
 
         while (!cancelCurrentAction)
         {
-            float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
+            float distance = Vector2.Distance(transform.position, enemyPosition.Value); // Calculate distance to the enemy champion
 
             if (distance <= champion.autoAttack.range)
             {
@@ -168,7 +178,7 @@ public class PlayerNetwork : NetworkBehaviour
 
             // Move toward the enemy
             Debug.Log("Moving toward the enemy champion.");
-            RequestMoveRpc(enemyChampion.transform.position);
+            RequestMoveRpc(enemyPosition.Value); // Request movement to the enemy position
 
             yield return null; // Wait for the next frame
         }
