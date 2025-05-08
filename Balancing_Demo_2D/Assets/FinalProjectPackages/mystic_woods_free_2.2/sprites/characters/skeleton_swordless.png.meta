@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      skeleton_swordless_0: 7216552541025846149
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
