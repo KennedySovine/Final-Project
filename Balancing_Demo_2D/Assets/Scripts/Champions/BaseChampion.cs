@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class BaseChampion : NetworkBehaviour
 {
+    #region Variables
     public static GameManager GM; // Reference to the GameManager
 
     public AbilityStatsData AbilityStatsData;
@@ -77,7 +78,9 @@ public class BaseChampion : NetworkBehaviour
     public bool iconsSet = false; // Flag to check if icons are set
 
     private bool gameEndStuff = false;
+    #endregion
 
+    #region Initialization
     public void Start()
     {
         GM = GameManager.Instance; // Get the instance of the GameManager
@@ -120,7 +123,9 @@ public class BaseChampion : NetworkBehaviour
             };
         }
     }
+    #endregion
 
+    #region RPC Methods
     [Rpc(SendTo.Server)]
     public virtual void passiveAbilityRpc(){ Debug.Log("No passive ability assigned");}
     [Rpc(SendTo.Server)]
@@ -135,7 +140,9 @@ public class BaseChampion : NetworkBehaviour
     public virtual GameObject ability3Logic(GameObject bullet){ Debug.Log("No stack logic assigned"); return bullet;}
 
     public virtual void stackManager(){ Debug.Log("No stack manager assigned");}
-    
+    #endregion
+
+    #region Update Logic
     public virtual void Update()
     {
         if (!gameEndStuff && GM.gameTime.Value <= 0f){
@@ -179,8 +186,9 @@ public class BaseChampion : NetworkBehaviour
         stackManager(); // Call the stack manager logic
 
     }
+    #endregion
 
-
+    #region UI Management
     public virtual void abilityIconCooldownManaChecks()
     {
         if (IsOwner && iconsSet) // Only the owner should check cooldowns and mana
@@ -234,7 +242,9 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
+    #endregion
 
+    #region Health and Mana Management
     private void HealthandManaRegen()
     {
         // Health and mana regen logic
@@ -255,7 +265,9 @@ public class BaseChampion : NetworkBehaviour
             }
         }
     }
+    #endregion
 
+    #region Enemy Management
     public void getEnemyChampion(ulong enemyId)
     {
         enemyChampion = NetworkManager.Singleton.SpawnManager.SpawnedObjects[enemyId].gameObject; // Get the enemy champion object
@@ -335,7 +347,9 @@ public class BaseChampion : NetworkBehaviour
             Debug.LogError("Ability used is null.");
         }
     }
+    #endregion
 
+    #region Slow Management
     [Rpc(SendTo.Server)]
     public void applySlowRpc(float slowAmount, float duration)
     {
@@ -351,7 +365,9 @@ public class BaseChampion : NetworkBehaviour
         slowDuration.Value = duration; // Set the slow duration
         slowStartTime.Value = Time.time; // Set the start time for the slow effect
     }
+    #endregion
 
+    #region Stat Updates
     [Rpc(SendTo.Server)]
     public void updateMaxHealthRpc(float healthChange)
     {
@@ -626,7 +642,9 @@ public class BaseChampion : NetworkBehaviour
         if (!IsServer) return; // Ensure this is only executed on the server
         stackCount.Value = 0; // Reset the stack count
     }
+    #endregion
 
+    #region Final Ability Stats
     [Rpc(SendTo.Server)]
     public void SubmitFinalAbilityStatsServerRpc(AbilityStatsData ability1, AbilityStatsData ability2, AbilityStatsData ability3, AbilityStatsData passive)
     {
@@ -661,4 +679,5 @@ public class BaseChampion : NetworkBehaviour
             ability3.timeOfCast = castTime;
         }
     }
+    #endregion
 }
