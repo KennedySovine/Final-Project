@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 1182713526884703607}
   - component: {fileID: 752664424059945664}
   - component: {fileID: 1340520847739071468}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: PlayerController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32,7 +32,7 @@ Transform:
   m_GameObject: {fileID: 3316088473501965052}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -106,6 +106,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  AbilityStatsData:
+    damageOverTime: 0
+    damage: 0
+    costToDamage: 0
+    totalManaSpent: 0
+    damageTotal: 0
+    gameTime: 0
+  IGUIM: {fileID: 0}
   championType: 
   maxHealth:
     m_InternalValue: 600
@@ -170,6 +178,8 @@ MonoBehaviour:
   mana:
     m_InternalValue: 300
   autoAttack:
+    icon: {fileID: 0}
+    icon2: {fileID: 0}
     name: Auto Attack
     description: Basic attack
     cooldown: 0
@@ -182,9 +192,14 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
+      damageTotal: 0
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   passive:
+    icon: {fileID: 0}
+    icon2: {fileID: 0}
     name: 
     description: 
     cooldown: 0
@@ -197,9 +212,14 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
+      damageTotal: 0
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   ability1:
+    icon: {fileID: 0}
+    icon2: {fileID: 0}
     name: 
     description: 
     cooldown: 0
@@ -212,9 +232,14 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
+      damageTotal: 0
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   ability2:
+    icon: {fileID: 0}
+    icon2: {fileID: 0}
     name: 
     description: 
     cooldown: 0
@@ -227,9 +252,14 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
+      damageTotal: 0
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   ability3:
+    icon: {fileID: 0}
+    icon2: {fileID: 0}
     name: 
     description: 
     cooldown: 0
@@ -242,7 +272,10 @@ MonoBehaviour:
       damage: 0
       costToDamage: 0
       totalManaSpent: 0
+      championType: 
+      damageTotal: 0
       gameTime: 0
+      chosenAugments: []
     timeOfCast: 0
   lastAutoAttackTime:
     m_InternalValue: 0
@@ -252,6 +285,7 @@ MonoBehaviour:
     m_InternalValue: 0
   bulletPrefab: {fileID: 2169341123581716514, guid: 66c025e1f784eb2478380fa1d8dd1de2, type: 3}
   PN: {fileID: 479571641050879420}
+  iconsSet: 0
   attackStacks: 0
 --- !u!114 &479571641050879420
 MonoBehaviour:
@@ -332,7 +366,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 1
-  m_Mass: 1
+  m_Mass: 4
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 0
@@ -342,10 +376,10 @@ Rigidbody2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!114 &752664424059945664
 MonoBehaviour:
@@ -380,7 +414,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -394,7 +428,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -421,8 +455,7 @@ GameObject:
   - component: {fileID: 1330155807776156165}
   - component: {fileID: 1115304479915891273}
   - component: {fileID: 7235667429038699871}
-  - component: {fileID: 8743134429531742974}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: ADRange2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -438,7 +471,7 @@ Transform:
   m_GameObject: {fileID: 4431904003385403123}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -517,52 +550,6 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!61 &8743134429531742974
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4431904003385403123}
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
 --- !u!1 &6166729283015894883
 GameObject:
   m_ObjectHideFlags: 0
@@ -575,7 +562,7 @@ GameObject:
   - component: {fileID: 4986339328056519817}
   - component: {fileID: 4939262339259533465}
   - component: {fileID: 9052366349326837282}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -670,3 +657,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 5529780649511139312}
   offset: {x: 0, y: 0, z: -10}
+  smallestSize: 10
+  largestSize: 30

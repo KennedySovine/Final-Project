@@ -46,9 +46,8 @@ public class Bullet : NetworkBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        //TODO: Check if collides with terrain and if so destroy
         if (!IsServer) return;
-
-        //owner = owner.transform.Find("PlayerController")?.gameObject;
 
         // Check if the bullet hit the target player
         if (collision.gameObject == targetPlayer)
@@ -81,6 +80,13 @@ public class Bullet : NetworkBehaviour
                 GetComponent<NetworkObject>().Despawn();
                 Debug.Log("Bullet despawned on the server.");
             }
+        }
+        else if (collision.gameObject.CompareTag("Terrain"))
+        {
+            // Bullet hit the terrain, destroy it
+            Debug.Log("Bullet hit the terrain: " + collision.gameObject.name);
+            GetComponent<NetworkObject>().Despawn();
+            Debug.Log("Bullet despawned on the server.");
         }
     }
 }
