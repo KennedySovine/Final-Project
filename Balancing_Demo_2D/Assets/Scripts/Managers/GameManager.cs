@@ -288,9 +288,13 @@ public class GameManager : NetworkBehaviour
             SpawnChampionForPlayer(player.Value, player.Key);
         }
 
-        if (player1 != null && player2 != null)
+        if (player1 != null && player2 != null) // If both players are spawned in
         {
-            FinalizeBothPlayersSpawned();
+            playersSpawned.Value = true;
+            Debug.Log("Both players have been spawned. Starting the game.");
+        
+            SetupPlayerReferences();
+            InitializeUIForPlayers();
         }
     }
 
@@ -302,46 +306,27 @@ public class GameManager : NetworkBehaviour
         switch (playerIDsSpawned.Count)
         {
             case 0:
-                SpawnPlayer1(playerClass, playerId);
+                player1 = Instantiate(playerClass, spawnPoints[0].position, Quaternion.identity);
+                FindPlayerControllers(player1, ref player1Controller);
+                player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
+                playerIDsSpawned.Add(playerId);
+                player1ID = playerId;
+                player1Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[0].position;
+                Debug.Log($"Spawned champion for Player 1 (Client {playerId}).");
                 break;
             case 1:
-                SpawnPlayer2(playerClass, playerId);
+                player2 = Instantiate(playerClass, spawnPoints[1].position, Quaternion.identity);
+                FindPlayerControllers(player2, ref player2Controller);
+                player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
+                playerIDsSpawned.Add(playerId);
+                player2ID = playerId;
+                player2Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[1].position;
+                Debug.Log($"Spawned champion for Player 2 (Client {playerId}).");
                 break;
             default:
                 Debug.LogWarning("No available spawn points for additional players.");
                 break;
         }
-    }
-
-    private void SpawnPlayer1(GameObject playerClass, ulong playerId)
-    {
-        player1 = Instantiate(playerClass, spawnPoints[0].position, Quaternion.identity);
-        FindPlayerControllers(player1, ref player1Controller);
-        player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
-        playerIDsSpawned.Add(playerId);
-        player1ID = playerId;
-        player1Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[0].position;
-        Debug.Log($"Spawned champion for Player 1 (Client {playerId}).");
-    }
-
-    private void SpawnPlayer2(GameObject playerClass, ulong playerId)
-    {
-        player2 = Instantiate(playerClass, spawnPoints[1].position, Quaternion.identity);
-        FindPlayerControllers(player2, ref player2Controller);
-        player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
-        playerIDsSpawned.Add(playerId);
-        player2ID = playerId;
-        player2Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[1].position;
-        Debug.Log($"Spawned champion for Player 2 (Client {playerId}).");
-    }
-
-    private void FinalizeBothPlayersSpawned()
-    {
-        playersSpawned.Value = true;
-        Debug.Log("Both players have been spawned. Starting the game.");
-        
-        SetupPlayerReferences();
-        InitializeUIForPlayers();
     }
 
     private void SetupPlayerReferences()
