@@ -3,7 +3,7 @@ using Unity.Netcode;
 
 public class ADRange : BaseChampion
 {
-
+    #region Initialization Methods
     void Start()
     {
         base.Start();
@@ -37,13 +37,8 @@ public class ADRange : BaseChampion
         maxStacks.Value = 3; // Maximum number of stacks for the ability
     }
 
-    public override void Update(){
-        base.Update(); // Call the base class Update method
-    }
-
     private void AddAbilities()
     {
-
         autoAttack.setRange(18f); // Set the range of the auto attack ability
         
         passive = new Ability(
@@ -61,7 +56,6 @@ public class ADRange : BaseChampion
             30f, // Mana cost
             10f  // Range
         );
-
         ability1.icon = Resources.Load<Sprite>("Sprites/Vayne_Tumble"); // Load the icon for the ability from Resources folder
 
         ability2 = new Ability(
@@ -69,9 +63,8 @@ public class ADRange : BaseChampion
             "Basic attacks apply a stack and at 3 stacks, deal bonus true damage based on <i>6% of the target's max health</i>. Deals minimum <i>50</i> bonus damage.",
             0f, // Cooldown in seconds
             0f, // Mana cost
-            0f   // No range
+            0f  // No range
         );
-
         ability2.icon = Resources.Load<Sprite>("Sprites/Vayne_Silver_Bolts"); // Load the icon for the ability from Resources folder
 
         ability3 = new Ability(
@@ -81,9 +74,7 @@ public class ADRange : BaseChampion
             90f, // Mana cost
             5f   // Range
         );
-
         ability3.icon = Resources.Load<Sprite>("Sprites/Vayne_Condemn"); // Load the icon for the ability from Resources folder
-
         ability3.setDuration(8f);
 
         passive.Stats.championType = championType; // Set the champion type for the passive ability
@@ -94,7 +85,24 @@ public class ADRange : BaseChampion
 
         SendToUI();
     }
-    
+    #endregion
+
+    #region Core Game Loop Methods
+    public override void Update(){
+        base.Update(); // Call the base class Update method
+    }
+
+    public override void stackManager(){
+        if (stackCount.Value > 0){
+            if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
+            {
+                resetStackCountRpc(); // Reset the stack count
+            }
+        }
+    }
+    #endregion
+
+    #region Ability Logic Methods
     public override GameObject empowerLogic(GameObject bullet)
     {
         var bulletComponent = bullet.GetComponent<Bullet>();
@@ -107,15 +115,6 @@ public class ADRange : BaseChampion
             Debug.LogError("Bullet component is missing on the bullet prefab.");
         }
         return bullet;
-    }
-
-    public override void stackManager(){
-        if (stackCount.Value > 0){
-            if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
-            {
-                resetStackCountRpc(); // Reset the stack count
-            }
-        }
     }
 
     public override GameObject stackLogic(GameObject bullet)
@@ -146,7 +145,9 @@ public class ADRange : BaseChampion
         }
         return bullet;
     }
+    #endregion
 
+    #region RPC Methods
     [Rpc(SendTo.Server)]
     public override void passiveAbilityRpc(){
         if (!IsServer) return; // Only the owner can use this ability
@@ -254,4 +255,5 @@ public class ADRange : BaseChampion
         // Modify the bullet prefab to deal extra physical damage
         // Add a knockback effect to the target if they are hit by the bolt
     }
+    #endregion
 }
