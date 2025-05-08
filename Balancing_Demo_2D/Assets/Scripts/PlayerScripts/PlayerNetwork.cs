@@ -80,6 +80,7 @@ public class PlayerNetwork : NetworkBehaviour
         {
             if (!AttackOrMove()){
                 Debug.Log("Move input detected.");
+                checkLockOnRpc(); // Check lock-on state
                 SendMousePositionRpc(mousePosition); // Send mouse position to the server
                 RequestMoveRpc(mousePosition); // Request movement on the server
                 Vector3 direction = targetPositionNet.Value - transform.position;
@@ -151,8 +152,6 @@ public class PlayerNetwork : NetworkBehaviour
             UpdateRotationRpc(angle); // Update rotation
             PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value); // Call the auto-attack function on the server
             //Make player stop moving when auto attacking
-            SendMousePositionRpc(transform.position); // Send mouse position to the server
-            RequestMoveRpc(transform.position); // Request movement on the server
         }
         else
         {
@@ -258,14 +257,6 @@ public class PlayerNetwork : NetworkBehaviour
             return;
         }
 
-        //Lock on here; want it called before cool down is checked b/c cooldown can be valid by the time player is in range
-        float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
-        if (distance > champion.autoAttack.range)
-        {
-            StartCoroutine(moveIntoRange(targetPosition, enemyChampion)); // Move into range of the enemy champion
-            
-        }
-
         if (Time.time < champion.lastAutoAttackTime.Value + (1f / champion.attackSpeed.Value))
         {
             Debug.Log("Auto-attack is on cooldown!");
@@ -273,7 +264,7 @@ public class PlayerNetwork : NetworkBehaviour
             return;
         }
 
-        StartCoroutine(PerformAutoAttackCoroutine(targetPosition, enemyChampion, rapidFire));
+        StartCoroutine(MoveIntoRangeCoroutine(targetPosition, enemyChampion, rapidFire)); // Move into range of the enemy champion
         Debug.Log("Auto-attack performed on the server.");
     }
 
@@ -352,17 +343,21 @@ public class PlayerNetwork : NetworkBehaviour
         yield return new WaitForSeconds(seconds);
     }
 
-    private IEnumerator moveIntoRange(Vector3 targetPosition, GameObject enemyChampion)
+    private IEnumerator MoveIntoRangeCoroutine(Vector3 targetPosition, GameObject enemyChampion, int rapidFire)
     {
         float distance = Vector2.Distance(transform.position, enemyChampion.transform.position); // Calculate the distance to the enemy champion
         // While the player isnt in range and the player hasnt registed a new click input.
         while ((distance > champion.autoAttack.range) && lockOn.Value)
         {
-            targetPositionNet.Value = enemyChampion.transform.position; // Update the target position to the enemy champion's position
-            // MovePlayer() should be being called in update so I shouldnt have to call it here???
+            Debug.Log("Enemy champion is out of range. Moving into range.");
+            RequestMoveRpc(enemyChampion.transform.position); // Request movement on the server
             yield return null; // Wait for the next frame
         }
+        // Stop player from moving when in range
+        SendMousePositionRpc(transform.position);
+        RequestMoveRpc(transform.position);
         Debug.Log("Player moved into range of the enemy champion.");
+        StartCoroutine(PerformAutoAttackCoroutine(targetPosition, enemyChampion, rapidFire));
     }
 
 
@@ -379,7 +374,6 @@ public class PlayerNetwork : NetworkBehaviour
         }
 
         StartCoroutine(MoveGhostBullet(ghostBullet, targetPosition, speed));
-
     }
 
     private IEnumerator MoveGhostBullet(GameObject GB, Vector3 targetPosition, float speed)
