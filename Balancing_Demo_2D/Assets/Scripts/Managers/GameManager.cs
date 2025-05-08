@@ -7,10 +7,16 @@ using System.Linq;
 
 public class GameManager : NetworkBehaviour
 {
+    #region Singleton and References
     public static GameManager Instance; // Singleton instance
 
-    //public NetworkManager networkManager; // Reference to the NetworkManager
+    [Header("Managers")]
+    public AugmentManager AM; // Reference to the AugmentManager
+    public InGameManager IGM; // Reference to the InGameManager
+    public InGameUIManager IGUIM; // Reference to the InGameUIManager
+    #endregion
 
+    #region Player Prefabs and References
     [Header("Player Class Prefabs")]
     public List<GameObject> playerPrefabsList = new List<GameObject>(); // List of player prefabs
     public GameObject ghostBulletPrefab;
@@ -25,7 +31,9 @@ public class GameManager : NetworkBehaviour
 
     public Ability player1AbilityUsed = null; // Reference to the ability used by player 1
     public Ability player2AbilityUsed = null; // Reference to the ability used by player 2
+    #endregion
 
+    #region Networking and Server Settings
     [Header("Server Settings")]
     public Dictionary<ulong, GameObject> playerChampions = new Dictionary<ulong, GameObject>(); // Dictionary to store player prefabs and connect it to the client ID
     public List<ulong> playerIDsSpawned = new List<ulong>(); // List of player IDs that have spawned champions
@@ -35,7 +43,10 @@ public class GameManager : NetworkBehaviour
     public ulong player1ID = 0; // ID of player 1
     public ulong player2ID = 0; // ID of player 2
     public NetworkVariable<bool> playersSpawned = new NetworkVariable<bool>(false); // Flag to indicate if player 1 is ready
+    private Camera serverCamera; // Reference to the server camera
+    #endregion
 
+    #region Game State and Settings
     [Header("Game Settings")]
     private bool gameEnded = false; // Flag to indicate if the game has ended
     public int playerCount = 0; // Number of players connected
@@ -45,44 +56,63 @@ public class GameManager : NetworkBehaviour
     public NetworkVariable<float> gameTime = new NetworkVariable<float>(60f); // Game time in seconds
     public float augmentBuffer = 20f; //Choose aug every 40 seconds
     public NetworkVariable<bool> augmentChoosing = new NetworkVariable<bool>(false); //If the player is choosing an augment, dont countdown the game time
-    private Camera serverCamera; // Reference to the server camera
+    #endregion
 
+    #region Champion Management
     [Header("Champion Management")]
     public GameObject championPrefab; // Prefab for spawning champions
     public Transform[] spawnPoints; // Array of spawn points for champions
-    private bool recievedEndGameCalculations {
-        get{
-            return recievedCalcs >= 2; // Check if both players have received end game calculations
-        }
-    }
     public int recievedCalcs = 0;
+    private bool recievedEndGameCalculations => recievedCalcs >= 2;
+    #endregion
 
-    [Header("Managers")]
-    public AugmentManager AM; // Reference to the AugmentManager
-    public InGameManager IGM; // Reference to the InGameManager
-    public InGameUIManager IGUIM; // Reference to the InGameUIManager
-
+    #region Unity Lifecycle Methods
     private void Awake()
     {
-        // Ensure only one instance of GameManager exists
+        InitializeSingleton();
+    }
+
+    private void OnEnable()
+    {
+        SubscribeToNetworkEvents();
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeFromNetworkEvents();
+    }
+
+    private void Start()
+    {
+        Debug.Log("Game Manager Initialized");
+        maxGameTime = gameTime.Value; // Set the maximum game time
+    }
+
+    private void Update()
+    {
+        UpdatePlayerCount();
+        
+        if (!IsServer && !IsHost) return;
+        
+        HandleGameLogic();
+    }
+    #endregion
+
+    #region Initialization Methods
+    private void InitializeSingleton()
+    {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // Persist across scenes
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
         }
-
-        /*networkManager = FindObjectOfType<NetworkManager>(); // Find the NetworkManager in the scene
-        if (networkManager == null)
-        {
-            Debug.LogError("NetworkManager not found in the scene. Ensure it is present.");
-        }*/
     }
 
-    private void OnEnable()
+    private void SubscribeToNetworkEvents()
     {
         if (NetworkManager.Singleton != null)
         {
@@ -95,116 +125,12 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    private void OnDisable()
+    private void UnsubscribeFromNetworkEvents()
     {
         if (NetworkManager.Singleton != null)
         {
             Debug.Log("Unsubscribing from NetworkManager callbacks.");
             NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
-        }
-    }
-
-    private void Start()
-    {
-        Debug.Log("Game Manager Initialized");
-        maxGameTime = gameTime.Value; // Set the maximum game time
-    }
-
-    private void Update()
-    {
-        playerCount = playerChampions.Count; // Update player count
-
-        if (IsServer || IsHost) // Ensure this runs only on the server
-        {
-            
-            //Debug.Log("Player Count: " + playerCount); // Debug log for player count
-            if (playerCount == maxPlayers) // Check if the maximum number of players is reached
-            {
-                if (!playerSpawningStart) // Check if champions have not been spawned yet
-                {
-                    Debug.Log("Spawning champions for players.");
-                    spawnChampions(); // Spawn champions for both players
-                    playerSpawningStart = true; // Set the flag to true to prevent multiple spawns
-                }
-                else
-                {
-                    //Debug.Log("Champions already spawned. Waiting for game time to end.");
-                }
-
-                if (augmentBuffer <= 0)
-                {
-                    augmentChoosing.Value = true;
-                }
-
-                if (augmentChoosing.Value)
-                {
-                    gamePaused.Value = true;
-                }
-
-                if (gameTime.Value > 0 && !gamePaused.Value)
-                {
-                    gameTime.Value -= Time.deltaTime;
-                }
-
-                if (augmentBuffer > 0 && !augmentChoosing.Value && !gamePaused.Value) // If Augment buffer is greater than 0, players are not choosing augments, and the game isn't paused.
-                {
-                    augmentBuffer -= Time.deltaTime;
-                }
-                else if (augmentChoosing.Value) // Ensure this block runs only once when augmentChoosing is false
-                {
-                    Debug.Log("Loading Augments for Player 1: " + player1ID);
-                    loadAugmentsRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
-                    Debug.Log("Loading Augments for Player 2: " + player2ID);
-                    loadAugmentsRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
-
-                    augmentChoosing.Value = false;
-                    augmentBuffer = 15f; // Reset the augment buffer for the next cycle
-                }
-            }
-            if (gameTime.Value <= 0 && !gameEnded) // Check if the game time has expired
-            {
-                gamePaused.Value = true; // Pause the game
-                gameEnded = true; // Set the game ended flag to true
-                if (!IsServer) return; // Ensure this runs only on the server
-                EndGame(); // Call the EndGame function to handle game over logic
-            }
-
-            //Basicially all calls to the server need to be done here to do anything that is done at the 'start'
-            if (playersSpawned.Value)
-            {
-
-            }
-        }
-    }
-
-    private void OnClientConnected(ulong clientId)
-    {
-        Debug.Log($"Client {clientId} connected.");
-    }
-
-    //TODO: Finish this function to handle player disconnects properly
-    private void OnClientDisconnect(ulong clientId)
-    {
-        Debug.Log($"Client {clientId} disconnected.");
-        if (playerChampions.ContainsKey(clientId))
-        {
-            playerChampions.Remove(clientId); // Remove the player from the dictionary
-            Debug.Log($"Removed player {clientId} from playerChampions.");
-            playerIDsSpawned.Remove(clientId); // Remove the player ID from the spawned list
-            Debug.Log($"Removed player {clientId} from playerIDsSpawned.");
-            playerCount--; // Decrease the player count
-            Debug.Log($"Player count decreased. Current count: {playerCount}.");
-            if (playerIDsSpawned.Count == 0) // Check if all players have disconnected
-            {
-                gameEnded = true; // Set the game ended flag to true
-                Debug.Log("All players disconnected. Ending game.");
-                EndGame(); // Call the EndGame function to handle game over logic
-            }
-            else if (playerIDsSpawned.Count == 1) // Check if only one player is left
-            {
-                gamePaused.Value = true; // Pause the game
-                // TODO: Pause game and do a pop up saying waiting for other player to reconnect.
-            }
         }
     }
 
@@ -214,17 +140,142 @@ public class GameManager : NetworkBehaviour
         {
             Debug.Log("Subscribing to NetworkManager callbacks.");
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect; // Subscribe to the client disconnect callback
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
         }
         else
         {
             Debug.LogError("NetworkManager.Singleton is null. Ensure the NetworkManager is active in the scene.");
         }
     }
+    #endregion
 
-    public void spawnChampions()
+    #region Game Logic
+    private void UpdatePlayerCount()
     {
-        if (!IsServer) // Ensure only the server can execute this
+        playerCount = playerChampions.Count;
+    }
+
+    private void HandleGameLogic()
+    {
+        if (playerCount == maxPlayers)
+        {
+            HandlePlayerSpawning();
+            ManageAugmentSystem();
+            UpdateGameTime();
+        }
+        
+        HandleGameEnd();
+    }
+
+    private void HandlePlayerSpawning()
+    {
+        if (!playerSpawningStart)
+        {
+            Debug.Log("Spawning champions for players.");
+            SpawnChampions();
+            playerSpawningStart = true;
+        }
+    }
+
+    private void ManageAugmentSystem()
+    {
+        if (augmentBuffer <= 0)
+        {
+            augmentChoosing.Value = true;
+        }
+
+        if (augmentChoosing.Value)
+        {
+            gamePaused.Value = true;
+        }
+
+        if (augmentBuffer > 0 && !augmentChoosing.Value && !gamePaused.Value)
+        {
+            augmentBuffer -= Time.deltaTime;
+        }
+        else if (augmentChoosing.Value)
+        {
+            LoadAugmentsForPlayers();
+            augmentChoosing.Value = false;
+            augmentBuffer = 15f;
+        }
+    }
+
+    private void LoadAugmentsForPlayers()
+    {
+        Debug.Log("Loading Augments for Player 1: " + player1ID);
+        loadAugmentsRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
+        Debug.Log("Loading Augments for Player 2: " + player2ID);
+        loadAugmentsRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
+    }
+
+    private void UpdateGameTime()
+    {
+        if (gameTime.Value > 0 && !gamePaused.Value)
+        {
+            gameTime.Value -= Time.deltaTime;
+        }
+    }
+
+    private void HandleGameEnd()
+    {
+        if (gameTime.Value <= 0 && !gameEnded)
+        {
+            gamePaused.Value = true;
+            gameEnded = true;
+            if (IsServer) EndGame();
+        }
+    }
+    #endregion
+
+    #region Network Event Handlers
+    private void OnClientConnected(ulong clientId)
+    {
+        Debug.Log($"Client {clientId} connected.");
+    }
+
+//TODO: Finish this function to handle player disconnects properly
+    private void OnClientDisconnect(ulong clientId)
+    {
+        Debug.Log($"Client {clientId} disconnected.");
+        if (playerChampions.ContainsKey(clientId))
+        {
+            RemoveDisconnectedPlayer(clientId);
+        }
+    }
+
+    private void RemoveDisconnectedPlayer(ulong clientId)
+    {
+        playerChampions.Remove(clientId);
+        Debug.Log($"Removed player {clientId} from playerChampions.");
+        playerIDsSpawned.Remove(clientId);
+        Debug.Log($"Removed player {clientId} from playerIDsSpawned.");
+        playerCount--;
+        Debug.Log($"Player count decreased. Current count: {playerCount}.");
+        
+        HandlePlayerDisconnectGameState(clientId);
+    }
+
+    private void HandlePlayerDisconnectGameState(ulong clientId)
+    {
+        if (playerIDsSpawned.Count == 0)
+        {
+            gameEnded = true;
+            Debug.Log("All players disconnected. Ending game.");
+            EndGame();
+        }
+        else if (playerIDsSpawned.Count == 1)
+        {
+            gamePaused.Value = true;
+            // TODO: Pause game and do a pop up saying waiting for other player to reconnect.
+        }
+    }
+    #endregion
+
+    #region Player and Champion Management
+    public void SpawnChampions()
+    {
+        if (!IsServer)
         {
             Debug.LogWarning("Only the server can spawn champions!");
             return;
@@ -234,65 +285,102 @@ public class GameManager : NetworkBehaviour
     
         foreach (var player in playerChampions)
         {
-            GameObject playerClass = player.Value;
-            ulong playerId = player.Key;
+            SpawnChampionForPlayer(player.Value, player.Key);
+        }
 
-            if (!playerIDsSpawned.Contains(playerId))
-            {
-                switch (playerIDsSpawned.Count)
-                {
-                    case 0:
-                        player1 = Instantiate(playerClass, spawnPoints[0].position, Quaternion.identity);
-                        findPlayerControllers(player1, ref player1Controller); // Find the PlayerController for player 1
-                        player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
-                        playerIDsSpawned.Add(playerId);
-                        player1ID = playerId; // Store the ID of player 1
-                        player1Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[0].position; // Set the target position for player 1
-                        Debug.Log($"Spawned champion for Player 1 (Client {playerId}).");
-                        break;
-
-                    case 1:
-                        player2 = Instantiate(playerClass, spawnPoints[1].position, Quaternion.identity);
-                        findPlayerControllers(player2, ref player2Controller); // Find the PlayerController for player 2
-                        player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
-                        playerIDsSpawned.Add(playerId);
-                        player2ID = playerId; // Store the ID of player 2
-                        player2Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[1].position; // Set the target position for player 2
-                        Debug.Log($"Spawned champion for Player 2 (Client {playerId}).");
-                        break;
-
-                    default:
-                        Debug.LogWarning("No available spawn points for additional players.");
-                        break;
-                }
-            }
-
-            if (player1 != null && player2 != null) // Check if both players have been spawned
-            {
-                playersSpawned.Value = true; // Set the flag to indicate both players have spawned
-                Debug.Log("Both players have been spawned. Starting the game.");
-                // Add any additional logic to start the game here
-                player1Controller.GetComponent<BaseChampion>().enemyChampion = player2Controller;
-                player2Controller.GetComponent<BaseChampion>().enemyChampion = player1Controller; // Set the enemy champion reference for both players
-
-                player1Controller.GetComponent<BaseChampion>().enemyChampionId.Value = player2.GetComponent<NetworkObject>().OwnerClientId; // Set the player ID for player 1
-                player2Controller.GetComponent<BaseChampion>().enemyChampionId.Value = player1.GetComponent<NetworkObject>().OwnerClientId; // Set the player ID for player 2
-
-                initializeIGUIMRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 1
-                initializeIGUIMRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp)); // Initialize the InGameUIManager for player 2
-            }
+        if (player1 != null && player2 != null)
+        {
+            FinalizeBothPlayersSpawned();
         }
     }
+
+    private void SpawnChampionForPlayer(GameObject playerClass, ulong playerId)
+    {
+        if (playerIDsSpawned.Contains(playerId))
+            return;
+
+        switch (playerIDsSpawned.Count)
+        {
+            case 0:
+                SpawnPlayer1(playerClass, playerId);
+                break;
+            case 1:
+                SpawnPlayer2(playerClass, playerId);
+                break;
+            default:
+                Debug.LogWarning("No available spawn points for additional players.");
+                break;
+        }
+    }
+
+    private void SpawnPlayer1(GameObject playerClass, ulong playerId)
+    {
+        player1 = Instantiate(playerClass, spawnPoints[0].position, Quaternion.identity);
+        FindPlayerControllers(player1, ref player1Controller);
+        player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
+        playerIDsSpawned.Add(playerId);
+        player1ID = playerId;
+        player1Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[0].position;
+        Debug.Log($"Spawned champion for Player 1 (Client {playerId}).");
+    }
+
+    private void SpawnPlayer2(GameObject playerClass, ulong playerId)
+    {
+        player2 = Instantiate(playerClass, spawnPoints[1].position, Quaternion.identity);
+        FindPlayerControllers(player2, ref player2Controller);
+        player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
+        playerIDsSpawned.Add(playerId);
+        player2ID = playerId;
+        player2Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[1].position;
+        Debug.Log($"Spawned champion for Player 2 (Client {playerId}).");
+    }
+
+    private void FinalizeBothPlayersSpawned()
+    {
+        playersSpawned.Value = true;
+        Debug.Log("Both players have been spawned. Starting the game.");
+        
+        SetupPlayerReferences();
+        InitializeUIForPlayers();
+    }
+
+    private void SetupPlayerReferences()
+    {
+        player1Controller.GetComponent<BaseChampion>().enemyChampion = player2Controller;
+        player2Controller.GetComponent<BaseChampion>().enemyChampion = player1Controller;
+
+        player1Controller.GetComponent<BaseChampion>().enemyChampionId.Value = player2.GetComponent<NetworkObject>().OwnerClientId;
+        player2Controller.GetComponent<BaseChampion>().enemyChampionId.Value = player1.GetComponent<NetworkObject>().OwnerClientId;
+    }
+
+    private void InitializeUIForPlayers()
+    {
+        initializeIGUIMRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
+        initializeIGUIMRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
+    }
+
+    private void FindPlayerControllers(GameObject parent, ref GameObject controller)
+    {
+        Transform childTransform = parent.transform.Find("PlayerController");
+        if (childTransform != null)
+        {
+            controller = childTransform.gameObject;
+            Debug.Log("Found PlayerController: " + controller.name);
+        }
+        else
+        {
+            Debug.LogWarning("PlayerController not found in " + parent.name);
+        }
+    }
+    #endregion
+
+    #region Server Utilities
     public void EnableServerObserverMode()
     {
         if (NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
         {
-            if (serverCamera == null)
-            {
-                // Find the camera even if it's inactive
-                serverCamera = GameObject.FindWithTag("MainCamera")?.GetComponent<Camera>();
-            }
-
+            serverCamera = GameObject.FindWithTag("MainCamera")?.GetComponent<Camera>();
+            
             if (serverCamera != null)
             {
                 serverCamera.enabled = true;
@@ -305,232 +393,229 @@ public class GameManager : NetworkBehaviour
             hostReady.Value = true;
         }
     }
-    private void findPlayerControllers(GameObject parent, ref GameObject controller)
-    {
-        Transform childTransform = parent.transform.Find("PlayerController");
-        if (childTransform != null)
-        {
-            controller = childTransform.gameObject; // Assign the found child object to the controller variable
-            Debug.Log("Found PlayerController: " + controller.name);
-        }
-        else
-        {
-            Debug.LogWarning("PlayerController not found in " + parent.name);
-        }
-    }
+    #endregion
 
-    public void EndGame()
+    #region Augment System
+    public void ApplyAugments(ulong playerID)
     {
-        Debug.Log("Game Over!");
-        // Add logic to handle end of the game (e.g., show results, restart, etc.)
-        List<Augment> player1Aug = new List<Augment>(); // Create a new list to store player 1's augments
-        List<Augment> player2Aug = new List<Augment>(); // Create a new list to store player 2's augments
-        foreach (int augmentID in player1Augments)
-        {
-            Augment augment = AM.augmentFromID(augmentID);
-            if (augment != null)
-            {
-                player1Aug.Add(augment); // Add the augment to player 1's list
-            }
-        }
+        BaseChampion targetChampion = GetTargetChampion(playerID);
+        if (targetChampion == null) return;
+
+        if (!HasAugmentsToApply(playerID)) return;
         
-        foreach (int augmentID in player2Augments)
-        {
-            Augment augment = AM.augmentFromID(augmentID);
-            if (augment != null)
-            {
-                player2Aug.Add(augment); // Add the augment to player 2's list
-            }
-        }
-
-        if (!IsServer) return; // Ensure this runs only on the server
-        StartCoroutine(waitForEndGameStats()); // Start the coroutine to wait for end game stats
-
-        //Call all end game calculations for the champions and abilities
-        player1Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's champion
-        player2Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's champion
-
-        player1Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's ability
-        player2Controller.GetComponent<BaseChampion>().ability1.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's ability
-        player1Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's ability
-        player2Controller.GetComponent<BaseChampion>().ability2.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's ability
-        player1Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player1Aug, maxGameTime); // Call the endGameCalculations method for player 1's ability
-        player2Controller.GetComponent<BaseChampion>().ability3.Stats.endGameCalculations(player2Aug, maxGameTime); // Call the endGameCalculations method for player 2's ability
-    }
-    public void applyAugments(ulong playerID)
-    {
-        BaseChampion targetChampion = null;
-
-        // Determine which player's champion to update
-        if (playerID == player1ID)
-        {
-            targetChampion = player1Controller.GetComponent<BaseChampion>();
-            if (player1Augments.Count == 0) return; // Ensure there are augments to apply
-        }
-        else if (playerID == player2ID)
-        {
-            targetChampion = player2Controller.GetComponent<BaseChampion>();
-            if (player2Augments.Count == 0) return; // Ensure there are augments to apply
-        }
-        else
-        {
-            Debug.LogWarning($"Player ID {playerID} not found. Cannot apply augments.");
-            return;
-        }
-
         targetChampion.passive.Stats.saveBetweenAugments();
-
-        // Get the last augment chosen by the player
-        int augmentID = (playerID == player1ID) 
-            ? player1Augments[player1Augments.Count - 1] 
-            : player2Augments[player2Augments.Count - 1];
-        Augment newAugment = AM.augmentFromID(augmentID);
-
-        if (newAugment == null)
-        {
-            Debug.LogWarning($"Augment with ID {augmentID} not found.");
-            return;
-        }
-
-        // Calculate the random adjustment value
-        float randomAdjustment = newAugment.max;
-        if (newAugment.min != newAugment.max)
-        {
-            randomAdjustment = Random.Range(newAugment.min, newAugment.max + 1); // Inclusive range
-            if (randomAdjustment >= 1){ // Ignore % based adjustment from being rounded
-                randomAdjustment = Mathf.Round(randomAdjustment); // Round to the nearest whole number
-            }
-
-        }
-
-        // Apply the augment effect based on its type
-        switch (newAugment.type)
-        {
-            case "AbilityHaste":
-                targetChampion.updateAbilityHasteRpc(randomAdjustment);
-                break;
-            case "Armor":
-                targetChampion.updateArmorRpc(randomAdjustment);
-                break;
-            case "AttackDamage":
-                targetChampion.updateADRpc(randomAdjustment);
-                break;
-            case "AbilityPower":
-                targetChampion.updateAPRpc(randomAdjustment);
-                break;
-            case "Health":
-                targetChampion.updateMaxHealthRpc(randomAdjustment);
-                break;
-            case "AttackSpeed":
-                targetChampion.updateAttackSpeedRpc(randomAdjustment);
-                break;
-            case "CriticalStrike":
-                targetChampion.updateCritChanceRpc(randomAdjustment);
-                break;
-            case "CriticalDamage":
-                targetChampion.updateCritDamageRpc(randomAdjustment);
-                break;
-            case "ArmorPenetration":
-                targetChampion.updateArmorPenRpc(randomAdjustment);
-                break;
-            case "MagicPenetration":
-                targetChampion.updateMagicPenRpc(randomAdjustment);
-                break;
-            case "MagicResist":
-                targetChampion.updateMagicResistRpc(randomAdjustment);
-                break;
-            default:
-                Debug.LogWarning($"Unknown augment type: {newAugment.type}");
-                break;
-        }
-
+        
+        Augment newAugment = GetLastAugment(playerID);
+        if (newAugment == null) return;
+        
+        float randomAdjustment = CalculateAugmentAdjustment(newAugment);
+        ApplyAugmentEffect(targetChampion, newAugment.type, randomAdjustment);
+        
         Debug.Log($"Applied augment {newAugment.name} to player {playerID} with adjustment {randomAdjustment}.");
     }
 
-    //Add Augments to UI for Choosing
-    // Send to specified clients only
+    private BaseChampion GetTargetChampion(ulong playerID)
+    {
+        if (playerID == player1ID)
+            return player1Controller?.GetComponent<BaseChampion>();
+        else if (playerID == player2ID)
+            return player2Controller?.GetComponent<BaseChampion>();
+        
+        Debug.LogWarning($"Player ID {playerID} not found. Cannot apply augments.");
+        return null;
+    }
+
+    private bool HasAugmentsToApply(ulong playerID)
+    {
+        return (playerID == player1ID && player1Augments.Count > 0) || 
+               (playerID == player2ID && player2Augments.Count > 0);
+    }
+
+    private Augment GetLastAugment(ulong playerID)
+    {
+        int augmentID = (playerID == player1ID) 
+            ? player1Augments[player1Augments.Count - 1] 
+            : player2Augments[player2Augments.Count - 1];
+            
+        Augment newAugment = AM.augmentFromID(augmentID);
+        
+        if (newAugment == null)
+            Debug.LogWarning($"Augment with ID {augmentID} not found.");
+            
+        return newAugment;
+    }
+
+    private float CalculateAugmentAdjustment(Augment augment)
+    {
+        // If min equals max, just return the value (no randomness needed)
+        if (augment.min == augment.max) return augment.max;
+            
+        // Check if the values appear to be integers
+        bool isInteger = Mathf.Approximately(augment.min, Mathf.Round(augment.min)) && Mathf.Approximately(augment.max, Mathf.Round(augment.max));
+        
+        float adjustment;
+        if (isInteger)
+        {
+            // For integer values (like flat health, damage, etc.)
+            // Get a random integer between min (inclusive) and max (inclusive)
+            adjustment = Mathf.Floor(Random.Range(augment.min, augment.max + 0.999f));
+        }
+        else
+        {
+            // For float values (like percentage multipliers)
+            // Get a random float between min and max (both inclusive)
+            adjustment = Random.Range(augment.min, augment.max);
+            
+            // For small decimal values (likely percentages), keep 2 decimal places
+            if (augment.max < 1)
+                adjustment = Mathf.Round(adjustment * 100) / 100f; // Round to 2 decimal places
+            else
+                adjustment = Mathf.Round(adjustment * 10) / 10f;   // Round to 1 decimal place
+        }
+        
+        return adjustment;
+    }
+
+    private void ApplyAugmentEffect(BaseChampion champion, string augmentType, float value)
+    {
+        switch (augmentType)
+        {
+            case "AbilityHaste": champion.updateAbilityHasteRpc(value); break;
+            case "Armor": champion.updateArmorRpc(value); break;
+            case "AttackDamage": champion.updateADRpc(value); break;
+            case "AbilityPower": champion.updateAPRpc(value); break;
+            case "Health": champion.updateMaxHealthRpc(value); break;
+            case "AttackSpeed": champion.updateAttackSpeedRpc(value); break;
+            case "CriticalStrike": champion.updateCritChanceRpc(value); break;
+            case "CriticalDamage": champion.updateCritDamageRpc(value); break;
+            case "ArmorPenetration": champion.updateArmorPenRpc(value); break;
+            case "MagicPenetration": champion.updateMagicPenRpc(value); break;
+            case "MagicResist": champion.updateMagicResistRpc(value); break;
+            default: Debug.LogWarning($"Unknown augment type: {augmentType}"); break;
+        }
+    }
+    #endregion
+
+    #region Game End Logic
+    public void EndGame()
+    {
+        Debug.Log("Game Over!");
+        
+        PrepareEndGameAugmentLists();
+        
+        if (!IsServer) return;
+        
+        StartCoroutine(WaitForEndGameStats());
+        ProcessEndGameCalculationsForChampions();
+    }
+
+    private void PrepareEndGameAugmentLists()
+    {
+        List<Augment> player1Aug = ConvertAugmentIdsToAugments(player1Augments);
+        List<Augment> player2Aug = ConvertAugmentIdsToAugments(player2Augments);
+    }
+
+    private List<Augment> ConvertAugmentIdsToAugments(NetworkList<int> augmentIds)
+    {
+        List<Augment> augments = new List<Augment>();
+        foreach (int augmentID in augmentIds)
+        {
+            Augment augment = AM.augmentFromID(augmentID);
+            if (augment != null)
+            {
+                augments.Add(augment);
+            }
+        }
+        return augments;
+    }
+
+    private void ProcessEndGameCalculationsForChampions()
+    {
+        List<Augment> player1Aug = ConvertAugmentIdsToAugments(player1Augments);
+        List<Augment> player2Aug = ConvertAugmentIdsToAugments(player2Augments);
+        
+        // Process passive stats
+        player1Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player1Aug, maxGameTime);
+        player2Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player2Aug, maxGameTime);
+        
+        // Process abilities stats
+        ProcessAbilityEndGameCalculations(player1Controller, player1Aug);
+        ProcessAbilityEndGameCalculations(player2Controller, player2Aug);
+    }
+
+    private void ProcessAbilityEndGameCalculations(GameObject playerController, List<Augment> augments)
+    {
+        BaseChampion champion = playerController.GetComponent<BaseChampion>();
+        champion.ability1.Stats.endGameCalculations(augments, maxGameTime);
+        champion.ability2.Stats.endGameCalculations(augments, maxGameTime);
+        champion.ability3.Stats.endGameCalculations(augments, maxGameTime);
+    }
+
+    private IEnumerator WaitForEndGameStats()
+    {
+        while (!recievedEndGameCalculations)
+        {
+            yield return null;
+        }
+        IGM.endGameUI.statsToList();
+        endGameUIRpc();
+    }
+    #endregion
+
+    #region RPC Methods
     [Rpc(SendTo.SpecifiedInParams)]
-    public void loadAugmentsRpc(RpcParams rpcParams){
-        Debug.Log("Loading Augments for Client " + NetworkManager.Singleton.LocalClientId); // Log the client ID for debugging
-        AM.augmentUI.SetActive(true); // Show the augment UI
-        AM.augmentUISetup(AM.augmentSelector()); // Get the list of chosen augments
+    public void loadAugmentsRpc(RpcParams rpcParams)
+    {
+        Debug.Log("Loading Augments for Client " + NetworkManager.Singleton.LocalClientId);
+        AM.augmentUI.SetActive(true);
+        AM.augmentUISetup(AM.augmentSelector());
     }
 
     [Rpc(SendTo.Server)]
     public void updatePlayerAbilityUsedRpc(ulong playerID, string abilityKey)
     {
-        if (!IsServer) return; // Ensure this runs only on the server
+        if (!IsServer) return;
 
-        BaseChampion playerChampion = null;
+        BaseChampion playerChampion = GetTargetChampion(playerID);
+        if (playerChampion == null) return;
 
-        // Determine which player's champion to update
-        if (playerID == player1ID)
-        {
-            playerChampion = player1Controller.GetComponent<BaseChampion>();
-        }
-        else if (playerID == player2ID)
-        {
-            playerChampion = player2Controller.GetComponent<BaseChampion>();
-        }
-        else
-        {
-            Debug.LogWarning($"Invalid player ID: {playerID}.");
-            return;
-        }
+        UpdateAbilityReference(playerID, playerChampion, abilityKey);
+    }
 
-        // Update the ability used based on the ability key
+    private void UpdateAbilityReference(ulong playerID, BaseChampion champion, string abilityKey)
+    {
+        Ability abilityToAssign = null;
+        
         switch (abilityKey)
         {
-            case "Q":
-                if (playerID == player1ID)
-                    player1AbilityUsed = playerChampion.ability1;
-                else
-                    player2AbilityUsed = playerChampion.ability1;
-                break;
-
-            case "W":
-                if (playerID == player1ID)
-                    player1AbilityUsed = playerChampion.ability2;
-                else
-                    player2AbilityUsed = playerChampion.ability2;
-                break;
-
-            case "E":
-                if (playerID == player1ID)
-                    player1AbilityUsed = playerChampion.ability3;
-                else
-                    player2AbilityUsed = playerChampion.ability3;
-                break;
-
+            case "Q": abilityToAssign = champion.ability1; break;
+            case "W": abilityToAssign = champion.ability2; break;
+            case "E": abilityToAssign = champion.ability3; break;
             default:
                 Debug.LogWarning($"Invalid ability key: {abilityKey} for player {playerID}.");
                 return;
         }
-
-        // Log the ability used
-        Ability abilityUsed = (playerID == player1ID) ? player1AbilityUsed : player2AbilityUsed;
-        Debug.Log($"Player {playerID} used ability: {abilityUsed.name}");
+        
+        if (playerID == player1ID)
+            player1AbilityUsed = abilityToAssign;
+        else
+            player2AbilityUsed = abilityToAssign;
+            
+        Debug.Log($"Player {playerID} used ability: {abilityToAssign.name}");
     }
+
     [Rpc(SendTo.SpecifiedInParams)]
     public void initializeIGUIMRpc(RpcParams rpcParams)
     {
-        IGUIM.inGameUI.SetActive(true); // Activate the in-game UI
+        IGUIM.inGameUI.SetActive(true);
         Debug.Log("In-game UI initialized and activated.");
     }
 
     [Rpc(SendTo.Everyone)]
     public void endGameUIRpc()
     {
-        IGM.endGameUI.displayEndGameUI(); // Display the end game UI
+        IGM.endGameUI.displayEndGameUI();
         Debug.Log("End game UI initialized and activated.");
-        
     }
-
-    private IEnumerator waitForEndGameStats(){
-        while (!recievedEndGameCalculations){
-            yield return null; // Wait for the end game calculations to be received
-        }
-        IGM.endGameUI.statsToList();
-        endGameUIRpc();
-    }
+    #endregion
 }

@@ -224,7 +224,7 @@ public class AugmentManager : NetworkBehaviour
         Debug.Log($"Player {senderClientID} selected augment {augmentID} and it is being applied."); // Log the selected augment ID
 
         // Apply the selected augment to the player's stats
-        GM.applyAugments(senderClientID);
+        GM.ApplyAugments(senderClientID);
 
         // Check if both players have selected their augments
         if (GM.player1Augments.Count == GM.player2Augments.Count)
