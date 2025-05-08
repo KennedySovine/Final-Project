@@ -8,6 +8,7 @@ using UnityEngine.EventSystems; // Import EventSystems for event handling
 
 public class InGameUIManager : NetworkBehaviour
 {
+    #region Fields
     public List<Button> abilityIcons = new List<Button>(); // List to hold ability icons
     [SerializeField] private TextMeshProUGUI timerText; // Reference to the TextMeshProUGUI component for displaying the timer
 
@@ -19,8 +20,9 @@ public class InGameUIManager : NetworkBehaviour
 
     public GameObject inGameUI; // Reference to the in-game UI GameObject
     public bool iconsSet = false; // Flag to check if icons are set
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    #endregion
 
+    #region Unity Lifecycle Methods
     private void Awake()
     {
         GM = GameManager.Instance; // Get the GameManager instance
@@ -29,6 +31,7 @@ public class InGameUIManager : NetworkBehaviour
             Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
         }
     }
+
     void Start()
     {
         GM.IGUIM = this; // Set the InGameUIManager instance in GameManager
@@ -50,34 +53,30 @@ public class InGameUIManager : NetworkBehaviour
         if (!IsClient) return; // Only run this for clients
     }
 
-    // Update is called once per frame
     void Update()
     {
 
-
     }
+    #endregion
 
+    #region UI Update Methods
     public void UpdateHealthSlider(float previousValue, float newValue)
     {
-        //Debug.Log($"Updating health slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
         healthSlider.value = newValue; // Update the health slider in the UI
     }
 
     public void UpdateManaSlider(float previousValue, float newValue)
     {
-        //Debug.Log($"Updating mana slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
         manaSlider.value = newValue; // Update the mana slider in the UI
     }
 
     public void UpdateMaxHealthSlider(float previousValue, float newValue)
     {
-        //Debug.Log($"Updating max health slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
         healthSlider.maxValue = newValue; // Update the max health slider in the UI
     }
 
     public void UpdateMaxManaSlider(float previousValue, float newValue)
     {
-        //Debug.Log($"Updating max mana slider for Client {NetworkManager.Singleton.LocalClientId}. New Value: {newValue}");
         manaSlider.maxValue = newValue; // Update the max mana slider in the UI
     }
 
@@ -93,8 +92,10 @@ public class InGameUIManager : NetworkBehaviour
         }
     }
 
-    public void buttonInteractable(string position, bool isInteractable){
-        switch (position){
+    public void buttonInteractable(string position, bool isInteractable)
+    {
+        switch (position)
+        {
             case "Q":
                 abilityIcons[0].interactable = isInteractable; // Disable the Q ability button
                 break;
@@ -110,28 +111,36 @@ public class InGameUIManager : NetworkBehaviour
         }
     }
 
-    public void setAbilityToButtons(Dictionary<string, Ability> abilityDict){
-        // Set the ability to the button based on the position
-        foreach (Button button in abilityIcons){
-            if (button == null){
+    public void setAbilityToButtons(Dictionary<string, Ability> abilityDict)
+    {
+        foreach (Button button in abilityIcons)
+        {
+            if (button == null)
+            {
                 Debug.LogError("Button reference is null. Ensure the button is assigned in the inspector.");
                 continue; // Skip to the next button if the current one is null
             }
             string position = button.name; // Get the name of the button to determine its position
-            if (abilityDict.ContainsKey(position)){
+            if (abilityDict.ContainsKey(position))
+            {
                 Ability ability = abilityDict[position]; // Get the ability from the dictionary
                 button.GetComponent<Image>().sprite = ability.icon; // Set the icon for the button
                 button.GetComponent<HoverButton>().ability = ability; // Set the ability reference in the HoverButton component
                 button.GetComponent<HoverButton>().addAbilityInfo(); // Add ability info to the button
-                //button.GetComponent<HoverButton>().IGUIM = this; // Set the InGameUIManager reference in the HoverButton component
             }
-            else{
+            else
+            {
                 Debug.LogWarning($"Ability not found for position: {position}. No action taken.");
             }
         }
     }
+    #endregion
 
-    
-    
+    #region Event Handlers
+    // Add event handler methods here if needed
+    #endregion
 
+    #region Network Methods
+    // Add network-related methods here if needed
+    #endregion
 }

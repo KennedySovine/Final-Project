@@ -5,9 +5,9 @@ using UnityEngine.UI;
 using Unity.Netcode;
 using TMPro;
 
-
 public class InGameManager : NetworkBehaviour
 {
+    #region Fields
     private GameManager GM;
     [SerializeField] private GameObject beginButton;
     [SerializeField] private TMP_Dropdown champSelectDropdown;
@@ -15,8 +15,9 @@ public class InGameManager : NetworkBehaviour
     [SerializeField] private AugmentManager AM; // Reference to the AugmentManager
     [SerializeField] private InGameUIManager IGUIM; // Reference to the InGameUIManager
     public EndGameUI endGameUI; // Reference to the EndGameUI
-    
+    #endregion
 
+    #region Unity Lifecycle Methods
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -66,22 +67,9 @@ public class InGameManager : NetworkBehaviour
         // Optional: Add any logic that needs to run every frame
         checkHostReady(); // Check if the host is ready
     }
+    #endregion
 
-    public void checkHostReady(){
-        if (NetworkManager.Singleton.IsHost){
-            return;
-        }
-        else if (!GM.hostReady.Value){
-            champSelectDropdown.interactable = false; // Enable dropdown for client
-        }
-        else if (GM.hostReady.Value){
-            champSelectDropdown.interactable = true; // Disable dropdown for client
-        }
-        else{
-            Debug.LogWarning("I dont know how we got here.");
-        }
-    }
-
+    #region UI Methods
     public void dropDownSelectLogic()
     {
         // Enable the begin button only if a valid connection type and champion are selected
@@ -92,6 +80,28 @@ public class InGameManager : NetworkBehaviour
         else
         {
             beginButton.GetComponent<Button>().interactable = false;
+        }
+    }
+    #endregion
+
+    #region Game Logic Methods
+    public void checkHostReady()
+    {
+        if (NetworkManager.Singleton.IsHost)
+        {
+            return;
+        }
+        else if (!GM.hostReady.Value)
+        {
+            champSelectDropdown.interactable = false; // Enable dropdown for client
+        }
+        else if (GM.hostReady.Value)
+        {
+            champSelectDropdown.interactable = true; // Disable dropdown for client
+        }
+        else
+        {
+            Debug.LogWarning("I dont know how we got here.");
         }
     }
 
@@ -124,7 +134,9 @@ public class InGameManager : NetworkBehaviour
             Debug.Log("Server starting the game.");
         }
     }
+    #endregion
 
+    #region Network Methods
     [Rpc(SendTo.Server)]
     public void AddClientToGameRpc(ulong clientID, int champChoiceIndex)
     {
@@ -149,4 +161,5 @@ public class InGameManager : NetworkBehaviour
             Debug.LogWarning($"Client {clientID} is already in the game.");
         }
     }
+    #endregion
 }

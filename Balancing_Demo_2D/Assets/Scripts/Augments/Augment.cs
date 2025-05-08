@@ -3,6 +3,7 @@ using UnityEngine;
 [System.Serializable]
 public class Augment
 {
+    #region Fields
     public string name;
     public int id;
     public string description;
@@ -11,4 +12,5 @@ public class Augment
     public float min;
     public float max;
     public int rarity; // Silver 1, Gold 2, Prismatic 3
+    #endregion
 }

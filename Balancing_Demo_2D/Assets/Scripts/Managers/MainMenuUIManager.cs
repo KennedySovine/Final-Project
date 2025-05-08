@@ -8,6 +8,7 @@ using Unity.Netcode;
 
 public class MainMenuUIManager : NetworkBehaviour
 {
+    #region Fields
     private GameManager GM;
     [SerializeField] private GameObject mainMenuUI;
     [SerializeField] private GameObject champSelectUI;
@@ -16,6 +17,9 @@ public class MainMenuUIManager : NetworkBehaviour
 
     [SerializeField] private TMP_Dropdown networkDropdown;
     [SerializeField] private GameObject netDropDown;
+    #endregion
+
+    #region Unity Lifecycle Methods
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -24,7 +28,6 @@ public class MainMenuUIManager : NetworkBehaviour
         {
             Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
         }
-
     }
 
     // Update is called once per frame
@@ -38,9 +41,10 @@ public class MainMenuUIManager : NetworkBehaviour
         {
             startButton.GetComponent<Button>().interactable = true;
         }
-        
     }
+    #endregion
 
+    #region UI Button Methods
     public void exitButtonClick(){
         Application.Quit();
     }
@@ -51,7 +55,9 @@ public class MainMenuUIManager : NetworkBehaviour
         // Load the game scene here
         // SceneManager.LoadScene("GameSceneName"); // Uncomment and replace with your scene name
     }
+    #endregion
 
+    #region Game Setup Methods
     public void enterGame(){
         // Load the game scene here
         //SceneManager.LoadScene(sceneBuildIndex: 1);
@@ -86,4 +92,5 @@ public class MainMenuUIManager : NetworkBehaviour
             Debug.Log("No connection type selected");
         }
     }
+    #endregion
 }

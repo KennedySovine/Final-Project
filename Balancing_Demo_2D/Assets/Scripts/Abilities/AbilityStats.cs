@@ -7,7 +7,7 @@ using System.Linq;
 [System.Serializable]
 public class AbilityStats
 {
-
+    #region Fields
     public List<float> damageValues = new List<float>(); // List to hold damage values between augments
     public float damageOverTime = 0f; // Damage over time value
     public float damage = 0f; // Total damage value
@@ -20,11 +20,16 @@ public class AbilityStats
     public float gameTime = 0f; // Game time value
 
     public List<Augment> chosenAugments = new List<Augment>(); // List of chosen augments for the ability
+    #endregion
 
+    #region Constructors
     public AbilityStats()
     {
 
     }
+    #endregion
+
+    #region Data Management Methods
     public void saveBetweenAugments()
     {
         damageValues.Add(damage); // Add the current damage value to the list
@@ -65,28 +70,34 @@ public class AbilityStats
 
         // Write the updated JSON back to the file
         File.WriteAllText(filePath, updatedJson);
-
+        
         Debug.Log($"Ability stats appended to {filePath}");
     }
+    #endregion
 
+    #region Helper Classes
     // Wrapper class to handle JSON arrays
     [System.Serializable]
     private class AbilityStatsListWrapper
     {
         public List<AbilityStats> stats;
     }
+    #endregion
 }
 
 [System.Serializable]
 public struct AbilityStatsData : INetworkSerializable
 {
+    #region Fields
     public float damageOverTime;
     public float damage;
     public float costToDamage;
     public float totalManaSpent;
     public float damageTotal;
     public float gameTime;
+    #endregion
 
+    #region Serialization Methods
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref damageOverTime);
@@ -96,7 +107,9 @@ public struct AbilityStatsData : INetworkSerializable
         serializer.SerializeValue(ref damageTotal);
         serializer.SerializeValue(ref gameTime);
     }
+    #endregion
 
+    #region Conversion Methods
     public static AbilityStatsData FromAbilityStats(AbilityStats stats)
     {
         return new AbilityStatsData
@@ -119,4 +132,5 @@ public struct AbilityStatsData : INetworkSerializable
         stats.damageTotal = damageTotal;
         stats.gameTime = gameTime;
     }
+    #endregion
 }

@@ -8,6 +8,7 @@ using Unity.Collections;
 
 public class EndGameUI : MonoBehaviour
 {
+    #region Fields
     private static GameManager GM;
     [SerializeField] private GameObject IGUI;
     [SerializeField] private GameObject augUI;
@@ -22,36 +23,28 @@ public class EndGameUI : MonoBehaviour
     public NetworkList<FixedString64Bytes> player2StatsText = new NetworkList<FixedString64Bytes>();
 
     public NetworkVariable<bool> statsAssigned = new NetworkVariable<bool>(false); // Flag to check if stats are assigned
+    #endregion
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    #region Unity Lifecycle
+    private void Awake()
     {
-        GM = GameManager.Instance; // Get the GameManager instance
+        // Try to find the GameManager using the correct singleton property name
+        GM = GameManager.Instance;
+        
+        // If that's not found, try to find GameManager in the scene
         if (GM == null)
         {
-            Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
+            GM = FindObjectOfType<GameManager>();
         }
-    }
-
-
-    public void statsToList(){
-        List<StatBlock> p1Stats = new List<StatBlock>();
-        List<StatBlock> p2Stats = new List<StatBlock>();
-
-        if (NetworkManager.Singleton.IsServer)
+        
+        if (GM == null)
         {
-            List<string> p1StatsRaw = findStats(GM.player1ID);
-            List<string> p2StatsRaw = findStats(GM.player2ID);
-
-            foreach (var stat in p1StatsRaw)
-                p1Stats.Add(new StatBlock(stat));
-            foreach (var stat in p2StatsRaw)
-                p2Stats.Add(new StatBlock(stat));
-
-            updateStatsUI(p1Stats, p2Stats); // Update the stats UI with the lists of stats
+            Debug.LogError("GameManager not found!");
         }
     }
+    #endregion
 
+    #region Public Methods
     public void displayEndGameUI()
     {
         HIDEALLOTHERUI(); // Hide all other UI elements
@@ -62,19 +55,20 @@ public class EndGameUI : MonoBehaviour
         StartCoroutine(displayStats()); // Start the coroutine to display stats
     }
 
-    private void HIDEALLOTHERUI(){
-        IGUI.SetActive(false); // Deactivate the in-game UI
-        augUI.SetActive(false); // Deactivate the augment UI
-    }
-
     public void updateStatsUI(List<StatBlock> stats1, List<StatBlock> stats2)
     {
-        for (int i = 0; i < 7; i++)
+        // Make sure we don't try to access non-existent elements
+        for (int i = 0; i < Mathf.Min(7, stats1.Count, player1StatsList.Count); i++)
         {
             player1StatsList[i].GetComponent<TextMeshProUGUI>().text = stats1[i].value.ToString();
+        }
+        
+        for (int i = 0; i < Mathf.Min(7, stats2.Count, player2StatsList.Count); i++)
+        {
             player2StatsList[i].GetComponent<TextMeshProUGUI>().text = stats2[i].value.ToString();
         }
-        statsAssigned.Value = true; // Set the flag to true after assigning stats
+        
+        statsAssigned.Value = true;
     }
 
     public List<string> findStats(ulong playerId)
@@ -137,6 +131,59 @@ public class EndGameUI : MonoBehaviour
         return stats; // Return the list of stats as strings
     }
 
+    public void statsToList(){
+        if (NetworkManager.Singleton.IsServer)
+        {
+            // Clear previous data
+            player1StatsText.Clear();
+            player2StatsText.Clear();
+            
+            // Get raw stats
+            List<string> p1StatsRaw = findStats(GM.player1ID);
+            List<string> p2StatsRaw = findStats(GM.player2ID);
+            
+            // Convert to StatBlocks for UI
+            List<StatBlock> p1Stats = new List<StatBlock>();
+            List<StatBlock> p2Stats = new List<StatBlock>();
+            
+            // Populate NetworkLists for network synchronization
+            foreach (var stat in p1StatsRaw) {
+                player1StatsText.Add(new FixedString64Bytes(stat));
+                p1Stats.Add(new StatBlock(stat));
+            }
+            
+            foreach (var stat in p2StatsRaw) {
+                player2StatsText.Add(new FixedString64Bytes(stat));
+                p2Stats.Add(new StatBlock(stat));
+            }
+            
+            // Update UI
+            updateStatsUI(p1Stats, p2Stats);
+        }
+        else if (NetworkManager.Singleton.IsClient && statsAssigned.Value)
+        {
+            // Client side - convert received NetworkList data to StatBlocks
+            List<StatBlock> p1Stats = new List<StatBlock>();
+            List<StatBlock> p2Stats = new List<StatBlock>();
+            
+            foreach (var stat in player1StatsText)
+                p1Stats.Add(new StatBlock(stat.ToString()));
+            
+            foreach (var stat in player2StatsText)
+                p2Stats.Add(new StatBlock(stat.ToString()));
+            
+            // Update UI with received data
+            updateStatsUI(p1Stats, p2Stats);
+        }
+    }
+    #endregion
+
+    #region Private Methods
+    private void HIDEALLOTHERUI(){
+        IGUI.SetActive(false); // Deactivate the in-game UI
+        augUI.SetActive(false); // Deactivate the augment UI
+    }
+
     private IEnumerator displayStats()
     {
         yield return new WaitUntil(() => statsAssigned.Value); // Wait until stats are assigned
@@ -150,17 +197,22 @@ public class EndGameUI : MonoBehaviour
             yield return new WaitForSeconds(1f); // Wait for 1 second before displaying the next stat
         }
     }
+    #endregion
 }
 
 [System.Serializable]
 public struct StatBlock : INetworkSerializable
 {
+    #region Fields
     public FixedString64Bytes value;
+    #endregion
 
+    #region Serialization Methods
     public StatBlock(string v) => value = v;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref value);
     }
+    #endregion
 }

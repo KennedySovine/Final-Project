@@ -3,10 +3,12 @@ using Unity.Netcode;
 
 public class APMelee : BaseChampion
 {
-
+    #region Fields
     [Header("Champion Settings")]
     public int attackStacks = 0; // Gwen generates passive stacks per auto attack.
+    #endregion
 
+    #region Unity Lifecycle Methods
     void Start()
     {
         base.Start();
@@ -15,7 +17,9 @@ public class APMelee : BaseChampion
         health.Value = maxHealth.Value; // Initialize health to max health
         mana.Value = maxMana.Value; // Initialize mana to max mana
     }
+    #endregion
 
+    #region Champion Setup Methods
     //Based on Gwen from LOL
     private void UpdateStats()
     {
@@ -78,14 +82,15 @@ public class APMelee : BaseChampion
             35f, // Mana cost
             350f // Range
         );
-
     }
 
     public void passiveStats(){
         // Bonus magic damage = 1% (+0.6% per 100 Ap) of the target's maximum health
         // Healing is 50% of damage dealt after mitigation, capped at 10 + 6.5% AP
     }
+    #endregion
 
+    #region Network RPC Methods
     [Rpc(SendTo.Server)]
     public void UseAbility1Rpc(){
         for (int i = 0; i < attackStacks; i++){
@@ -113,5 +118,6 @@ public class APMelee : BaseChampion
         // Bonus magic damage = 15 + 20% AP
         // Bonus attack range = 75
     }
+    #endregion
 }
 
