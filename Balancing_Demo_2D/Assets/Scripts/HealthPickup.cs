@@ -22,6 +22,7 @@ public class HealthPickup : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         var champion = other.GetComponent<BaseChampion>();
+        Debug.Log("HealthPickup: OnTriggerEnter2D found champion: " + champion?.name);
         if (champion != null)
         {
             // Heal the champion by defined percentage of their max health
@@ -29,6 +30,7 @@ public class HealthPickup : MonoBehaviour
             
             // Record the time when we disable the pickup
             disableTime = Time.time;
+            Debug.Log(disableTime);
             gameObject.SetActive(false); // Deactivate the pickup object
         }
         else
