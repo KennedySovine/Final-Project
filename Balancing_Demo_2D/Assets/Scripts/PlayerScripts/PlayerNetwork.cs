@@ -71,7 +71,7 @@ public class PlayerNetwork : NetworkBehaviour
         {
             if (AttackOrMove())
             {
-                Debug.Log("Attack input detected.");
+                //Debug.Log("Attack input detected.");
                 PerformAutoAttack(); // Perform auto-attack
             }
         }
@@ -79,7 +79,7 @@ public class PlayerNetwork : NetworkBehaviour
         if (Input.GetMouseButton(1)) // Right Mouse Button Pressed
         {
             if (!AttackOrMove()){
-                Debug.Log("Move input detected.");
+                //Debug.Log("Move input detected.");
                 checkLockOnRpc(); // Check lock-on state
                 SendMousePositionRpc(mousePosition); // Send mouse position to the server
                 RequestMoveRpc(mousePosition); // Request movement on the server
@@ -345,18 +345,26 @@ public class PlayerNetwork : NetworkBehaviour
 
     private IEnumerator MoveIntoRangeCoroutine(Vector3 targetPosition, GameObject enemyChampion, int rapidFire)
     {
-        float distance = Vector2.Distance(transform.position, enemyChampion.transform.position); // Calculate the distance to the enemy champion
-        // While the player isnt in range and the player hasnt registed a new click input.
-        while ((distance > champion.autoAttack.range) && lockOn.Value)
+        while (lockOn.Value)
         {
+            // Recalculate the distance to the enemy champion in each frame
+            float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
+
+            if (distance <= champion.autoAttack.range)
+            {
+                break; // Exit the loop when the player is in range
+            }
+
             Debug.Log("Enemy champion is out of range. Moving into range.");
             RequestMoveRpc(enemyChampion.transform.position); // Request movement on the server
             yield return null; // Wait for the next frame
         }
-        // Stop player from moving when in range
-        SendMousePositionRpc(transform.position);
-        RequestMoveRpc(transform.position);
+
         Debug.Log("Player moved into range of the enemy champion.");
+        // Stop player from moving when in range
+        targetPositionNet.Value = transform.position; // Set target position to current position
+
+        // Start the auto-attack coroutine
         StartCoroutine(PerformAutoAttackCoroutine(targetPosition, enemyChampion, rapidFire));
     }
 
