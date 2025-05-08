@@ -19,7 +19,7 @@ public class PlayerNetwork : NetworkBehaviour
 
     public NetworkVariable<bool> isMoving = new NetworkVariable<bool>(false); // Network variable for movement state
 
-    private Vector3 clickPosition; // Click position in world space || Used specifically for moving the player into range of the enemy 
+    public NetworkVariable<bool> lockOn = new NetworkVariable<bool>(false); // Network variable for attack state
     
 
     void Start()
@@ -71,7 +71,6 @@ public class PlayerNetwork : NetworkBehaviour
         {
             if (AttackOrMove())
             {
-                clickPosition = mousePosition; // Store the click position
                 Debug.Log("Attack input detected.");
                 PerformAutoAttack(); // Perform auto-attack
             }
@@ -82,7 +81,6 @@ public class PlayerNetwork : NetworkBehaviour
             if (!AttackOrMove()){
                 Debug.Log("Move input detected.");
                 SendMousePositionRpc(mousePosition); // Send mouse position to the server
-                clickPosition = mousePosition; // Store the click position
                 RequestMoveRpc(mousePosition); // Request movement on the server
                 Vector3 direction = targetPositionNet.Value - transform.position;
                 float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -124,32 +122,33 @@ public class PlayerNetwork : NetworkBehaviour
         }
     }
 
+    [Rpc(SendTo.Server)]
+    private void checkLockOnRpc()
+    {
+        if (!IsServer) return; // Only the server can check lock-on
+        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+        if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && (hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId))
+        {
+            lockOn.Value = true; // Lock on to the enemy champion
+        }
+        else
+        {
+            lockOn.Value = false; // Unlock from the enemy champion
+        }
+    }
+
     public void PerformAutoAttack()
     {
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
         if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && (hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId))
         {
             Debug.Log("Raycast hit the enemy champion!");
-            float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
-            if (distance > champion.autoAttack.range)
-            {
-                Vector3 oldClickPosition = clickPosition; // Store the old click position
-                // Move towards target until in range
-                // Exit out of loop if new move input is detected
-                while ((distance > champion.autoAttack.range) && (oldClickPosition == clickPosition))
-                {
-                    transform.position = Vector3.MoveTowards(transform.position, enemyChampion.transform.position, Time.deltaTime * champion.movementSpeed.Value);
-                    distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
-                }
-            }
-            else
-            {
-               // Stop moving when auto attacking
-                Vector3 direction = targetPositionNet.Value - transform.position;
-                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                UpdateRotationRpc(angle); // Update rotation
-            }
-            
+            checkLockOnRpc(); // Check lock-on state
+    
+            // Stop moving when auto attacking
+            Vector3 direction = targetPositionNet.Value - transform.position;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            UpdateRotationRpc(angle); // Update rotation
             PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value); // Call the auto-attack function on the server
             //Make player stop moving when auto attacking
             SendMousePositionRpc(transform.position); // Send mouse position to the server
@@ -244,6 +243,7 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (!IsServer) return;
         // Enemy should already be in range before calling this function
+        // Need to do lock on stuff here. Needs to be done on the server b/c of the update to the enemy champion's position
 
         if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetNetworkObjectId, out NetworkObject targetObj))
         {
@@ -258,13 +258,20 @@ public class PlayerNetwork : NetworkBehaviour
             return;
         }
 
+        //Lock on here; want it called before cool down is checked b/c cooldown can be valid by the time player is in range
+        float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
+        if (distance > champion.autoAttack.range)
+        {
+            StartCoroutine(moveIntoRange(targetPosition, enemyChampion)); // Move into range of the enemy champion
+            
+        }
+
         if (Time.time < champion.lastAutoAttackTime.Value + (1f / champion.attackSpeed.Value))
         {
             Debug.Log("Auto-attack is on cooldown!");
             Debug.Log($"Time: {Time.time}, Last Auto Attack Time: {champion.lastAutoAttackTime.Value}, Attack Speed: {champion.attackSpeed.Value}");
             return;
         }
-        
 
         StartCoroutine(PerformAutoAttackCoroutine(targetPosition, enemyChampion, rapidFire));
         Debug.Log("Auto-attack performed on the server.");
@@ -343,6 +350,19 @@ public class PlayerNetwork : NetworkBehaviour
     private IEnumerator waitForSec(float seconds)
     {
         yield return new WaitForSeconds(seconds);
+    }
+
+    private IEnumerator moveIntoRange(Vector3 targetPosition, GameObject enemyChampion)
+    {
+        float distance = Vector2.Distance(transform.position, enemyChampion.transform.position); // Calculate the distance to the enemy champion
+        // While the player isnt in range and the player hasnt registed a new click input.
+        while ((distance > champion.autoAttack.range) && lockOn.Value)
+        {
+            targetPositionNet.Value = enemyChampion.transform.position; // Update the target position to the enemy champion's position
+            // MovePlayer() should be being called in update so I shouldnt have to call it here???
+            yield return null; // Wait for the next frame
+        }
+        Debug.Log("Player moved into range of the enemy champion.");
     }
 
 
