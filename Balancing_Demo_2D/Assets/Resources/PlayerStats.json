@@ -3310,6 +3310,1606 @@
                     "rarity": 1
                 }
             ]
+        },
+        {
+            "damageValues": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "AD Range",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [
+                0.0,
+                0.0,
+                56.60377502441406
+            ],
+            "damageOverTime": 0.943396270275116,
+            "damage": 56.60377502441406,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "AD Range",
+            "damageTotal": 56.60377502441406,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Magic Resist Shard",
+                    "id": 1101,
+                    "description": "Grants between 14 and 28 bonus magic resistance.",
+                    "type": "MagicResist",
+                    "min": 14.0,
+                    "max": 28.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Magic Resist Shard",
+                    "id": 1101,
+                    "description": "Grants between 14 and 28 bonus magic resistance.",
+                    "type": "MagicResist",
+                    "min": 14.0,
+                    "max": 28.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Magic Resist Shard",
+                    "id": 1101,
+                    "description": "Grants between 14 and 28 bonus magic resistance.",
+                    "type": "MagicResist",
+                    "min": 14.0,
+                    "max": 28.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Magic Resist Shard",
+                    "id": 1101,
+                    "description": "Grants between 14 and 28 bonus magic resistance.",
+                    "type": "MagicResist",
+                    "min": 14.0,
+                    "max": 28.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [
+                0.0,
+                0.0,
+                48.780487060546878
+            ],
+            "damageOverTime": 0.8130081295967102,
+            "damage": 48.780487060546878,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "AD Range",
+            "damageTotal": 48.780487060546878,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Magic Penetration Shard",
+                    "id": 801,
+                    "description": "Grants between 10 and 20 flat magic penetration.",
+                    "type": "MagicPenetration",
+                    "min": 10.0,
+                    "max": 20.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [
+                0.0,
+                0.0,
+                44.44444274902344
+            ],
+            "damageOverTime": 0.7407407164573669,
+            "damage": 44.44444274902344,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "AD Range",
+            "damageTotal": 44.44444274902344,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Armor Shard",
+                    "id": 301,
+                    "description": "Grants between 12 and 24 armor.",
+                    "type": "Armor",
+                    "min": 12.0,
+                    "max": 24.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Magic Resist Shard",
+                    "id": 1101,
+                    "description": "Grants between 14 and 28 bonus magic resistance.",
+                    "type": "MagicResist",
+                    "min": 14.0,
+                    "max": 28.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Attack Damage Shard",
+                    "id": 401,
+                    "description": "Grants between 11 and 22 attack damage.",
+                    "type": "AttackDamage",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Magic Penetration Shard",
+                    "id": 801,
+                    "description": "Grants between 10 and 20 flat magic penetration.",
+                    "type": "MagicPenetration",
+                    "min": 10.0,
+                    "max": 20.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Armor Shard",
+                    "id": 301,
+                    "description": "Grants between 12 and 24 armor.",
+                    "type": "Armor",
+                    "min": 12.0,
+                    "max": 24.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Magic Resist Shard",
+                    "id": 1101,
+                    "description": "Grants between 14 and 28 bonus magic resistance.",
+                    "type": "MagicResist",
+                    "min": 14.0,
+                    "max": 28.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Attack Damage Shard",
+                    "id": 401,
+                    "description": "Grants between 11 and 22 attack damage.",
+                    "type": "AttackDamage",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Magic Penetration Shard",
+                    "id": 801,
+                    "description": "Grants between 10 and 20 flat magic penetration.",
+                    "type": "MagicPenetration",
+                    "min": 10.0,
+                    "max": 20.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Armor Shard",
+                    "id": 301,
+                    "description": "Grants between 12 and 24 armor.",
+                    "type": "Armor",
+                    "min": 12.0,
+                    "max": 24.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Magic Resist Shard",
+                    "id": 1101,
+                    "description": "Grants between 14 and 28 bonus magic resistance.",
+                    "type": "MagicResist",
+                    "min": 14.0,
+                    "max": 28.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Attack Damage Shard",
+                    "id": 401,
+                    "description": "Grants between 11 and 22 attack damage.",
+                    "type": "AttackDamage",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Magic Penetration Shard",
+                    "id": 801,
+                    "description": "Grants between 10 and 20 flat magic penetration.",
+                    "type": "MagicPenetration",
+                    "min": 10.0,
+                    "max": 20.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Armor Shard",
+                    "id": 301,
+                    "description": "Grants between 12 and 24 armor.",
+                    "type": "Armor",
+                    "min": 12.0,
+                    "max": 24.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Magic Resist Shard",
+                    "id": 1101,
+                    "description": "Grants between 14 and 28 bonus magic resistance.",
+                    "type": "MagicResist",
+                    "min": 14.0,
+                    "max": 28.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Attack Damage Shard",
+                    "id": 401,
+                    "description": "Grants between 11 and 22 attack damage.",
+                    "type": "AttackDamage",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [
+                0.0,
+                0.0
+            ],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "AD Range",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Power Shard",
+                    "id": 201,
+                    "description": "Grants between 18 and 36 ability power.",
+                    "type": "AbilityPower",
+                    "min": 18.0,
+                    "max": 36.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [
+                0.0,
+                0.0
+            ],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "AD Range",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Power Shard",
+                    "id": 201,
+                    "description": "Grants between 18 and 36 ability power.",
+                    "type": "AbilityPower",
+                    "min": 18.0,
+                    "max": 36.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Power Shard",
+                    "id": 201,
+                    "description": "Grants between 18 and 36 ability power.",
+                    "type": "AbilityPower",
+                    "min": 18.0,
+                    "max": 36.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Power Shard",
+                    "id": 201,
+                    "description": "Grants between 18 and 36 ability power.",
+                    "type": "AbilityPower",
+                    "min": 18.0,
+                    "max": 36.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Power Shard",
+                    "id": 201,
+                    "description": "Grants between 18 and 36 ability power.",
+                    "type": "AbilityPower",
+                    "min": 18.0,
+                    "max": 36.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Power Shard",
+                    "id": 201,
+                    "description": "Grants between 18 and 36 ability power.",
+                    "type": "AbilityPower",
+                    "min": 18.0,
+                    "max": 36.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Power Shard",
+                    "id": 201,
+                    "description": "Grants between 18 and 36 ability power.",
+                    "type": "AbilityPower",
+                    "min": 18.0,
+                    "max": 36.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Health Shard",
+                    "id": 701,
+                    "description": "Grants between 110 and 220 bonus health.",
+                    "type": "Health",
+                    "min": 110.0,
+                    "max": 220.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Power Shard",
+                    "id": 201,
+                    "description": "Grants between 18 and 36 ability power.",
+                    "type": "AbilityPower",
+                    "min": 18.0,
+                    "max": 36.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "AD Range",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Critical Damage Shard",
+                    "id": 1201,
+                    "description": "Grants 25% critical damage.",
+                    "type": "CriticalDamage",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 3
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "AD Range",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Critical Strike Shard",
+                    "id": 602,
+                    "description": "Grants 25% critical strike chance.",
+                    "type": "CriticalStrike",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 2
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Haste Shard",
+                    "id": 101,
+                    "description": "Grants between 11 and 22 ability haste.",
+                    "type": "AbilityHaste",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Critical Damage Shard",
+                    "id": 1201,
+                    "description": "Grants 25% critical damage.",
+                    "type": "CriticalDamage",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 3
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Critical Strike Shard",
+                    "id": 602,
+                    "description": "Grants 25% critical strike chance.",
+                    "type": "CriticalStrike",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 2
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Haste Shard",
+                    "id": 101,
+                    "description": "Grants between 11 and 22 ability haste.",
+                    "type": "AbilityHaste",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Critical Damage Shard",
+                    "id": 1201,
+                    "description": "Grants 25% critical damage.",
+                    "type": "CriticalDamage",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 3
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Critical Strike Shard",
+                    "id": 602,
+                    "description": "Grants 25% critical strike chance.",
+                    "type": "CriticalStrike",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 2
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Haste Shard",
+                    "id": 101,
+                    "description": "Grants between 11 and 22 ability haste.",
+                    "type": "AbilityHaste",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Critical Damage Shard",
+                    "id": 1201,
+                    "description": "Grants 25% critical damage.",
+                    "type": "CriticalDamage",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 3
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                },
+                {
+                    "name": "Armor Penetration Shard",
+                    "id": 901,
+                    "description": "Grants between 8 and 16 flat armor penetration.",
+                    "type": "ArmorPenetration",
+                    "min": 8.0,
+                    "max": 16.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Critical Strike Shard",
+                    "id": 602,
+                    "description": "Grants 25% critical strike chance.",
+                    "type": "CriticalStrike",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 2
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Haste Shard",
+                    "id": 101,
+                    "description": "Grants between 11 and 22 ability haste.",
+                    "type": "AbilityHaste",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [
+                0.0,
+                48.780487060546878,
+                48.780487060546878,
+                48.780487060546878
+            ],
+            "damageOverTime": 2.4390244483947756,
+            "damage": 48.780487060546878,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "AD Range",
+            "damageTotal": 146.34146118164063,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Critical Damage Shard",
+                    "id": 1201,
+                    "description": "Grants 25% critical damage.",
+                    "type": "CriticalDamage",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 3
+                },
+                {
+                    "name": "Critical Strike Shard",
+                    "id": 602,
+                    "description": "Grants 25% critical strike chance.",
+                    "type": "CriticalStrike",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 2
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                },
+                {
+                    "name": "Attack Damage Shard",
+                    "id": 401,
+                    "description": "Grants between 11 and 22 attack damage.",
+                    "type": "AttackDamage",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [
+                0.0,
+                0.0,
+                48.780487060546878,
+                48.780487060546878
+            ],
+            "damageOverTime": 1.6260162591934205,
+            "damage": 58.53658676147461,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "AD Range",
+            "damageTotal": 97.56097412109375,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Ability Power Shard",
+                    "id": 201,
+                    "description": "Grants between 18 and 36 ability power.",
+                    "type": "AbilityPower",
+                    "min": 18.0,
+                    "max": 36.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Haste Shard",
+                    "id": 101,
+                    "description": "Grants between 11 and 22 ability haste.",
+                    "type": "AbilityHaste",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Haste Shard",
+                    "id": 101,
+                    "description": "Grants between 11 and 22 ability haste.",
+                    "type": "AbilityHaste",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Magic Resist Shard",
+                    "id": 1101,
+                    "description": "Grants between 14 and 28 bonus magic resistance.",
+                    "type": "MagicResist",
+                    "min": 14.0,
+                    "max": 28.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Critical Damage Shard",
+                    "id": 1201,
+                    "description": "Grants 25% critical damage.",
+                    "type": "CriticalDamage",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 3
+                },
+                {
+                    "name": "Critical Strike Shard",
+                    "id": 602,
+                    "description": "Grants 25% critical strike chance.",
+                    "type": "CriticalStrike",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 2
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                },
+                {
+                    "name": "Attack Damage Shard",
+                    "id": 401,
+                    "description": "Grants between 11 and 22 attack damage.",
+                    "type": "AttackDamage",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Ability Power Shard",
+                    "id": 201,
+                    "description": "Grants between 18 and 36 ability power.",
+                    "type": "AbilityPower",
+                    "min": 18.0,
+                    "max": 36.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Haste Shard",
+                    "id": 101,
+                    "description": "Grants between 11 and 22 ability haste.",
+                    "type": "AbilityHaste",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Haste Shard",
+                    "id": 101,
+                    "description": "Grants between 11 and 22 ability haste.",
+                    "type": "AbilityHaste",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Magic Resist Shard",
+                    "id": 1101,
+                    "description": "Grants between 14 and 28 bonus magic resistance.",
+                    "type": "MagicResist",
+                    "min": 14.0,
+                    "max": 28.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Critical Damage Shard",
+                    "id": 1201,
+                    "description": "Grants 25% critical damage.",
+                    "type": "CriticalDamage",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 3
+                },
+                {
+                    "name": "Critical Strike Shard",
+                    "id": 602,
+                    "description": "Grants 25% critical strike chance.",
+                    "type": "CriticalStrike",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 2
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                },
+                {
+                    "name": "Attack Damage Shard",
+                    "id": 401,
+                    "description": "Grants between 11 and 22 attack damage.",
+                    "type": "AttackDamage",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Ability Power Shard",
+                    "id": 201,
+                    "description": "Grants between 18 and 36 ability power.",
+                    "type": "AbilityPower",
+                    "min": 18.0,
+                    "max": 36.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Haste Shard",
+                    "id": 101,
+                    "description": "Grants between 11 and 22 ability haste.",
+                    "type": "AbilityHaste",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Haste Shard",
+                    "id": 101,
+                    "description": "Grants between 11 and 22 ability haste.",
+                    "type": "AbilityHaste",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Magic Resist Shard",
+                    "id": 1101,
+                    "description": "Grants between 14 and 28 bonus magic resistance.",
+                    "type": "MagicResist",
+                    "min": 14.0,
+                    "max": 28.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Critical Damage Shard",
+                    "id": 1201,
+                    "description": "Grants 25% critical damage.",
+                    "type": "CriticalDamage",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 3
+                },
+                {
+                    "name": "Critical Strike Shard",
+                    "id": 602,
+                    "description": "Grants 25% critical strike chance.",
+                    "type": "CriticalStrike",
+                    "min": 0.25,
+                    "max": 0.25,
+                    "rarity": 2
+                },
+                {
+                    "name": "Attack Speed Shard",
+                    "id": 501,
+                    "description": "Grants between 11% and 22% attack speed.",
+                    "type": "AttackSpeed",
+                    "min": 0.10999999940395355,
+                    "max": 0.2199999988079071,
+                    "rarity": 1
+                },
+                {
+                    "name": "Attack Damage Shard",
+                    "id": 401,
+                    "description": "Grants between 11 and 22 attack damage.",
+                    "type": "AttackDamage",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                }
+            ]
+        },
+        {
+            "damageValues": [],
+            "damageOverTime": 0.0,
+            "damage": 0.0,
+            "costToDamage": 0.0,
+            "totalManaSpent": 0.0,
+            "championType": "",
+            "damageTotal": 0.0,
+            "gameTime": 0.0,
+            "chosenAugments": [
+                {
+                    "name": "Ability Power Shard",
+                    "id": 201,
+                    "description": "Grants between 18 and 36 ability power.",
+                    "type": "AbilityPower",
+                    "min": 18.0,
+                    "max": 36.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Haste Shard",
+                    "id": 101,
+                    "description": "Grants between 11 and 22 ability haste.",
+                    "type": "AbilityHaste",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Ability Haste Shard",
+                    "id": 101,
+                    "description": "Grants between 11 and 22 ability haste.",
+                    "type": "AbilityHaste",
+                    "min": 11.0,
+                    "max": 22.0,
+                    "rarity": 1
+                },
+                {
+                    "name": "Magic Resist Shard",
+                    "id": 1101,
+                    "description": "Grants between 14 and 28 bonus magic resistance.",
+                    "type": "MagicResist",
+                    "min": 14.0,
+                    "max": 28.0,
+                    "rarity": 1
+                }
+            ]
         }
     ]
 }

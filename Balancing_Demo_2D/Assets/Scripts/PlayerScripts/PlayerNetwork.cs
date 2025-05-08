@@ -22,7 +22,7 @@ public class PlayerNetwork : NetworkBehaviour
     private Vector3 clickPosition; // Click position in world space || Used specifically for moving the player into range of the enemy 
 
     private bool cancelCurrentAction = false; // Flag to cancel the current action
-    public NetworkVariable<Vector3> enemyPosition = new NetworkVariable<Vector3>(); // Network variable for enemy position
+    public Vector3 enemyPosition; // Position of the enemy champion
 
     private GameObject enemyChampion; // Reference to the enemy champion
 
@@ -52,9 +52,6 @@ public class PlayerNetwork : NetworkBehaviour
 
     void Update()
     {
-        if (IsServer && enemyChampion != null && enemyChampion.GetComponent<NetworkObject>() != null){
-            updateEnemyPosition(enemyChampion.transform.Find("PlayerController").position); // Update enemy position)
-        }
         if (!IsOwner || GM.gamePaused.Value) return; // Only the owner can control the player and only if the game is not paused
 
         // Constantly update mouse position
@@ -68,12 +65,6 @@ public class PlayerNetwork : NetworkBehaviour
 
         //TODO: Check if colliding with terrain and if so stop moving
 
-    }
-
-    private void updateEnemyPosition(Vector3 enemyPos)
-    {
-        if (!IsServer) return; // Only the server can update the enemy position
-        enemyPosition.Value = enemyChampion.transform.Find("PlayerController").position; // Update enemy position
     }
 
     private void checkInputs()
@@ -92,8 +83,7 @@ public class PlayerNetwork : NetworkBehaviour
         }
 
         if (Input.GetMouseButton(1)) // Right Mouse Button Pressed and Stay down
-        {
-            cancelCurrentAction = true;
+            {
             if (!AttackOrMove()){
                 //Debug.Log("Move input detected.");
                 SendMousePositionRpc(mousePosition); // Send mouse position to the server
@@ -103,6 +93,7 @@ public class PlayerNetwork : NetworkBehaviour
                 float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
                 UpdateRotationRpc(angle); // Update rotation
             }
+            
         }
 
         if (Input.GetKeyDown(KeyCode.Q)) // Q key pressed
@@ -144,7 +135,7 @@ public class PlayerNetwork : NetworkBehaviour
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
         if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId)
         {
-            enemyChampion = hit.collider.GetComponentInParent<NetworkObject>().gameObject; // Get the enemy champion
+            enemyChampion = hit.collider.gameObject; // Get the enemy champion
             Debug.Log("Raycast hit the enemy champion!");
 
             // Start the coroutine to handle movement and attack
@@ -162,8 +153,11 @@ public class PlayerNetwork : NetworkBehaviour
 
         while (!cancelCurrentAction)
         {
-            float distance = Vector2.Distance(transform.position, enemyPosition.Value); // Calculate distance to the enemy champion
-
+            enemyPosition = enemyChampion.transform.position; // Update the enemy position
+            float distance = Vector2.Distance(transform.position, enemyPosition); // Calculate distance to the enemy champion
+            //Debug.Log($"Distance to enemy champion: {distance}");
+            //Debug.Log($"Enemy position: {enemyPosition}");
+            Debug.Log($"Distance {distance} <= {champion.autoAttack.range}");
             if (distance <= champion.autoAttack.range)
             {
                 Debug.Log("Player is in range of the enemy champion.");
@@ -172,14 +166,14 @@ public class PlayerNetwork : NetworkBehaviour
                 RequestMoveRpc(transform.position);
 
                 // Perform the auto-attack
-                PerformAutoAttackRpc(mousePosition, enemyChampion.GetComponent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value);
+                PerformAutoAttackRpc(mousePosition, enemyChampion.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value);
                 yield break; // Exit the coroutine after attacking
             }
-
+            
             // Move toward the enemy
             Debug.Log("Moving toward the enemy champion.");
-            RequestMoveRpc(enemyPosition.Value); // Request movement to the enemy position
-
+            RequestMoveRpc(enemyPosition); // Request movement to the enemy position
+            distance = Vector2.Distance(transform.position, enemyPosition); // Update distance to the enemy champion
             yield return null; // Wait for the next frame
         }
 
