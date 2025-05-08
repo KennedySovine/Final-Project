@@ -7,7 +7,7 @@ public class PlayerNetwork : NetworkBehaviour
     public Vector2 mousePosition; // Mouse position in world space
     public float dashSpeed;
 
-    public NetworkVariable<Vector3> targetPositionNet = new NetworkVariable<Vector3>(); // Network variable for target position
+    public NetworkVariable<Vector3> targetPositionNet = new NetworkVariable<Vector3>(); // Network variable for target position ONLY USED FOR DASHING
     public NetworkVariable<bool> isDashing = new NetworkVariable<bool>(false); // Network variable for dash state
 
     public Camera personalCamera;
@@ -16,6 +16,10 @@ public class PlayerNetwork : NetworkBehaviour
     private GameManager GM; // Reference to the GameManager
 
     private bool isCollidingWithTerrain = false; // Flag to check if colliding with terrain
+
+    public NetworkVariable<bool> isMoving = new NetworkVariable<bool>(false); // Network variable for movement state
+
+    private Vector3 clickPosition; // Click position in world space || Used specifically for moving the player into range of the enemy 
     
 
     void Start()
@@ -67,6 +71,7 @@ public class PlayerNetwork : NetworkBehaviour
         {
             if (AttackOrMove())
             {
+                clickPosition = mousePosition; // Store the click position
                 Debug.Log("Attack input detected.");
                 PerformAutoAttack(); // Perform auto-attack
             }
@@ -77,6 +82,7 @@ public class PlayerNetwork : NetworkBehaviour
             if (!AttackOrMove()){
                 Debug.Log("Move input detected.");
                 SendMousePositionRpc(mousePosition); // Send mouse position to the server
+                clickPosition = mousePosition; // Store the click position
                 RequestMoveRpc(mousePosition); // Request movement on the server
                 Vector3 direction = targetPositionNet.Value - transform.position;
                 float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -110,12 +116,10 @@ public class PlayerNetwork : NetworkBehaviour
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
         if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && (hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId))
         {
-            // Attack
             return true; // Attack
         }
         else
         {
-            // Move
             return false; // Move
         }
     }
@@ -126,13 +130,28 @@ public class PlayerNetwork : NetworkBehaviour
         if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && (hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId))
         {
             Debug.Log("Raycast hit the enemy champion!");
-
-            // Stop moving when auto attacking
-            Vector3 direction = targetPositionNet.Value - transform.position;
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            UpdateRotationRpc(angle); // Update rotation
+            float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
+            if (distance > champion.autoAttack.range)
+            {
+                Vector3 oldClickPosition = clickPosition; // Store the old click position
+                // Move towards target until in range
+                // Exit out of loop if new move input is detected
+                while ((distance > champion.autoAttack.range) && (oldClickPosition == clickPosition))
+                {
+                    transform.position = Vector3.MoveTowards(transform.position, enemyChampion.transform.position, Time.deltaTime * champion.movementSpeed.Value);
+                    distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
+                }
+            }
+            else
+            {
+               // Stop moving when auto attacking
+                Vector3 direction = targetPositionNet.Value - transform.position;
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                UpdateRotationRpc(angle); // Update rotation
+            }
             
             PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value); // Call the auto-attack function on the server
+            //Make player stop moving when auto attacking
             SendMousePositionRpc(transform.position); // Send mouse position to the server
             RequestMoveRpc(transform.position); // Request movement on the server
         }
@@ -224,6 +243,7 @@ public class PlayerNetwork : NetworkBehaviour
     public void PerformAutoAttackRpc(Vector3 targetPosition, ulong targetNetworkObjectId, int rapidFire)
     {
         if (!IsServer) return;
+        // Enemy should already be in range before calling this function
 
         if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetNetworkObjectId, out NetworkObject targetObj))
         {
@@ -238,19 +258,13 @@ public class PlayerNetwork : NetworkBehaviour
             return;
         }
 
-        float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
-        if (distance > champion.autoAttack.range)
-        {
-            Debug.Log("Target out of range!");
-            return;
-        }
-
         if (Time.time < champion.lastAutoAttackTime.Value + (1f / champion.attackSpeed.Value))
         {
             Debug.Log("Auto-attack is on cooldown!");
             Debug.Log($"Time: {Time.time}, Last Auto Attack Time: {champion.lastAutoAttackTime.Value}, Attack Speed: {champion.attackSpeed.Value}");
             return;
         }
+        
 
         StartCoroutine(PerformAutoAttackCoroutine(targetPosition, enemyChampion, rapidFire));
         Debug.Log("Auto-attack performed on the server.");
