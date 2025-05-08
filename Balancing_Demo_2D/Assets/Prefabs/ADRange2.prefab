@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 1340520847739071468}
   m_Layer: 3
   m_Name: PlayerController
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -308,6 +308,9 @@ MonoBehaviour:
     m_InternalValue: 0
   personalCamera: {fileID: 4986339328056519817}
   champion: {fileID: 2750187209312509762}
+  isMoving:
+    m_InternalValue: 0
+  enemyPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &5221310434119250730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -457,7 +460,7 @@ GameObject:
   - component: {fileID: 7235667429038699871}
   m_Layer: 3
   m_Name: ADRange2
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
