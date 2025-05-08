@@ -19,8 +19,12 @@ public class PlayerNetwork : NetworkBehaviour
 
     public NetworkVariable<bool> isMoving = new NetworkVariable<bool>(false); // Network variable for movement state
 
-    public NetworkVariable<bool> lockOn = new NetworkVariable<bool>(false); // Network variable for attack state
-    
+    private Vector3 clickPosition; // Click position in world space || Used specifically for moving the player into range of the enemy 
+
+    private bool cancelCurrentAction = false; // Flag to cancel the current action
+    public Vector3 enemyPosition; // Position of the enemy champion
+
+    private GameObject enemyChampion; // Reference to the enemy champion
 
     void Start()
     {
@@ -69,24 +73,27 @@ public class PlayerNetwork : NetworkBehaviour
 
         if (Input.GetMouseButtonDown(1)) // Right mouse button pressed
         {
+            cancelCurrentAction = true;
             if (AttackOrMove())
             {
-                //Debug.Log("Attack input detected.");
+                clickPosition = mousePosition; // Store the click position
+                Debug.Log("Attack input detected.");
                 PerformAutoAttack(); // Perform auto-attack
             }
         }
 
-        if (Input.GetMouseButton(1)) // Right Mouse Button Pressed
-        {
+        if (Input.GetMouseButton(1)) // Right Mouse Button Pressed and Stay down
+            {
             if (!AttackOrMove()){
                 //Debug.Log("Move input detected.");
-                checkLockOnRpc(); // Check lock-on state
                 SendMousePositionRpc(mousePosition); // Send mouse position to the server
+                clickPosition = mousePosition; // Store the click position
                 RequestMoveRpc(mousePosition); // Request movement on the server
                 Vector3 direction = targetPositionNet.Value - transform.position;
                 float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
                 UpdateRotationRpc(angle); // Update rotation
             }
+            
         }
 
         if (Input.GetKeyDown(KeyCode.Q)) // Q key pressed
@@ -123,40 +130,62 @@ public class PlayerNetwork : NetworkBehaviour
         }
     }
 
-    [Rpc(SendTo.Server)]
-    private void checkLockOnRpc()
-    {
-        if (!IsServer) return; // Only the server can check lock-on
-        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
-        if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && (hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId))
-        {
-            lockOn.Value = true; // Lock on to the enemy champion
-        }
-        else
-        {
-            lockOn.Value = false; // Unlock from the enemy champion
-        }
-    }
-
     public void PerformAutoAttack()
     {
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
-        if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && (hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId))
+        if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId)
         {
+            enemyChampion = hit.collider.gameObject; // Get the enemy champion
             Debug.Log("Raycast hit the enemy champion!");
-            checkLockOnRpc(); // Check lock-on state
-    
-            // Stop moving when auto attacking
-            Vector3 direction = targetPositionNet.Value - transform.position;
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            UpdateRotationRpc(angle); // Update rotation
-            PerformAutoAttackRpc(mousePosition, hit.collider.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value); // Call the auto-attack function on the server
-            //Make player stop moving when auto attacking
+
+            // Start the coroutine to handle movement and attack
+            StartCoroutine(MoveAndAttackCoroutine(enemyChampion));
         }
         else
         {
             Debug.Log("Raycast did not hit the enemy champion.");
         }
+    }
+
+    private IEnumerator MoveAndAttackCoroutine(GameObject enemyChampion)
+    {
+        cancelCurrentAction = false; // Reset the cancel flag
+        Vector3 direction = targetPositionNet.Value - transform.position;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        UpdateRotationRpc(angle); // Update rotation
+
+        while (!cancelCurrentAction)
+        {
+            enemyPosition = enemyChampion.transform.position; // Update the enemy position
+            float distance = Vector2.Distance(transform.position, enemyPosition); // Calculate distance to the enemy champion
+            Vector3 direction = enemyPosition - transform.position;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            UpdateRotationRpc(angle); // Update rotation
+            
+            if (distance <= champion.autoAttack.range)
+            {
+                Debug.Log("Player is in range of the enemy champion.");
+                // Stop movement
+                SendMousePositionRpc(transform.position);
+                RequestMoveRpc(transform.position);
+
+                Vector3 direction = targetPositionNet.Value - transform.position;
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                UpdateRotationRpc(angle); // Update rotation
+
+                // Perform the auto-attack
+                PerformAutoAttackRpc(enemyPosition, enemyChampion.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value);
+                yield break; // Exit the coroutine after attacking
+            }
+            
+            // Move toward the enemy
+            Debug.Log("Moving toward the enemy champion.");
+            RequestMoveRpc(enemyPosition); // Request movement to the enemy position
+            distance = Vector2.Distance(transform.position, enemyPosition); // Update distance to the enemy champion
+            yield return null; // Wait for the next frame
+        }
+
+        Debug.Log("Action canceled by the player.");
     }
 
     private void MovePlayer()
@@ -242,7 +271,6 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (!IsServer) return;
         // Enemy should already be in range before calling this function
-        // Need to do lock on stuff here. Needs to be done on the server b/c of the update to the enemy champion's position
 
         if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetNetworkObjectId, out NetworkObject targetObj))
         {
@@ -263,8 +291,9 @@ public class PlayerNetwork : NetworkBehaviour
             Debug.Log($"Time: {Time.time}, Last Auto Attack Time: {champion.lastAutoAttackTime.Value}, Attack Speed: {champion.attackSpeed.Value}");
             return;
         }
+        
 
-        StartCoroutine(MoveIntoRangeCoroutine(targetPosition, enemyChampion, rapidFire)); // Move into range of the enemy champion
+        StartCoroutine(PerformAutoAttackCoroutine(targetPosition, enemyChampion, rapidFire));
         Debug.Log("Auto-attack performed on the server.");
     }
 
@@ -343,31 +372,6 @@ public class PlayerNetwork : NetworkBehaviour
         yield return new WaitForSeconds(seconds);
     }
 
-    private IEnumerator MoveIntoRangeCoroutine(Vector3 targetPosition, GameObject enemyChampion, int rapidFire)
-    {
-        while (lockOn.Value)
-        {
-            // Recalculate the distance to the enemy champion in each frame
-            float distance = Vector2.Distance(transform.position, enemyChampion.transform.position);
-
-            if (distance <= champion.autoAttack.range)
-            {
-                break; // Exit the loop when the player is in range
-            }
-
-            Debug.Log("Enemy champion is out of range. Moving into range.");
-            RequestMoveRpc(enemyChampion.transform.position); // Request movement on the server
-            yield return null; // Wait for the next frame
-        }
-
-        Debug.Log("Player moved into range of the enemy champion.");
-        // Stop player from moving when in range
-        targetPositionNet.Value = transform.position; // Set target position to current position
-
-        // Start the auto-attack coroutine
-        StartCoroutine(PerformAutoAttackCoroutine(targetPosition, enemyChampion, rapidFire));
-    }
-
 
     //GHOST BULLET
     [Rpc(SendTo.NotServer)]
@@ -382,6 +386,7 @@ public class PlayerNetwork : NetworkBehaviour
         }
 
         StartCoroutine(MoveGhostBullet(ghostBullet, targetPosition, speed));
+
     }
 
     private IEnumerator MoveGhostBullet(GameObject GB, Vector3 targetPosition, float speed)

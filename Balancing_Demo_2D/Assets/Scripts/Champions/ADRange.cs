@@ -31,7 +31,6 @@ public class ADRange : BaseChampion
         critChance.Value = 0f;
         critDamage.Value = 1.75f; // 175% damage on crit
 
-        autoAttack.setRange(18f); // Set the range of the auto attack ability
         health.Value = maxHealth.Value; // Initialize health to max health
         mana.Value = maxMana.Value; // Initialize mana to max mana
         missileSpeed.Value = 33f;
@@ -44,6 +43,9 @@ public class ADRange : BaseChampion
 
     private void AddAbilities()
     {
+
+        autoAttack.setRange(18f); // Set the range of the auto attack ability
+        
         passive = new Ability(
             "Night Hunter",
             "Gain bonus movement speed when moving towards an enemy champion.",

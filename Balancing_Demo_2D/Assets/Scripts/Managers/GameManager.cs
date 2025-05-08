@@ -525,7 +525,6 @@ public class GameManager : NetworkBehaviour
         Debug.Log("End game UI initialized and activated.");
         
     }
-    
 
     private IEnumerator waitForEndGameStats(){
         while (!recievedEndGameCalculations){
