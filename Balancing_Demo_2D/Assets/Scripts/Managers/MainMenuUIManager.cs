@@ -45,26 +45,26 @@ public class MainMenuUIManager : NetworkBehaviour
     #endregion
 
     #region UI Button Methods
-    public void exitButtonClick(){
+    public void ExitButtonClick(){
         Application.Quit();
     }
 
-    public void startButtonClick(){
+    public void StartButtonClick(){
         mainMenuUI.SetActive(false);
-        connectionType();
+        ConnectionType();
         // Load the game scene here
         // SceneManager.LoadScene("GameSceneName"); // Uncomment and replace with your scene name
     }
     #endregion
 
     #region Game Setup Methods
-    public void enterGame(){
+    public void EnterGame(){
         // Load the game scene here
         //SceneManager.LoadScene(sceneBuildIndex: 1);
         NetworkManager.Singleton.SceneManager.LoadScene("InGame", LoadSceneMode.Single); // Load the game scene
     }
 
-    public void connectionType()
+    public void ConnectionType()
     {
         if (networkDropdown.value == 1)
         {
@@ -72,20 +72,20 @@ public class MainMenuUIManager : NetworkBehaviour
             NetworkManager.Singleton.StartServer();
             GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the server
             GM.ServerID = NetworkManager.Singleton.LocalClientId; // Set the server ID to the local client ID
-            enterGame();
+            EnterGame();
         }
         else if (networkDropdown.value == 2)
         {
             Debug.Log("Starting as Host");
             NetworkManager.Singleton.StartHost();
             GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the host
-            enterGame();
+            EnterGame();
         }
         else if (networkDropdown.value == 3)
         {
             Debug.Log("Starting as Client");
             NetworkManager.Singleton.StartClient();
-            enterGame();
+            EnterGame();
         }
         else
         {

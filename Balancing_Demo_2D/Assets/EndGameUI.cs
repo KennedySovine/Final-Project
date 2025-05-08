@@ -88,7 +88,7 @@ public class EndGameUI : MonoBehaviour
             {
                 try
                 {
-                    stats.Add(GM.AM.augmentFromID(GM.player1Augments[i]).name); // Add augment name to stats list
+                    stats.Add(GM.AM.AugmentFromID(GM.player1Augments[i]).name); // Add augment name to stats list
                 }
                 catch (System.Exception e)
                 {
@@ -112,7 +112,7 @@ public class EndGameUI : MonoBehaviour
             {
                 try
                 {
-                    stats.Add(GM.AM.augmentFromID(GM.player2Augments[i]).name); // Add augment name to stats list
+                    stats.Add(GM.AM.AugmentFromID(GM.player2Augments[i]).name); // Add augment name to stats list
                 }
                 catch (System.Exception e)
                 {

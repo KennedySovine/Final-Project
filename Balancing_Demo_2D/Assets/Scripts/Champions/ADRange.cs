@@ -39,7 +39,7 @@ public class ADRange : BaseChampion
 
     private void AddAbilities()
     {
-        autoAttack.setRange(18f); // Set the range of the auto attack ability
+        autoAttack.SetRange(18f); // Set the range of the auto attack ability
         
         passive = new Ability(
             "Night Hunter",
@@ -75,7 +75,7 @@ public class ADRange : BaseChampion
             5f   // Range
         );
         ability3.icon = Resources.Load<Sprite>("Sprites/Vayne_Condemn"); // Load the icon for the ability from Resources folder
-        ability3.setDuration(8f);
+        ability3.SetDuration(8f);
 
         passive.Stats.championType = championType; // Set the champion type for the passive ability
 
@@ -92,18 +92,18 @@ public class ADRange : BaseChampion
         base.Update(); // Call the base class Update method
     }
 
-    public override void stackManager(){
+    public override void StackManager(){
         if (stackCount.Value > 0){
             if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
             {
-                resetStackCountRpc(); // Reset the stack count
+                ResetStackCountRpc(); // Reset the stack count
             }
         }
     }
     #endregion
 
     #region Ability Logic Methods
-    public override GameObject empowerLogic(GameObject bullet)
+    public override GameObject EmpowerLogic(GameObject bullet)
     {
         var bulletComponent = bullet.GetComponent<Bullet>();
         if (bulletComponent != null)
@@ -117,7 +117,7 @@ public class ADRange : BaseChampion
         return bullet;
     }
 
-    public override GameObject stackLogic(GameObject bullet)
+    public override GameObject StackLogic(GameObject bullet)
     {
         var bulletComponent = bullet.GetComponent<Bullet>();
         if (bulletComponent != null)
@@ -132,7 +132,7 @@ public class ADRange : BaseChampion
         return bullet;
     }
 
-    public override GameObject ability3Logic(GameObject bullet)
+    public override GameObject Ability3Logic(GameObject bullet)
     {
         var bulletComponent = bullet.GetComponent<Bullet>();
         if (bulletComponent != null)
@@ -149,7 +149,7 @@ public class ADRange : BaseChampion
 
     #region RPC Methods
     [Rpc(SendTo.Server)]
-    public override void passiveAbilityRpc(){
+    public override void PassiveAbilityRpc(){
         if (!IsServer) return; // Only the owner can use this ability
         //Passive ability logic
         if (enemyChampion == null){
@@ -198,12 +198,12 @@ public class ADRange : BaseChampion
         SetAbilityTimeOfCastRpc("Q", castTime);
 
         float newMoveSpeed = movementSpeed.Value + 17f; // Increase movement speed by 1 unit
-        updateManaRpc(-ability1.manaCost); // Deduct mana cost
+        UpdateManaRpc(-ability1.manaCost); // Deduct mana cost
         ability1.Stats.totalManaSpent += ability1.manaCost; // Update total mana spent for the ability
         Debug.Log("Tumble ability used. Player dashed towards the target position.");
 
         // Empower the next attack
-        updateIsEmpoweredRpc(true); // Set the empowered state to true
+        UpdateIsEmpoweredRpc(true); // Set the empowered state to true
 
         PN.ChampionDashRpc(PN.mousePosition, ability1.range, newMoveSpeed); // Call the dash function on the player network object
     }
@@ -248,10 +248,10 @@ public class ADRange : BaseChampion
 
         SetAbilityTimeOfCastRpc("E", Time.time); // Record the time of cast and synchronize it with clients
 
-        updateManaRpc(-ability3.manaCost); // Update the mana on the server
+        UpdateManaRpc(-ability3.manaCost); // Update the mana on the server
         ability3.Stats.totalManaSpent += ability3.manaCost; // Update the total mana spent for the ability
-        logAbilityUsedRpc(ability3); // Log the ability used
-        updateAbility3UsedRpc(true); // Update the ability used flag
+        LogAbilityUsedRpc(ability3); // Log the ability used
+        UpdateAbility3UsedRpc(true); // Update the ability used flag
         // Modify the bullet prefab to deal extra physical damage
         // Add a knockback effect to the target if they are hit by the bolt
     }

@@ -18,7 +18,7 @@ public class ADRange2 : BaseChampion
 
         if (IsOwner){
             attackSpeed.OnValueChanged += (previousValue, newValue) => { // Update the attack speed value
-                updateAbility1CooldownRpc(newValue); // Update the ability cooldown based on attack speed
+                UpdateAbility1CooldownRpc(newValue); // Update the ability cooldown based on attack speed
             };
         }
     }
@@ -88,10 +88,10 @@ public class ADRange2 : BaseChampion
             0f
         );
         ability3.icon = Resources.Load<Sprite>("Sprites/Ashe_Volley");
-        ability3.setDuration(6f);
+        ability3.SetDuration(6f);
 
-        autoAttack.setRange(20f); 
-        ability1.setDuration(6f);
+        autoAttack.SetRange(20f); 
+        ability1.SetDuration(6f);
         passive.Stats.championType = championType;
 
         abilityDict.Add("Q", ability1);
@@ -106,55 +106,55 @@ public class ADRange2 : BaseChampion
     public override void Update(){
         base.Update();
 
-        updateIsEmpoweredRpc(true);
+        UpdateIsEmpoweredRpc(true);
         // Ashe is always 'empowered' so she can always apply frost.
         // Ashe's ranger's focus cooldown is dependent on attackspeed
     }
 
-    public override void stackManager(){
+    public override void StackManager(){
         // 1 stack expires after 1 second
         if (stackCount.Value > 0){
             if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
             {
-                updateStackCountRpc(-1, stackCount.Value, maxStacks.Value);
+                UpdateStackCountRpc(-1, stackCount.Value, maxStacks.Value);
             }
         }
     }
 
-    public override void abilityIconCooldownManaChecks()
+    public override void AbilityIconCooldownManaChecks()
     {
         if (IsOwner && iconsSet) // Only the owner should check cooldowns and mana
         {
             // Check ability 1 (Rapid Frost)
-            if (ability1 != null && isMaxStacks && ability1.checkIfAvailable(mana.Value)) // Check if ability 1 is available and max stacks are present
+            if (ability1 != null && isMaxStacks && ability1.CheckIfAvailable(mana.Value)) // Check if ability 1 is available and max stacks are present
             {
-                IGUIM.buttonInteractable("Q", true); // Enable button for ability 1
+                IGUIM.ButtonInteractable("Q", true); // Enable button for ability 1
                 IGUIM.AsheEmpowerIcon(true, ability1); // Set empowered icon for Ashe
             }
             else
             {
-                IGUIM.buttonInteractable("Q", false); // Disable button for ability 1
+                IGUIM.ButtonInteractable("Q", false); // Disable button for ability 1
                 IGUIM.AsheEmpowerIcon(false, ability1); // Set normal icon for Ashe
             }
 
             // Check ability 2 (Ranger's Focus)
-            if (ability2 != null && ability2.checkIfAvailable(mana.Value)) // Check if ability 2 is available
+            if (ability2 != null && ability2.CheckIfAvailable(mana.Value)) // Check if ability 2 is available
             {
-                IGUIM.buttonInteractable("W", true); // Enable button for ability 2
+                IGUIM.ButtonInteractable("W", true); // Enable button for ability 2
             }
             else
             {
-                IGUIM.buttonInteractable("W", false); // Disable button for ability 2
+                IGUIM.ButtonInteractable("W", false); // Disable button for ability 2
             }
 
             // Check ability 3 (Volley)
-            if (ability3 != null && ability3.checkIfAvailable(mana.Value)) // Check if ability 3 is available
+            if (ability3 != null && ability3.CheckIfAvailable(mana.Value)) // Check if ability 3 is available
             {
-                IGUIM.buttonInteractable("E", true); // Enable button for ability 3
+                IGUIM.ButtonInteractable("E", true); // Enable button for ability 3
             }
             else
             {
-                IGUIM.buttonInteractable("E", false); // Disable button for ability 3
+                IGUIM.ButtonInteractable("E", false); // Disable button for ability 3
             }
         }
     }
@@ -162,7 +162,7 @@ public class ADRange2 : BaseChampion
 
     #region Ability Logic Methods
     //Slow Logic
-    public override GameObject empowerLogic(GameObject bullet)
+    public override GameObject EmpowerLogic(GameObject bullet)
     {
         var bulletComponent = bullet.GetComponent<Bullet>();
         if (bulletComponent != null){
@@ -171,7 +171,7 @@ public class ADRange2 : BaseChampion
         return bullet;
     }
 
-    public override GameObject critLogic(GameObject bullet){
+    public override GameObject CritLogic(GameObject bullet){
         // CRIT DOES FROST AND DOES NOT DO DMG
         float chance = Random.Range(0f, 1f);
         var bulletComponent = bullet.GetComponent<Bullet>();
@@ -188,7 +188,7 @@ public class ADRange2 : BaseChampion
         return bullet;
     }
 
-    public override GameObject ability3Logic(GameObject bullet){
+    public override GameObject Ability3Logic(GameObject bullet){
         var bulletComponent = bullet.GetComponent<Bullet>();
         if (bulletComponent != null){
             bulletComponent.ADDamage = 20f + AD.Value; 
@@ -203,13 +203,13 @@ public class ADRange2 : BaseChampion
         var tempAS = attackSpeed.Value; // Store the original attack speed
         var tempAD = AD.Value; // Store the original AD
         Debug.Log("Rapid Fire started!");
-        updateAttackSpeedRpc(0.25f); // Increase attack speed by 25
-        updateADRpc(.21f); // Increase AD by 21
+        UpdateAttackSpeedRpc(0.25f); // Increase attack speed by 25
+        UpdateADRpc(.21f); // Increase AD by 21
         yield return new WaitForSeconds(duration); // Wait for the specified duration
         Debug.Log("Rapid Fire ended!");
 
         // Reset rapid fire state
-        updateRapidFireRpc(1);
+        UpdateRapidFireRpc(1);
         attackSpeed.Value = tempAS; // Reset attack speed to original value
         AD.Value = tempAD; // Reset AD to original value
         Debug.Log("Rapid Fire state reset.");
@@ -218,11 +218,11 @@ public class ADRange2 : BaseChampion
 
     #region RPC Methods
     [Rpc(SendTo.Server)]
-    public override void passiveAbilityRpc(){
+    public override void PassiveAbilityRpc(){
         // Add a slow thing in base champion.
         // Frost = 20% slow for 2 seconds
         // Additional frost damage = 155% of crit chance as AD damage
-        // Look at empowerLogic
+        // Look at EmpowerLogic
     }
 
     [Rpc(SendTo.Server)]
@@ -236,13 +236,13 @@ public class ADRange2 : BaseChampion
         if (mana.Value < ability1.manaCost && !isMaxStacks && ability1.isOnCooldown) return; // Check if enough mana and stacks are present
         ability1.timeOfCast = Time.time; // Set the time of cast for cooldown tracking
         if (!IsServer) return; // Ensure this is only executed on the server
-        updateRapidFireRpc(5);
+        UpdateRapidFireRpc(5);
         StartCoroutine(RapidFireCoroutine(ability1.duration)); // Start the rapid fire coroutine
 
-        updateManaRpc(-ability1.manaCost); // Deduct the mana cost
+        UpdateManaRpc(-ability1.manaCost); // Deduct the mana cost
         ability1.Stats.totalManaSpent += ability1.manaCost; // Update the total mana spent for the ability
 
-        resetStackCountRpc(); // Reset the stack count
+        ResetStackCountRpc(); // Reset the stack count
     }
 
     [Rpc(SendTo.Server)]
@@ -268,39 +268,39 @@ public class ADRange2 : BaseChampion
             return;
         }
         if (!IsServer) return; // Ensure this is only executed on the server
-        updateAbility3UsedRpc(true); // Update the ability range
-        updateManaRpc(-ability3.manaCost); // Deduct mana cost
+        UpdateAbility3UsedRpc(true); // Update the ability range
+        UpdateManaRpc(-ability3.manaCost); // Deduct mana cost
         ability3.Stats.totalManaSpent += ability3.manaCost; // Update the total mana spent for the ability
     }
 
     [Rpc(SendTo.Server)]
-    public void updateAbility1CooldownRpc(float attackSpeed)
+    public void UpdateAbility1CooldownRpc(float attackSpeed)
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         
         if (attackSpeed < 0.75f){
-            ability1.setCooldown(6.08f);
+            ability1.SetCooldown(6.08f);
         }
         else if (attackSpeed < 1f){
-            ability1.setCooldown(5.33f);
+            ability1.SetCooldown(5.33f);
         }
         else if (attackSpeed < 1.25f){
-            ability1.setCooldown(4f);
+            ability1.SetCooldown(4f);
         }
         else if (attackSpeed < 1.5f){
-            ability1.setCooldown(3.2f);
+            ability1.SetCooldown(3.2f);
         }
         else if (attackSpeed < 1.75f){
-            ability1.setCooldown(2.67f);
+            ability1.SetCooldown(2.67f);
         }
         else if (attackSpeed < 2f){
-            ability1.setCooldown(2.29f);
+            ability1.SetCooldown(2.29f);
         }
         else if (attackSpeed < 2.25f){
-            ability1.setCooldown(1.78f);
+            ability1.SetCooldown(1.78f);
         }
         else if (attackSpeed < 2.5f){
-            ability1.setCooldown(1.6f);
+            ability1.SetCooldown(1.6f);
         }
     }
     #endregion

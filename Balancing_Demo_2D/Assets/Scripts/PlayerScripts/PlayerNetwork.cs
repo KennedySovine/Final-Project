@@ -4,6 +4,7 @@ using Unity.Netcode;
 
 public class PlayerNetwork : NetworkBehaviour
 {
+    #region Variables
     public Vector2 mousePosition; // Mouse position in world space
     public float dashSpeed;
 
@@ -25,7 +26,9 @@ public class PlayerNetwork : NetworkBehaviour
     public Vector3 enemyPosition; // Position of the enemy champion
 
     private GameObject enemyChampion; // Reference to the enemy champion
+    #endregion
 
+    #region Unity Lifecycle Methods
     void Start()
     {
         GM = GameManager.Instance; // Get the GameManager instance
@@ -56,7 +59,7 @@ public class PlayerNetwork : NetworkBehaviour
 
         // Constantly update mouse position
         mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition);
-        checkInputs(); // Check for player inputs
+        CheckInputs(); // Check for player inputs
 
         if (!isDashing.Value && !isCollidingWithTerrain) // If not dashing and not colliding with terrain
         {
@@ -64,10 +67,23 @@ public class PlayerNetwork : NetworkBehaviour
         }
 
         //TODO: Check if colliding with terrain and if so stop moving
-
     }
 
-    private void checkInputs()
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Terrain"))
+        {
+            // Stop moving when colliding with terrain
+            champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+            Debug.Log("Collided with terrain. Stopping movement.");
+            isCollidingWithTerrain = true; // Set the flag to true
+        }
+        isCollidingWithTerrain = false; // Reset the flag when not colliding with terrain
+    }
+    #endregion
+
+    #region Input & Movement
+    private void CheckInputs()
     {
         if (isDashing.Value) return; // Ignore inputs if the player is dashing
 
@@ -99,25 +115,40 @@ public class PlayerNetwork : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.Q)) // Q key pressed
         {
             Debug.Log("Ability 1 key pressed.");
-            GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "Q"); // Update ability 1 used state
+            GM.UpdatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "Q"); // Update ability 1 used state
             champion.UseAbility1Rpc();
         }
 
         if (Input.GetKeyDown(KeyCode.W)) // W key pressed
         {
             Debug.Log("Ability 2 key pressed.");
-            GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "W"); // Update ability 2 used state
+            GM.UpdatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "W"); // Update ability 2 used state
             champion.UseAbility2Rpc();
         }
 
         if (Input.GetKeyDown(KeyCode.E)) // E key pressed
         {
             Debug.Log("Ability 3 key pressed.");
-            GM.updatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "E"); // Update ability 3 used state
+            GM.UpdatePlayerAbilityUsedRpc(NetworkManager.Singleton.LocalClientId, "E"); // Update ability 3 used state
             champion.UseAbility3Rpc();
         }
     }
 
+    private void MovePlayer()
+    {
+        float speed = champion.movementSpeed.Value;
+        if (Vector2.Distance(transform.position, targetPositionNet.Value) > 0.1f)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * speed);
+        }
+        else
+        {
+            champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+        }
+    }
+    #endregion
+
+    #region Combat & Abilities
     public bool AttackOrMove(){
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
         if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && (hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId))
@@ -146,70 +177,9 @@ public class PlayerNetwork : NetworkBehaviour
             Debug.Log("Raycast did not hit the enemy champion.");
         }
     }
+    #endregion
 
-    private IEnumerator MoveAndAttackCoroutine(GameObject enemyChampion)
-    {
-        cancelCurrentAction = false; // Reset the cancel flag
-
-        while (!cancelCurrentAction)
-        {
-            enemyPosition = enemyChampion.transform.position; // Update the enemy position
-            float distance = Vector2.Distance(transform.position, enemyPosition); // Calculate distance to the enemy champion
-            Vector3 direc = enemyPosition - transform.position;
-            float angle = Mathf.Atan2(direc.y, direc.x) * Mathf.Rad2Deg;
-            UpdateRotationRpc(angle); // Update rotation
-            
-            if (distance <= champion.autoAttack.range)
-            {
-                Debug.Log("Player is in range of the enemy champion.");
-                // Stop movement
-                SendMousePositionRpc(transform.position);
-                RequestMoveRpc(transform.position);
-
-                direc = targetPositionNet.Value - transform.position;
-                angle = Mathf.Atan2(direc.y, direc.x) * Mathf.Rad2Deg;
-                UpdateRotationRpc(angle); // Update rotation
-
-                // Perform the auto-attack
-                PerformAutoAttackRpc(enemyPosition, enemyChampion.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value);
-                yield break; // Exit the coroutine after attacking
-            }
-            
-            // Move toward the enemy
-            Debug.Log("Moving toward the enemy champion.");
-            RequestMoveRpc(enemyPosition); // Request movement to the enemy position
-            distance = Vector2.Distance(transform.position, enemyPosition); // Update distance to the enemy champion
-            yield return null; // Wait for the next frame
-        }
-
-        Debug.Log("Action canceled by the player.");
-    }
-
-    private void MovePlayer()
-    {
-        float speed = champion.movementSpeed.Value;
-        if (Vector2.Distance(transform.position, targetPositionNet.Value) > 0.1f)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * speed);
-        }
-        else
-        {
-            champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
-        }
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Terrain"))
-        {
-            // Stop moving when colliding with terrain
-            champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
-            Debug.Log("Collided with terrain. Stopping movement.");
-            isCollidingWithTerrain = true; // Set the flag to true
-        }
-        isCollidingWithTerrain = false; // Reset the flag when not colliding with terrain
-    }
-
+    #region Network RPCs
     [Rpc(SendTo.Server)]
     public void SendMousePositionRpc(Vector2 mousePos)
     {
@@ -250,19 +220,6 @@ public class PlayerNetwork : NetworkBehaviour
         StartCoroutine(DashToTarget(targetPosition));
     }
 
-    private IEnumerator DashToTarget(Vector2 targetPosition)
-    {
-        while (Vector2.Distance(transform.position, targetPositionNet.Value) > 0.1f)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * dashSpeed);
-            yield return null;
-        }
-
-        transform.position = targetPositionNet.Value; // Snap to the target position
-        isDashing.Value = false; // Reset the dash state
-        Debug.Log("Dash completed.");
-    }
-
     [Rpc(SendTo.Server)]
     public void PerformAutoAttackRpc(Vector3 targetPosition, ulong targetNetworkObjectId, int rapidFire)
     {
@@ -292,6 +249,73 @@ public class PlayerNetwork : NetworkBehaviour
 
         StartCoroutine(PerformAutoAttackCoroutine(targetPosition, enemyChampion, rapidFire));
         Debug.Log("Auto-attack performed on the server.");
+    }
+
+    [Rpc(SendTo.NotServer)]
+    public void SpawnGhostBulletRpc(Vector3 targetPosition, Vector3 startPos, float speed = 10f)
+    {
+        GameObject ghostBullet = Instantiate(GM.ghostBulletPrefab, startPos, Quaternion.identity);
+
+        if (ghostBullet == null)
+        {
+            Debug.LogError("Ghost bullet prefab is null. Cannot instantiate.");
+            return; // Exit the coroutine if the ghost bullet prefab is null
+        }
+
+        StartCoroutine(MoveGhostBullet(ghostBullet, targetPosition, speed));
+    }
+    #endregion
+
+    #region Coroutines & Utility Methods
+    private IEnumerator MoveAndAttackCoroutine(GameObject enemyChampion)
+    {
+        cancelCurrentAction = false; // Reset the cancel flag
+
+        while (!cancelCurrentAction)
+        {
+            enemyPosition = enemyChampion.transform.position; // Update the enemy position
+            float distance = Vector2.Distance(transform.position, enemyPosition); // Calculate distance to the enemy champion
+            Vector3 direc = enemyPosition - transform.position;
+            float angle = Mathf.Atan2(direc.y, direc.x) * Mathf.Rad2Deg;
+            UpdateRotationRpc(angle); // Update rotation
+            
+            if (distance <= champion.autoAttack.range)
+            {
+                Debug.Log("Player is in range of the enemy champion.");
+                // Stop movement
+                SendMousePositionRpc(transform.position);
+                RequestMoveRpc(transform.position);
+
+                direc = targetPositionNet.Value - transform.position;
+                angle = Mathf.Atan2(direc.y, direc.x) * Mathf.Rad2Deg;
+                UpdateRotationRpc(angle); // Update rotation
+
+                // Perform the auto-attack
+                PerformAutoAttackRpc(enemyPosition, enemyChampion.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value);
+                yield break; // Exit the coroutine after attacking
+            }
+            
+            // Move toward the enemy
+            Debug.Log("Moving toward the enemy champion.");
+            RequestMoveRpc(enemyPosition); // Request movement to the enemy position
+            distance = Vector2.Distance(transform.position, enemyPosition); // Update distance to the enemy champion
+            yield return null; // Wait for the next frame
+        }
+
+        Debug.Log("Action canceled by the player.");
+    }
+
+    private IEnumerator DashToTarget(Vector2 targetPosition)
+    {
+        while (Vector2.Distance(transform.position, targetPositionNet.Value) > 0.1f)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, targetPositionNet.Value, Time.deltaTime * dashSpeed);
+            yield return null;
+        }
+
+        transform.position = targetPositionNet.Value; // Snap to the target position
+        isDashing.Value = false; // Reset the dash state
+        Debug.Log("Dash completed.");
     }
 
     private IEnumerator PerformAutoAttackCoroutine(Vector3 targetPosition, GameObject enemyChampion, int rapidFire)
@@ -329,30 +353,30 @@ public class PlayerNetwork : NetworkBehaviour
 
             SpawnGhostBulletRpc(targetPosition, transform.position, champion.missileSpeed.Value); // Spawn the ghost
 
-            bullet = champion.critLogic(bullet); // Apply crit logic
+            bullet = champion.CritLogic(bullet); // Apply crit logic
 
             if (champion.isEmpowered.Value)
             {
-                bullet = champion.empowerLogic(bullet);
-                champion.updateIsEmpoweredRpc(false);
+                bullet = champion.EmpowerLogic(bullet);
+                champion.UpdateIsEmpoweredRpc(false);
             }
 
             if (champion.isMaxStacks && champion.maxStacks.Value == 3) //only for vayne
             {
-                bullet = champion.stackLogic(bullet);
-                champion.resetStackCountRpc();
+                bullet = champion.StackLogic(bullet);
+                champion.ResetStackCountRpc();
             }
 
             if (champion.ability3Used.Value)
             {
-                bullet = champion.ability3Logic(bullet);
-                champion.updateAbility3UsedRpc(false); // Reset the ability 3 used state
+                bullet = champion.Ability3Logic(bullet);
+                champion.UpdateAbility3UsedRpc(false); // Reset the ability 3 used state
             }
 
             Debug.Log("Bullet spawned on the server.");
             Debug.Log("Auto-attack performed.");
             // Update the last auto-attack time after firing each bullet
-            champion.updateStackCountRpc(1, champion.stackCount.Value, champion.maxStacks.Value); // Update the stack count
+            champion.UpdateStackCountRpc(1, champion.stackCount.Value, champion.maxStacks.Value); // Update the stack count
             
 
             // Wait for 0.1 seconds before firing the next bullet
@@ -369,23 +393,6 @@ public class PlayerNetwork : NetworkBehaviour
         yield return new WaitForSeconds(seconds);
     }
 
-
-    //GHOST BULLET
-    [Rpc(SendTo.NotServer)]
-    public void SpawnGhostBulletRpc(Vector3 targetPosition, Vector3 startPos, float speed = 10f)
-    {
-        GameObject ghostBullet = Instantiate(GM.ghostBulletPrefab, startPos, Quaternion.identity);
-
-        if (ghostBullet == null)
-        {
-            Debug.LogError("Ghost bullet prefab is null. Cannot instantiate.");
-            return; // Exit the coroutine if the ghost bullet prefab is null
-        }
-
-        StartCoroutine(MoveGhostBullet(ghostBullet, targetPosition, speed));
-
-    }
-
     private IEnumerator MoveGhostBullet(GameObject GB, Vector3 targetPosition, float speed)
     {
         while (GB!= null && Vector3.Distance(GB.transform.position, targetPosition) > 0.1f)
@@ -399,4 +406,5 @@ public class PlayerNetwork : NetworkBehaviour
 
         Destroy(GB); // Destroy the ghost bullet after reaching the target position
     }
+    #endregion
 }

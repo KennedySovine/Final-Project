@@ -61,7 +61,7 @@ public class Bullet : NetworkBehaviour
                 // NO CODE FOR SELF DAMAGE NEEDED
                 // Apply slow effect to the target player if applicable
                 if (slowAmount != 0f){
-                    champion.applySlowRpc(slowAmount, 2f);
+                    champion.ApplySlowRpc(slowAmount, 2f);
                     // Extra dmg for frost
                     if (hasFrost){
                         Debug.Log("Frost damage applied to the target player: " + targetPlayer.name);

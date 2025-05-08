@@ -110,7 +110,7 @@ public class AugmentManager : NetworkBehaviour
         }
     }
 
-    public List<Augment> augmentSelector()
+    public List<Augment> AugmentSelector()
     {
         var augOptions = new List<Augment>();
         var usedPrefixes = new HashSet<int>();
@@ -175,7 +175,7 @@ public class AugmentManager : NetworkBehaviour
     }
 
 
-    public void augmentUISetup(List<Augment> augOptions)
+    public void AugmentUISetup(List<Augment> augOptions)
     {
         for (int i = 0; i < augmentUIList.Count; i++)
         {
@@ -195,7 +195,7 @@ public class AugmentManager : NetworkBehaviour
     }
 
 
-    public Augment augmentFromID(int id)
+    public Augment AugmentFromID(int id)
     {
         if (augmentsById.TryGetValue(id, out Augment augment))
             return augment;
@@ -204,7 +204,7 @@ public class AugmentManager : NetworkBehaviour
         return null;
     }
 
-    private Augment augmentFromName(string name)
+    private Augment AugmentFromName(string name)
     {
         if (augmentsByName.TryGetValue(name, out Augment augment))
             return augment;
@@ -242,7 +242,7 @@ public class AugmentManager : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server)]
-    public void sendAugmentChoiceRpc(int augmentID, RpcParams rpcParams = default)
+    public void SendAugmentChoiceRpc(int augmentID, RpcParams rpcParams = default)
     {
         if (!IsServer)
         {
@@ -253,7 +253,7 @@ public class AugmentManager : NetworkBehaviour
         ulong senderClientID = rpcParams.Receive.SenderClientId;
         
         // Validate the augment ID exists
-        Augment selectedAugment = augmentFromID(augmentID);
+        Augment selectedAugment = AugmentFromID(augmentID);
         if (selectedAugment == null)
         {
             Debug.LogError($"Invalid augment ID: {augmentID}");
@@ -284,7 +284,7 @@ public class AugmentManager : NetworkBehaviour
         }
     }
 
-    public void augmentSelection(int augID)
+    public void AugmentSelection(int augID)
     {
         if (augID < 0 || augID >= augmentUIList.Count)
         {
@@ -299,14 +299,14 @@ public class AugmentManager : NetworkBehaviour
             return;
         }
         
-        Augment selectedAugment = augmentFromName(nameText.text);
+        Augment selectedAugment = AugmentFromName(nameText.text);
         if (selectedAugment == null)
         {
             Debug.LogError($"Could not find augment with name: {nameText.text}");
             return;
         }
         
-        sendAugmentChoiceRpc(selectedAugment.id);
+        SendAugmentChoiceRpc(selectedAugment.id);
         augmentUI.SetActive(false);
     }
 }

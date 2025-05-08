@@ -92,7 +92,7 @@ public class InGameUIManager : NetworkBehaviour
         }
     }
 
-    public void buttonInteractable(string position, bool isInteractable)
+    public void ButtonInteractable(string position, bool isInteractable)
     {
         switch (position)
         {
@@ -111,7 +111,7 @@ public class InGameUIManager : NetworkBehaviour
         }
     }
 
-    public void setAbilityToButtons(Dictionary<string, Ability> abilityDict)
+    public void SetAbilityToButtons(Dictionary<string, Ability> abilityDict)
     {
         foreach (Button button in abilityIcons)
         {
@@ -134,13 +134,5 @@ public class InGameUIManager : NetworkBehaviour
             }
         }
     }
-    #endregion
-
-    #region Event Handlers
-    // Add event handler methods here if needed
-    #endregion
-
-    #region Network Methods
-    // Add network-related methods here if needed
     #endregion
 }

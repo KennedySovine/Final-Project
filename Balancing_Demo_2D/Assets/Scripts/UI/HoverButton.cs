@@ -21,7 +21,7 @@ public class HoverButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         }
         abilityDescription = ability.description; // Get the ability description from the Ability class
         abilityName = ability.name; // Get the ability name from the Ability class
-        formatInfoBox(); // Format the info box text with ability name and description
+        FormatInfoBox(); // Format the info box text with ability name and description
         
     }
 
@@ -32,7 +32,7 @@ public class HoverButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public void addAbilityInfo(){
         abilityDescription = ability.description; // Get the ability description from the Ability class
         abilityName = ability.name; // Get the ability name from the Ability class
-        formatInfoBox(); // Format the info box text with ability name and description
+        FormatInfoBox(); // Format the info box text with ability name and description
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -51,7 +51,7 @@ public class HoverButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         // Example: Restore original color, stop audio, etc.
     }
 
-    private void formatInfoBox(){
+    private void FormatInfoBox(){
         infoBoxText.text = string.Format("<b>{0}</b>\n{1}", abilityName, abilityDescription); // Format the info box text with ability name and description
     }
 }

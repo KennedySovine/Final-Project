@@ -127,7 +127,7 @@ public class BaseChampion : NetworkBehaviour
 
     #region RPC Methods
     [Rpc(SendTo.Server)]
-    public virtual void passiveAbilityRpc(){ Debug.Log("No passive ability assigned");}
+    public virtual void PassiveAbilityRpc(){ Debug.Log("No passive ability assigned");}
     [Rpc(SendTo.Server)]
     public virtual void UseAbility1Rpc(){ Debug.Log("No ability 1 assigned");}
     [Rpc(SendTo.Server)]
@@ -135,11 +135,11 @@ public class BaseChampion : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public virtual void UseAbility3Rpc(){ Debug.Log("No ability 3 assigned");}
 
-    public virtual GameObject empowerLogic(GameObject bullet){ Debug.Log("No empower logic assigned"); return bullet;}
-    public virtual GameObject stackLogic(GameObject bullet){ Debug.Log("No stack logic assigned"); return bullet;}
-    public virtual GameObject ability3Logic(GameObject bullet){ Debug.Log("No stack logic assigned"); return bullet;}
+    public virtual GameObject EmpowerLogic(GameObject bullet){ Debug.Log("No empower logic assigned"); return bullet;}
+    public virtual GameObject StackLogic(GameObject bullet){ Debug.Log("No stack logic assigned"); return bullet;}
+    public virtual GameObject Ability3Logic(GameObject bullet){ Debug.Log("No stack logic assigned"); return bullet;}
 
-    public virtual void stackManager(){ Debug.Log("No stack manager assigned");}
+    public virtual void StackManager(){ Debug.Log("No stack manager assigned");}
     #endregion
 
     #region Update Logic
@@ -157,11 +157,11 @@ public class BaseChampion : NetworkBehaviour
 
         if (passive != null)
         {
-            passiveAbilityRpc(); // Call the passive ability logic
+            PassiveAbilityRpc(); // Call the passive ability logic
         }
 
         if (IsOwner){
-            abilityIconCooldownManaChecks(); // Check cooldowns and mana for abilities
+            AbilityIconCooldownManaChecks(); // Check cooldowns and mana for abilities
         }
 
         if (!IsServer) return; // Only the server should execute this logic
@@ -171,7 +171,7 @@ public class BaseChampion : NetworkBehaviour
         if (isEmpowered.Value){
             if (Time.time > empowerStartTime.Value + empowerDuration.Value)
             {
-                updateIsEmpoweredRpc(false); // Reset the empowered state
+                UpdateIsEmpoweredRpc(false); // Reset the empowered state
             }
         }
 
@@ -179,48 +179,48 @@ public class BaseChampion : NetworkBehaviour
         {
             slowAmount.Value = 0f; // Reset the slow amount
             slowStartTime.Value = 0f; // Reset the slow start time
-            applySlowRpc(0f, 0f); // Reset the slow effect on the client
+            ApplySlowRpc(0f, 0f); // Reset the slow effect on the client
         }
 
 
-        stackManager(); // Call the stack manager logic
+        StackManager(); // Call the stack manager logic
 
     }
     #endregion
 
     #region UI Management
-    public virtual void abilityIconCooldownManaChecks()
+    public virtual void AbilityIconCooldownManaChecks()
     {
         if (IsOwner && iconsSet) // Only the owner should check cooldowns and mana
         {
             // Check ability 1
             if (ability1 != null && !ability1.isOnCooldown && mana.Value >= ability1.manaCost)
             {
-                IGUIM.buttonInteractable("Q", true); // Enable the button if ability 1 is available
+                IGUIM.ButtonInteractable("Q", true); // Enable the button if ability 1 is available
             }
             else
             {
-                IGUIM.buttonInteractable("Q", false); // Disable the button if ability 1 is on cooldown or not enough mana
+                IGUIM.ButtonInteractable("Q", false); // Disable the button if ability 1 is on cooldown or not enough mana
             }
 
             // Check ability 2
             if (ability2 != null && !ability2.isOnCooldown && mana.Value >= ability2.manaCost)
             {
-                IGUIM.buttonInteractable("W", true); // Enable the button if ability 2 is available
+                IGUIM.ButtonInteractable("W", true); // Enable the button if ability 2 is available
             }
             else
             {
-                IGUIM.buttonInteractable("W", false); // Disable the button if ability 2 is on cooldown or not enough mana
+                IGUIM.ButtonInteractable("W", false); // Disable the button if ability 2 is on cooldown or not enough mana
             }
 
             // Check ability 3
             if (ability3 != null && !ability3.isOnCooldown && mana.Value >= ability3.manaCost)
             {
-                IGUIM.buttonInteractable("E", true); // Enable the button if ability 3 is available
+                IGUIM.ButtonInteractable("E", true); // Enable the button if ability 3 is available
             }
             else
             {
-                IGUIM.buttonInteractable("E", false); // Disable the button if ability 3 is on cooldown or not enough mana
+                IGUIM.ButtonInteractable("E", false); // Disable the button if ability 3 is on cooldown or not enough mana
             }
         }
     }
@@ -232,7 +232,7 @@ public class BaseChampion : NetworkBehaviour
             if (abilityDict.ContainsKey("E")) // Check if the abilities are not null and icons are not set
             {
                 Debug.Log("Setting abilities to buttons for player " + NetworkManager.Singleton.LocalClientId);
-                IGUIM.setAbilityToButtons(abilityDict); // Set the abilities to the buttons in the UI
+                IGUIM.SetAbilityToButtons(abilityDict); // Set the abilities to the buttons in the UI
                 iconsSet = true; // Set the flag to true to indicate icons are set
             }
             else
@@ -268,12 +268,12 @@ public class BaseChampion : NetworkBehaviour
     #endregion
 
     #region Enemy Management
-    public void getEnemyChampion(ulong enemyId)
+    public void GetEnemyChampion(ulong enemyId)
     {
         enemyChampion = NetworkManager.Singleton.SpawnManager.SpawnedObjects[enemyId].gameObject; // Get the enemy champion object
     }
 
-    public virtual GameObject critLogic(GameObject bullet){
+    public virtual GameObject CritLogic(GameObject bullet){
         float chance = Random.Range(0f, 1f);
         var bulletComponent = bullet.GetComponent<Bullet>();
         if (chance <= critChance.Value) // If the random chance is less than or equal to critChance
@@ -289,7 +289,7 @@ public class BaseChampion : NetworkBehaviour
         return bullet;
     }
 
-    public void logAbilityUsedRpc(Ability ability)
+    public void LogAbilityUsedRpc(Ability ability)
     {
         if (NetworkManager.Singleton.LocalClientId == GM.player1ID)
         {
@@ -311,7 +311,7 @@ public class BaseChampion : NetworkBehaviour
         damage += AD / (1 + (armor.Value - armorPen) / 100); // Calculate damage with armor penetration
         damage += AP / (1 + (magicResist.Value - magicPen) / 100); // Calculate damage with magic penetration
 
-        updateHealthRpc(-damage); // Update health with the calculated damage
+        UpdateHealthRpc(-damage); // Update health with the calculated damage
         Debug.Log($"Damage taken: {damage} (AD: {AD}, AP: {AP}, Armor Pen: {armorPen}, Magic Pen: {magicPen})");
 
         // Assign damage to the ability stats of the enemy
@@ -351,7 +351,7 @@ public class BaseChampion : NetworkBehaviour
 
     #region Slow Management
     [Rpc(SendTo.Server)]
-    public void applySlowRpc(float slowAmount, float duration)
+    public void ApplySlowRpc(float slowAmount, float duration)
     {
         if (!IsServer) return; // Only the server should apply the slow
         if (slowAmount == 0f){
@@ -369,7 +369,7 @@ public class BaseChampion : NetworkBehaviour
 
     #region Stat Updates
     [Rpc(SendTo.Server)]
-    public void updateMaxHealthRpc(float healthChange)
+    public void UpdateMaxHealthRpc(float healthChange)
     {
         if (!IsServer) return; // Ensure this is only executed on the server
 
@@ -383,7 +383,7 @@ public class BaseChampion : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server)]
-    public void updateHealthRpc(float healthChange)
+    public void UpdateHealthRpc(float healthChange)
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         health.Value += healthChange; // Update the health value
@@ -393,7 +393,7 @@ public class BaseChampion : NetworkBehaviour
         }
     }
     [Rpc(SendTo.Server)]
-    public void updateADRpc(float adChange)
+    public void UpdateADRpc(float adChange)
     {
         if (!IsServer) return;
 
@@ -406,7 +406,7 @@ public class BaseChampion : NetworkBehaviour
         AD.Value += adChange;
     }
     [Rpc(SendTo.Server)]
-    public void updateAPRpc(float apChange)
+    public void UpdateAPRpc(float apChange)
     {
         if (!IsServer) return;
 
@@ -419,7 +419,7 @@ public class BaseChampion : NetworkBehaviour
         AP.Value += apChange;
     }
     [Rpc(SendTo.Server)]
-    public void updateArmorRpc(float armorChange)
+    public void UpdateArmorRpc(float armorChange)
     {
         if (!IsServer) return;
 
@@ -432,7 +432,7 @@ public class BaseChampion : NetworkBehaviour
         armor.Value += armorChange;
     }
     [Rpc(SendTo.Server)]
-    public void updateMagicResistRpc(float magicResistChange)
+    public void UpdateMagicResistRpc(float magicResistChange)
     {
         if (!IsServer) return;
 
@@ -445,7 +445,7 @@ public class BaseChampion : NetworkBehaviour
         magicResist.Value += magicResistChange;
     }
     [Rpc(SendTo.Server)]
-    public void updateAttackSpeedRpc(float attackSpeedChange)
+    public void UpdateAttackSpeedRpc(float attackSpeedChange)
     {
         if (!IsServer) return;
 
@@ -458,7 +458,7 @@ public class BaseChampion : NetworkBehaviour
         attackSpeed.Value += attackSpeedChange;
     }
     [Rpc(SendTo.Server)]
-    public void updateMovementSpeedRpc(float movementSpeedChange)
+    public void UpdateMovementSpeedRpc(float movementSpeedChange)
     {
         if (!IsServer) return;
 
@@ -471,7 +471,7 @@ public class BaseChampion : NetworkBehaviour
         movementSpeed.Value += movementSpeedChange;
     }
     [Rpc(SendTo.Server)]
-    public void updateMaxManaRpc(float manaChange)
+    public void UpdateMaxManaRpc(float manaChange)
     {
         if (!IsServer) return;
 
@@ -484,7 +484,7 @@ public class BaseChampion : NetworkBehaviour
         maxMana.Value += manaChange;
     }
     [Rpc(SendTo.Server)]
-    public void updateManaRpc(float manaChange)
+    public void UpdateManaRpc(float manaChange)
     {
         if (!IsServer) return;
 
@@ -496,7 +496,7 @@ public class BaseChampion : NetworkBehaviour
     }
     
     [Rpc(SendTo.Server)]
-    public void updateManaRegenRpc(float manaRegenChange)
+    public void UpdateManaRegenRpc(float manaRegenChange)
     {
         if (!IsServer) return;
 
@@ -509,7 +509,7 @@ public class BaseChampion : NetworkBehaviour
         manaRegen.Value += manaRegenChange;
     }
     [Rpc(SendTo.Server)]
-    public void updateAbilityHasteRpc(float abilityHasteChange)
+    public void UpdateAbilityHasteRpc(float abilityHasteChange)
     {
         if (!IsServer) return;
 
@@ -522,12 +522,12 @@ public class BaseChampion : NetworkBehaviour
         {
             abilityHaste.Value += abilityHasteChange;
         }
-        ability1.setCooldown(ability1.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 1 based on ability haste
-        ability2.setCooldown(ability2.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 2 based on ability haste
-        ability3.setCooldown(ability3.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 3 based on ability haste
+        ability1.SetCooldown(ability1.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 1 based on ability haste
+        ability2.SetCooldown(ability2.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 2 based on ability haste
+        ability3.SetCooldown(ability3.cooldown * (1 - abilityHaste.Value / 100)); // Update the cooldown of ability 3 based on ability haste
     }
     [Rpc(SendTo.Server)]
-    public void updateCritChanceRpc(float critChanceChange)
+    public void UpdateCritChanceRpc(float critChanceChange)
     {
         if (!IsServer) return;
 
@@ -540,7 +540,7 @@ public class BaseChampion : NetworkBehaviour
         critChance.Value += critChanceChange;
     }
     [Rpc(SendTo.Server)]
-    public void updateCritDamageRpc(float critDamageChange)
+    public void UpdateCritDamageRpc(float critDamageChange)
     {
         if (!IsServer) return;
 
@@ -553,7 +553,7 @@ public class BaseChampion : NetworkBehaviour
         critDamage.Value += critDamageChange;
     }
     [Rpc(SendTo.Server)]
-    public void updateArmorPenRpc(float armorPenChange)
+    public void UpdateArmorPenRpc(float armorPenChange)
     {
         if (!IsServer) return;
 
@@ -566,7 +566,7 @@ public class BaseChampion : NetworkBehaviour
         armorPen.Value += armorPenChange;
     }
     [Rpc(SendTo.Server)]
-    public void updateMagicPenRpc(float magicPenChange)
+    public void UpdateMagicPenRpc(float magicPenChange)
     {
         if (!IsServer) return;
 
@@ -580,7 +580,7 @@ public class BaseChampion : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server)]
-    public void updateStackCountRpc(int change, int current, int max)
+    public void UpdateStackCountRpc(int change, int current, int max)
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         if (change == 0){
@@ -609,20 +609,20 @@ public class BaseChampion : NetworkBehaviour
         stackStartTime.Value = Time.time; // Reset the stack start time
     }
     [Rpc(SendTo.Server)]
-    public void updateAbility3UsedRpc(bool value)
+    public void UpdateAbility3UsedRpc(bool value)
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         ability3Used.Value = value;
         ability3.timeOfCast = Time.time; // Record the time when the ability was used
     }
     [Rpc(SendTo.Server)]
-    public void updateRapidFireRpc(int value)
+    public void UpdateRapidFireRpc(int value)
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         rapidFire.Value = value;
     }
     [Rpc(SendTo.Server)]
-    public void updateIsEmpoweredRpc(bool value)
+    public void UpdateIsEmpoweredRpc(bool value)
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         isEmpowered.Value = value;
@@ -630,14 +630,14 @@ public class BaseChampion : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server)]
-    public void updateSlowAmountRpc(float value)
+    public void UpdateSlowAmountRpc(float value)
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         slowAmount.Value = value;
     }
 
     [Rpc(SendTo.Server)]
-    public void resetStackCountRpc()
+    public void ResetStackCountRpc()
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         stackCount.Value = 0; // Reset the stack count

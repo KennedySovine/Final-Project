@@ -52,27 +52,27 @@ public class Ability
         }
     }
 
-    public void setCooldown(float cooldown)
+    public void SetCooldown(float cooldown)
     {
         this.cooldown = cooldown;
     }
     
-    public void setManaCost(float manaCost)
+    public void SetManaCost(float manaCost)
     {
         this.manaCost = manaCost;
     }
     
-    public void setRange(float range)
+    public void SetRange(float range)
     {
         this.range = range;
     }
     
-    public void setDuration(float duration)
+    public void SetDuration(float duration)
     {
         this.duration = duration;
     }
 
-    public bool checkIfAvailable(float mana)
+    public bool CheckIfAvailable(float mana)
     {
         return (cooldown == 0 || (mana >= manaCost && !isOnCooldown)); // Check if the ability is available based on mana and cooldown
     }

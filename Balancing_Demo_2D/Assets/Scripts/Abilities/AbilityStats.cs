@@ -30,14 +30,14 @@ public class AbilityStats
     #endregion
 
     #region Data Management Methods
-    public void saveBetweenAugments()
+    public void SaveBetweenAugments()
     {
         damageValues.Add(damage); // Add the current damage value to the list
         Debug.Log($"Damage value saved: {damage}"); // Log the saved damage value
         damageTotal = 0f; // Reset the total damage for calculation
     }
 
-    public void endGameCalculations(List<Augment> chosenAugments, float gameTime)
+    public void EndGameCalculations(List<Augment> chosenAugments, float gameTime)
     {
         this.chosenAugments = chosenAugments; // Assign the chosen augments to the class variable
         damageTotal = damageValues.Sum(); // Calculate the total damage from the list of damage values

@@ -204,9 +204,9 @@ public class GameManager : NetworkBehaviour
     private void LoadAugmentsForPlayers()
     {
         Debug.Log("Loading Augments for Player 1: " + player1ID);
-        loadAugmentsRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
+        LoadAugmentsRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
         Debug.Log("Loading Augments for Player 2: " + player2ID);
-        loadAugmentsRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
+        LoadAugmentsRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
     }
 
     private void UpdateGameTime()
@@ -340,8 +340,8 @@ public class GameManager : NetworkBehaviour
 
     private void InitializeUIForPlayers()
     {
-        initializeIGUIMRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
-        initializeIGUIMRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
+        InitializeIGUIMRpc(RpcTarget.Single(player1ID, RpcTargetUse.Temp));
+        InitializeIGUIMRpc(RpcTarget.Single(player2ID, RpcTargetUse.Temp));
     }
 
     private void FindPlayerControllers(GameObject parent, ref GameObject controller)
@@ -388,7 +388,7 @@ public class GameManager : NetworkBehaviour
 
         if (!HasAugmentsToApply(playerID)) return;
         
-        targetChampion.passive.Stats.saveBetweenAugments();
+        targetChampion.passive.Stats.SaveBetweenAugments();
         
         Augment newAugment = GetLastAugment(playerID);
         if (newAugment == null) return;
@@ -422,7 +422,7 @@ public class GameManager : NetworkBehaviour
             ? player1Augments[player1Augments.Count - 1] 
             : player2Augments[player2Augments.Count - 1];
             
-        Augment newAugment = AM.augmentFromID(augmentID);
+        Augment newAugment = AM.AugmentFromID(augmentID);
         
         if (newAugment == null)
             Debug.LogWarning($"Augment with ID {augmentID} not found.");
@@ -465,17 +465,17 @@ public class GameManager : NetworkBehaviour
     {
         switch (augmentType)
         {
-            case "AbilityHaste": champion.updateAbilityHasteRpc(value); break;
-            case "Armor": champion.updateArmorRpc(value); break;
-            case "AttackDamage": champion.updateADRpc(value); break;
-            case "AbilityPower": champion.updateAPRpc(value); break;
-            case "Health": champion.updateMaxHealthRpc(value); break;
-            case "AttackSpeed": champion.updateAttackSpeedRpc(value); break;
-            case "CriticalStrike": champion.updateCritChanceRpc(value); break;
-            case "CriticalDamage": champion.updateCritDamageRpc(value); break;
-            case "ArmorPenetration": champion.updateArmorPenRpc(value); break;
-            case "MagicPenetration": champion.updateMagicPenRpc(value); break;
-            case "MagicResist": champion.updateMagicResistRpc(value); break;
+            case "AbilityHaste": champion.UpdateAbilityHasteRpc(value); break;
+            case "Armor": champion.UpdateArmorRpc(value); break;
+            case "AttackDamage": champion.UpdateADRpc(value); break;
+            case "AbilityPower": champion.UpdateAPRpc(value); break;
+            case "Health": champion.UpdateMaxHealthRpc(value); break;
+            case "AttackSpeed": champion.UpdateAttackSpeedRpc(value); break;
+            case "CriticalStrike": champion.UpdateCritChanceRpc(value); break;
+            case "CriticalDamage": champion.UpdateCritDamageRpc(value); break;
+            case "ArmorPenetration": champion.UpdateArmorPenRpc(value); break;
+            case "MagicPenetration": champion.UpdateMagicPenRpc(value); break;
+            case "MagicResist": champion.UpdateMagicResistRpc(value); break;
             default: Debug.LogWarning($"Unknown augment type: {augmentType}"); break;
         }
     }
@@ -505,7 +505,7 @@ public class GameManager : NetworkBehaviour
         List<Augment> augments = new List<Augment>();
         foreach (int augmentID in augmentIds)
         {
-            Augment augment = AM.augmentFromID(augmentID);
+            Augment augment = AM.AugmentFromID(augmentID);
             if (augment != null)
             {
                 augments.Add(augment);
@@ -520,8 +520,8 @@ public class GameManager : NetworkBehaviour
         List<Augment> player2Aug = ConvertAugmentIdsToAugments(player2Augments);
         
         // Process passive stats
-        player1Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player1Aug, maxGameTime);
-        player2Controller.GetComponent<BaseChampion>().passive.Stats.endGameCalculations(player2Aug, maxGameTime);
+        player1Controller.GetComponent<BaseChampion>().passive.Stats.EndGameCalculations(player1Aug, maxGameTime);
+        player2Controller.GetComponent<BaseChampion>().passive.Stats.EndGameCalculations(player2Aug, maxGameTime);
         
         // Process abilities stats
         ProcessAbilityEndGameCalculations(player1Controller, player1Aug);
@@ -531,9 +531,9 @@ public class GameManager : NetworkBehaviour
     private void ProcessAbilityEndGameCalculations(GameObject playerController, List<Augment> augments)
     {
         BaseChampion champion = playerController.GetComponent<BaseChampion>();
-        champion.ability1.Stats.endGameCalculations(augments, maxGameTime);
-        champion.ability2.Stats.endGameCalculations(augments, maxGameTime);
-        champion.ability3.Stats.endGameCalculations(augments, maxGameTime);
+        champion.ability1.Stats.EndGameCalculations(augments, maxGameTime);
+        champion.ability2.Stats.EndGameCalculations(augments, maxGameTime);
+        champion.ability3.Stats.EndGameCalculations(augments, maxGameTime);
     }
 
     private IEnumerator WaitForEndGameStats()
@@ -543,21 +543,21 @@ public class GameManager : NetworkBehaviour
             yield return null;
         }
         IGM.endGameUI.statsToList();
-        endGameUIRpc();
+        EndGameUIRpc();
     }
     #endregion
 
     #region RPC Methods
     [Rpc(SendTo.SpecifiedInParams)]
-    public void loadAugmentsRpc(RpcParams rpcParams)
+    public void LoadAugmentsRpc(RpcParams rpcParams)
     {
         Debug.Log("Loading Augments for Client " + NetworkManager.Singleton.LocalClientId);
         AM.augmentUI.SetActive(true);
-        AM.augmentUISetup(AM.augmentSelector());
+        AM.AugmentUISetup(AM.AugmentSelector());
     }
 
     [Rpc(SendTo.Server)]
-    public void updatePlayerAbilityUsedRpc(ulong playerID, string abilityKey)
+    public void UpdatePlayerAbilityUsedRpc(ulong playerID, string abilityKey)
     {
         if (!IsServer) return;
 
@@ -590,14 +590,14 @@ public class GameManager : NetworkBehaviour
     }
 
     [Rpc(SendTo.SpecifiedInParams)]
-    public void initializeIGUIMRpc(RpcParams rpcParams)
+    public void InitializeIGUIMRpc(RpcParams rpcParams)
     {
         IGUIM.inGameUI.SetActive(true);
         Debug.Log("In-game UI initialized and activated.");
     }
 
     [Rpc(SendTo.Everyone)]
-    public void endGameUIRpc()
+    public void EndGameUIRpc()
     {
         IGM.endGameUI.displayEndGameUI();
         Debug.Log("End game UI initialized and activated.");
