@@ -921,6 +921,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  AM: {fileID: 0}
+  IGM: {fileID: 0}
+  IGUIM: {fileID: 0}
   playerPrefabsList:
   - {fileID: 4431904003385403123, guid: 69aed170a264bdd4c8de738e2ae1ea26, type: 3}
   - {fileID: 4431904003385403123, guid: 903938bed89081f48883fc2458b3717c, type: 3}
@@ -992,9 +995,6 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   recievedCalcs: 0
-  AM: {fileID: 0}
-  IGM: {fileID: 0}
-  IGUIM: {fileID: 0}
 --- !u!4 &566942286
 Transform:
   m_ObjectHideFlags: 0
@@ -4204,7 +4204,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
-        m_MethodName: startButtonClick
+        m_MethodName: StartButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
