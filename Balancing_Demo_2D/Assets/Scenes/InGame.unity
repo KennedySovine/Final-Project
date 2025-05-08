@@ -29991,6 +29991,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   respawnTime: 30
   healPercentage: 0.15
+  disableTime: 0
 --- !u!61 &13235222
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -30722,6 +30723,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   respawnTime: 30
   healPercentage: 0.15
+  disableTime: 0
 --- !u!61 &75609203
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -34105,6 +34107,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   respawnTime: 30
   healPercentage: 0.15
+  disableTime: 0
 --- !u!61 &268097237
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -34545,6 +34548,13 @@ MonoBehaviour:
   AM: {fileID: 349277511}
   IGUIM: {fileID: 349277512}
   endGameUI: {fileID: 349277513}
+  healthPickups:
+  - {fileID: 384376914}
+  - {fileID: 13235219}
+  - {fileID: 535335355}
+  - {fileID: 75609200}
+  - {fileID: 268097234}
+  - {fileID: 1347327801}
 --- !u!114 &349277510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35365,6 +35375,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   respawnTime: 30
   healPercentage: 0.15
+  disableTime: 0
 --- !u!61 &384376917
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -35908,6 +35919,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   respawnTime: 30
   healPercentage: 0.15
+  disableTime: 0
 --- !u!61 &535335358
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -40132,6 +40144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   respawnTime: 30
   healPercentage: 0.15
+  disableTime: 0
 --- !u!61 &1347327804
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -42032,12 +42045,12 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 268097235}
-  - {fileID: 1347327802}
-  - {fileID: 535335356}
-  - {fileID: 75609201}
   - {fileID: 384376915}
   - {fileID: 13235220}
+  - {fileID: 535335356}
+  - {fileID: 75609201}
+  - {fileID: 268097235}
+  - {fileID: 1347327802}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1815701901

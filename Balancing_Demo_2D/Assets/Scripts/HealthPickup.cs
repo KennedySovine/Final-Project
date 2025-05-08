@@ -2,18 +2,15 @@ using UnityEngine;
 
 public class HealthPickup : MonoBehaviour
 {
-    [SerializeField] private float respawnTime = 30f; // 30 seconds respawn time
+    public float respawnTime = 30f; // 30 seconds respawn time
     [SerializeField] private float healPercentage = 0.15f; // 15% of max health
 
-    private float disableTime = 0f;
+    public float disableTime = 0f;
 
     // Update is called once per frame
     void Update()
     {
-        if (!gameObject.activeSelf && Time.time - disableTime > respawnTime)
-        {
-            gameObject.SetActive(true); // Activate the pickup object after respawn time
-        }
+        
     }
 
     public void OnTriggerEnter2D(Collider2D other)

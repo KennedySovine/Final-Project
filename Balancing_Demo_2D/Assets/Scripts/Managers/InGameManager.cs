@@ -15,6 +15,8 @@ public class InGameManager : NetworkBehaviour
     [SerializeField] private AugmentManager AM; // Reference to the AugmentManager
     [SerializeField] private InGameUIManager IGUIM; // Reference to the InGameUIManager
     public EndGameUI endGameUI; // Reference to the EndGameUI
+
+    [SerializeField] private List<GameObject> healthPickups = new List<GameObject>(); // List of health pickups
     #endregion
 
     #region Unity Lifecycle Methods
@@ -66,6 +68,7 @@ public class InGameManager : NetworkBehaviour
     {
         // Optional: Add any logic that needs to run every frame
         checkHostReady(); // Check if the host is ready
+        respawnHealthPickups(); // Respawn health pickups if needed
     }
     #endregion
 
@@ -85,6 +88,19 @@ public class InGameManager : NetworkBehaviour
     #endregion
 
     #region Game Logic Methods
+
+    public void respawnHealthPickups()
+    {
+        // Check if the health pickups are active and respawn them if needed
+        foreach (GameObject pickup in healthPickups)
+        {
+            if (!pickup.activeSelf && Time.time - pickup.GetComponent<HealthPickup>().disableTime >= pickup.GetComponent<HealthPickup>().respawnTime)
+            {
+                pickup.SetActive(true); // Respawn the health pickup
+                Debug.Log("Health pickup respawned: " + pickup.name);
+            }
+        }
+    }
     public void checkHostReady()
     {
         if (NetworkManager.Singleton.IsHost)
