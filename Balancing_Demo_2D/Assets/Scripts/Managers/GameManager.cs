@@ -586,8 +586,12 @@ public class GameManager : NetworkBehaviour
     private List<Augment> ConvertAugmentIdsToAugments(NetworkList<int> augmentIds)
     {
         List<Augment> augments = new List<Augment>();
-        foreach (int augmentID in augmentIds)
+        // Only take the last 3 augments if there are more than 3
+        int count = augmentIds.Count;
+        int startIdx = Mathf.Max(0, count - 3);
+        for (int i = startIdx; i < count; i++)
         {
+            int augmentID = augmentIds[i];
             Augment augment = AM.AugmentFromID(augmentID);
             if (augment != null)
             {
@@ -603,8 +607,6 @@ public class GameManager : NetworkBehaviour
         List<Augment> player2Aug = ConvertAugmentIdsToAugments(player2Augments);
         
         // Process passive stats
-        player1Controller.GetComponent<BaseChampion>().passive.Stats.EndGameCalculations(player1Aug, maxGameTime);
-        player2Controller.GetComponent<BaseChampion>().passive.Stats.EndGameCalculations(player2Aug, maxGameTime);
         
         // Process abilities stats
         ProcessAbilityEndGameCalculations(player1Controller, player1Aug);
@@ -614,9 +616,17 @@ public class GameManager : NetworkBehaviour
     private void ProcessAbilityEndGameCalculations(GameObject playerController, List<Augment> augments)
     {
         BaseChampion champion = playerController.GetComponent<BaseChampion>();
-        champion.ability1.Stats.EndGameCalculations(augments, maxGameTime);
-        champion.ability2.Stats.EndGameCalculations(augments, maxGameTime);
-        champion.ability3.Stats.EndGameCalculations(augments, maxGameTime);
+        // Combine mana spent from all abilities into passive before saving
+        AbilityStats.CombineManaSpentToPassive(
+            champion.ability1?.Stats,
+            champion.ability2?.Stats,
+            champion.ability3?.Stats,
+            champion.passive?.Stats
+        );
+        //champion.ability1.Stats.EndGameCalculations(augments, maxGameTime);
+        //champion.ability2.Stats.EndGameCalculations(augments, maxGameTime);
+        //champion.ability3.Stats.EndGameCalculations(augments, maxGameTime);
+        champion.passive.Stats.EndGameCalculations(augments, maxGameTime);
     }
 
     private IEnumerator WaitForEndGameStats()

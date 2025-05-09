@@ -109,6 +109,17 @@ public class AbilityStats
             Debug.LogError("Failed to reset PlayerStats.json: " + ex.Message);
         }
     }
+
+    // Add this static helper to combine mana spent
+    public static void CombineManaSpentToPassive(AbilityStats ability1, AbilityStats ability2, AbilityStats ability3, AbilityStats passive)
+    {
+        if (passive == null) return;
+        float totalMana = 0f;
+        if (ability1 != null) totalMana += ability1.totalManaSpent;
+        if (ability2 != null) totalMana += ability2.totalManaSpent;
+        if (ability3 != null) totalMana += ability3.totalManaSpent;
+        passive.totalManaSpent = totalMana;
+    }
     #endregion
 
     #region Helper Classes
