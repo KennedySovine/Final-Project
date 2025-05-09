@@ -289,10 +289,18 @@ public class GameManager : NetworkBehaviour
             Debug.Log("All players disconnected. Ending game.");
             // Basically, I want the server to reset the game if all players disconnect so they dont have to restart everything and reselect server yada yada
             if (IsServer)
+            {
                 if (gameEnded)
+                {
                     EndGame();
+                    EndGameUIRpc(); // Ensure UI is shown even if game ends from disconnect
+                }
                 else
+                {
                     ResetGame();
+                    EndGameUIRpc(); // Show UI if resetting due to disconnect
+                }
+            }
         }
         else if (playerIDsSpawned.Count == 1)
         {
@@ -572,6 +580,7 @@ public class GameManager : NetworkBehaviour
         
         StartCoroutine(WaitForEndGameStats());
         ProcessEndGameCalculationsForChampions();
+        EndGameUIRpc(); // Always show UI after processing stats
     }
 
     private List<Augment> ConvertAugmentIdsToAugments(NetworkList<int> augmentIds)
