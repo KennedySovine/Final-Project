@@ -61,7 +61,7 @@ public class PlayerNetwork : NetworkBehaviour
         mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition);
         CheckInputs(); // Check for player inputs
 
-        if (!isDashing.Value && !isCollidingWithTerrain) // If not dashing and not colliding with terrain
+        if (!isDashing.Value) // If not dashing and not colliding with terrain
         {
             MovePlayer(); // Move the player if not dashing
         }
@@ -76,6 +76,7 @@ public class PlayerNetwork : NetworkBehaviour
             // Stop moving when colliding with terrain
             champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
             Debug.Log("Collided with terrain. Stopping movement.");
+            RequestMoveRpc(transform.position); // Request movement to the current position
             isCollidingWithTerrain = true; // Set the flag to true
         }
         isCollidingWithTerrain = false; // Reset the flag when not colliding with terrain

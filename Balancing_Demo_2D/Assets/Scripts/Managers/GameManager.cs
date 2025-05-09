@@ -4,6 +4,9 @@ using System.Collections;
 using Unity.Netcode;
 using TMPro;
 using System.Linq;
+using UnityEngine.SceneManagement;
+using System.IO;
+using UnityEngine.UI;
 
 public class GameManager : NetworkBehaviour
 {
@@ -147,6 +150,20 @@ public class GameManager : NetworkBehaviour
             Debug.LogError("NetworkManager.Singleton is null. Ensure the NetworkManager is active in the scene.");
         }
     }
+
+    public void ResetPlayerStats(){
+        if (!IsServer) return; // Only the server can clear player stats
+        string filePath = Path.Combine(Application.persistentDataPath, "Resources/PlayerStats.json");
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath); // Delete the file if it exists
+            Debug.Log("Player stats cleared.");
+        }
+        else
+        {
+            Debug.LogWarning("Player stats file not found. Nothing to delete");
+        }
+    }
     #endregion
 
     #region Game Logic
@@ -232,9 +249,11 @@ public class GameManager : NetworkBehaviour
     private void OnClientConnected(ulong clientId)
     {
         Debug.Log($"Client {clientId} connected.");
+        // TODO: Handle different player conenction here
+        // This would be like, a player leaving and then a new one joining. Maybe make them re-choose their champion?
     }
 
-//TODO: Finish this function to handle player disconnects properly
+    //TODO: Finish this function to handle player disconnects properly
     private void OnClientDisconnect(ulong clientId)
     {
         Debug.Log($"Client {clientId} disconnected.");
@@ -269,6 +288,21 @@ public class GameManager : NetworkBehaviour
             gamePaused.Value = true;
             // TODO: Pause game and do a pop up saying waiting for other player to reconnect.
         }
+    }
+
+    public void ReturnToMainMenu()
+    {
+        NetworkManager.Singleton.Shutdown();
+        Debug.Log("Returning to main menu.");
+        NetworkManager.Singleton.SceneManager.LoadScene("MainMenu", LoadSceneMode.Single); // Load the game scene
+    }
+
+    // Client code for when theyre disconnected from server
+    private void OnClientDisconnectCallback(ulong clientId)
+    {
+        Debug.Log($"The Server/Host has disconnected Client {clientId}.");
+        NetworkManager.Singleton.SceneManager.LoadScene("MainMenu", LoadSceneMode.Single); // Load the game scene
+        NetworkManager.Singleton.Shutdown(); // Disconnect the client
     }
     #endregion
 

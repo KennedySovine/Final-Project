@@ -45,6 +45,11 @@ public class EndGameUI : MonoBehaviour
     #endregion
 
     #region Public Methods
+
+    public void ReturnToMainMenu(){
+        GM.ReturnToMainMenu(); // Call the return to main menu method in GameManager
+    }
+    
     public void displayEndGameUI()
     {
         HIDEALLOTHERUI(); // Hide all other UI elements

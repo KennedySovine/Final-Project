@@ -34668,7 +34668,6 @@ GameObject:
   - component: {fileID: 356187478}
   - component: {fileID: 356187480}
   - component: {fileID: 356187479}
-  - component: {fileID: 356187481}
   m_Layer: 5
   m_Name: EndGameUI
   m_TagString: Untagged
@@ -34737,27 +34736,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 356187477}
   m_CullTransparentMesh: 1
---- !u!114 &356187481
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 356187477}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 404606da3d6283d4f98fa987f5fb6d45, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  IGUI: {fileID: 0}
-  augUI: {fileID: 0}
-  endGameUI: {fileID: 0}
-  player1Stats: {fileID: 0}
-  player2Stats: {fileID: 0}
-  player1StatsList: []
-  player2StatsList: []
-  statsAssigned:
-    m_InternalValue: 0
 --- !u!1 &358982447
 GameObject:
   m_ObjectHideFlags: 0
@@ -36345,7 +36323,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 590578785}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 349277513}
+        m_TargetAssemblyTypeName: EndGameUI, Assembly-CSharp
+        m_MethodName: ReturnToMainMenu
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &590578785
 MonoBehaviour:
   m_ObjectHideFlags: 0

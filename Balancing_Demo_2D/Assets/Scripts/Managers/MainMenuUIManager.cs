@@ -17,6 +17,7 @@ public class MainMenuUIManager : NetworkBehaviour
 
     [SerializeField] private TMP_Dropdown networkDropdown;
     [SerializeField] private GameObject netDropDown;
+    [SerializeField] private GameObject resetStatsToggle;
     #endregion
 
     #region Unity Lifecycle Methods
@@ -28,6 +29,8 @@ public class MainMenuUIManager : NetworkBehaviour
         {
             Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
         }
+        resetStatsToggle.SetActive(false); // Hide the reset stats toggle by default
+
     }
 
     // Update is called once per frame
@@ -41,6 +44,16 @@ public class MainMenuUIManager : NetworkBehaviour
         {
             startButton.GetComponent<Button>().interactable = true;
         }
+        
+
+        // Reset Stats Toggle
+        if (networkDropdown.value == 1){
+            resetStatsToggle.SetActive(true); // Show the reset stats toggle for server
+        }
+        else
+        {
+            resetStatsToggle.SetActive(false); // Hide the reset stats toggle for client/host
+        }
     }
     #endregion
 
@@ -52,8 +65,6 @@ public class MainMenuUIManager : NetworkBehaviour
     public void StartButtonClick(){
         mainMenuUI.SetActive(false);
         ConnectionType();
-        // Load the game scene here
-        // SceneManager.LoadScene("GameSceneName"); // Uncomment and replace with your scene name
     }
     #endregion
 
@@ -72,6 +83,10 @@ public class MainMenuUIManager : NetworkBehaviour
             NetworkManager.Singleton.StartServer();
             GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the server
             GM.ServerID = NetworkManager.Singleton.LocalClientId; // Set the server ID to the local client ID
+            if (resetStatsToggle.GetComponent<Toggle>().isOn)
+            {
+                GM.ResetPlayerStats(); // Reset player stats if the toggle is on
+            }
             EnterGame();
         }
         else if (networkDropdown.value == 2)
