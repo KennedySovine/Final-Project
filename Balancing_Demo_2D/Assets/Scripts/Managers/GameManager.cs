@@ -56,8 +56,9 @@ public class GameManager : NetworkBehaviour
     public int maxPlayers = 2;
     public NetworkVariable<bool> gamePaused = new NetworkVariable<bool>(false); // Flag to pause the game time
     [SerializeField] private float maxGameTime;
-    public NetworkVariable<float> gameTime = new NetworkVariable<float>(60f); // Game time in seconds
-    public float augmentBuffer = 20f; //Choose aug every 40 seconds
+    public NetworkVariable<float> gameTime = new NetworkVariable<float>(120f); // Game time in seconds
+    private float defaultAugmentBuffer;
+    public float augmentBuffer;
     public NetworkVariable<bool> augmentChoosing = new NetworkVariable<bool>(false); //If the player is choosing an augment, dont countdown the game time
     #endregion
 
@@ -89,6 +90,8 @@ public class GameManager : NetworkBehaviour
     {
         Debug.Log("Game Manager Initialized");
         maxGameTime = gameTime.Value; // Set the maximum game time
+        defaultAugmentBuffer = maxGameTime / 4; // Set the default augment buffer
+        augmentBuffer = defaultAugmentBuffer; // Set the default augment buffer
     }
 
     private void Update()
@@ -220,7 +223,7 @@ public class GameManager : NetworkBehaviour
         {
             LoadAugmentsForPlayers();
             augmentChoosing.Value = false;
-            augmentBuffer = 15f;
+            augmentBuffer = defaultAugmentBuffer;
         }
     }
 
@@ -333,13 +336,29 @@ public class GameManager : NetworkBehaviour
         {
             gameEnded = false;
             gameTime.Value = maxGameTime;
+            augmentBuffer = defaultAugmentBuffer; // or 30f if you want a fixed interval
             playerIDsSpawned.Clear();
             playerChampions.Clear();
             playerCount = 0;
             playersSpawned.Value = false;
             gamePaused.Value = false;
             augmentChoosing.Value = false;
-            augmentBuffer = 20f;
+            player1Augments.Clear();
+            player2Augments.Clear();
+            recievedCalcs = 0;
+
+            player1 = null;
+            player2 = null;
+            player1Controller = null;
+            player2Controller = null;
+
+            player1AbilityUsed = null;
+            player2AbilityUsed = null;
+
+            player1ID = 0;
+            player2ID = 0;
+
+            playerSpawningStart = false;
         }
     }
 

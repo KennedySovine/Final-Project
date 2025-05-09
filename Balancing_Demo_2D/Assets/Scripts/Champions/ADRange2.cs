@@ -104,6 +104,7 @@ public class ADRange2 : BaseChampion
 
     #region Core Game Loop Methods
     public override void Update(){
+        // Ensure ability cooldowns are updated each frame
         base.Update();
 
         UpdateIsEmpoweredRpc(true);
@@ -234,7 +235,7 @@ public class ADRange2 : BaseChampion
         // Check for mana
 
         if (mana.Value < ability1.manaCost || !isMaxStacks || ability1.isOnCooldown) return; // Check if enough mana and stacks are present
-        ability1.timeOfCast = Time.time; // Set the time of cast for cooldown tracking
+        SetAbilityTimeOfCastRpc("Q", Time.time); // Set the ability time of cast for all clients
         if (!IsServer) return; // Ensure this is only executed on the server
         UpdateRapidFireRpc(5);
         StartCoroutine(RapidFireCoroutine(ability1.duration)); // Start the rapid fire coroutine
@@ -268,6 +269,7 @@ public class ADRange2 : BaseChampion
             return;
         }
         if (!IsServer) return; // Ensure this is only executed on the server
+        SetAbilityTimeOfCastRpc("E", Time.time); // Set the ability time of cast for all clients
         UpdateAbility3UsedRpc(true); // Update the ability range
         UpdateManaRpc(-ability3.manaCost); // Deduct mana cost
         ability3.Stats.totalManaSpent += ability3.manaCost; // Update the total mana spent for the ability
