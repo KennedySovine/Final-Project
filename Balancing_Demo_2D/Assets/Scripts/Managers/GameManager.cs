@@ -614,7 +614,6 @@ public class GameManager : NetworkBehaviour
             Debug.LogWarning("End game calculations timed out, proceeding anyway");
         }
         
-        IGM.endGameUI.statsToList();
         EndGameUIRpc();
     }
     #endregion
@@ -694,6 +693,8 @@ public class GameManager : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     public void EndGameUIRpc()
     {
+        // Always update stats before displaying UI, on both server and clients
+        IGM.endGameUI.statsToList();
         IGM.endGameUI.displayEndGameUI();
         Debug.Log("End game UI initialized and activated.");
     }

@@ -59,8 +59,13 @@ public class AbilityStats
 
     public void SaveToFile()
     {
-        string filePath = Path.Combine(Application.dataPath, "Resources/PlayerStats.json"); // Construct the file path
+        string dirPath = Path.Combine(Application.persistentDataPath, "Resources");
+        string filePath = Path.Combine(dirPath, "PlayerStats.json");
         List<AbilityStats> statsList = new List<AbilityStats>();
+
+        // Ensure directory exists
+        if (!Directory.Exists(dirPath))
+            Directory.CreateDirectory(dirPath);
 
         // Check if the file exists
         if (File.Exists(filePath))
@@ -80,8 +85,28 @@ public class AbilityStats
 
         // Write the updated JSON back to the file
         File.WriteAllText(filePath, updatedJson);
-        
+
         Debug.Log($"Ability stats appended to {filePath}");
+    }
+
+    // Add this static method for safe deletion/reset
+    public static void ResetPlayerStatsFile()
+    {
+        string dirPath = Path.Combine(Application.persistentDataPath, "Resources");
+        string filePath = Path.Combine(dirPath, "PlayerStats.json");
+        try
+        {
+            if (!Directory.Exists(dirPath))
+                Directory.CreateDirectory(dirPath);
+
+            // Overwrite with empty stats array
+            File.WriteAllText(filePath, "{ \"stats\": [] }");
+            Debug.Log("PlayerStats.json reset (overwritten with empty stats array).");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("Failed to reset PlayerStats.json: " + ex.Message);
+        }
     }
     #endregion
 
