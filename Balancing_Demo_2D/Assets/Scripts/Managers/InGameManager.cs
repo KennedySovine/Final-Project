@@ -160,6 +160,11 @@ public class InGameManager : NetworkBehaviour
 
         if (!GM.playerChampions.ContainsKey(clientID))
         {
+            if (GM.maxPlayers == GM.playerChampions.Count)
+            {
+                Debug.LogWarning("Max players reached. Cannot add more players.");
+                return; // Prevent adding more players if max players reached
+            }
             if (champChoiceIndex >= 0 && champChoiceIndex < GM.playerPrefabsList.Count)
             {
                 GameObject champChoice = GM.playerPrefabsList[champChoiceIndex];
