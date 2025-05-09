@@ -303,9 +303,20 @@ public class GameManager : NetworkBehaviour
 
     public void ReturnToMainMenu()
     {
-        NetworkManager.Singleton.Shutdown();
-        Debug.Log("Returning to main menu.");
-        NetworkManager.Singleton.SceneManager.LoadScene("MainMenu", LoadSceneMode.Single); // Load the game scene
+        if (IsServer || IsHost)
+        {
+            // Server/Host: use NetworkManager's SceneManager before shutdown
+            Debug.Log("Returning to main menu (server/host).");
+            NetworkManager.Singleton.SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+            NetworkManager.Singleton.Shutdown();
+        }
+        else
+        {
+            // Client: shutdown first, then use Unity's SceneManager
+            Debug.Log("Returning to main menu (client).");
+            NetworkManager.Singleton.Shutdown();
+            SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+        }
     }
 
     public void ResetGame()
