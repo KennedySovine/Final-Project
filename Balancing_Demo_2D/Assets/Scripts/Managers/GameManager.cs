@@ -281,7 +281,12 @@ public class GameManager : NetworkBehaviour
         {
             gameEnded = true;
             Debug.Log("All players disconnected. Ending game.");
-            EndGame();
+            // Basically, I want the server to reset the game if all players disconnect so they dont have to restart everything and reselect server yada yada
+            if (IsServer)
+                if (gameEnded)
+                    EndGame();
+                else
+                    ResetGame();
         }
         else if (playerIDsSpawned.Count == 1)
         {
@@ -295,6 +300,22 @@ public class GameManager : NetworkBehaviour
         NetworkManager.Singleton.Shutdown();
         Debug.Log("Returning to main menu.");
         NetworkManager.Singleton.SceneManager.LoadScene("MainMenu", LoadSceneMode.Single); // Load the game scene
+    }
+
+    public void ResetGame()
+    {
+        if (IsServer)
+        {
+            gameEnded = false;
+            gameTime.Value = maxGameTime;
+            playerIDsSpawned.Clear();
+            playerChampions.Clear();
+            playerCount = 0;
+            playersSpawned.Value = false;
+            gamePaused.Value = false;
+            augmentChoosing.Value = false;
+            augmentBuffer = 20f;
+        }
     }
 
     // Client code for when theyre disconnected from server
