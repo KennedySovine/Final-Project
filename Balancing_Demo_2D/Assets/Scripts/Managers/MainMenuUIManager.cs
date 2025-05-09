@@ -30,7 +30,11 @@ public class MainMenuUIManager : NetworkBehaviour
             Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
         }
         resetStatsToggle.SetActive(false); // Hide the reset stats toggle by default
-
+        // Always ensure PlayerStats.json is empty at startup if toggle is on
+        if (resetStatsToggle.GetComponent<Toggle>().isOn)
+        {
+            AbilityStats.ResetPlayerStatsFile();
+        }
     }
 
     // Update is called once per frame
@@ -83,6 +87,7 @@ public class MainMenuUIManager : NetworkBehaviour
             if (resetStatsToggle.GetComponent<Toggle>().isOn)
             {
                 GM.ResetPlayerStats(); // Reset player stats if the toggle is on
+                AbilityStats.ResetPlayerStatsFile(); // Also call static helper to ensure file is empty
             }
             NetworkManager.Singleton.StartServer();
             GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the server
@@ -95,6 +100,7 @@ public class MainMenuUIManager : NetworkBehaviour
             if (resetStatsToggle.GetComponent<Toggle>().isOn)
             {
                 GM.ResetPlayerStats(); // Reset player stats if the toggle is on
+                AbilityStats.ResetPlayerStatsFile(); // Also call static helper to ensure file is empty
             }
             NetworkManager.Singleton.StartHost();
             GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the host
