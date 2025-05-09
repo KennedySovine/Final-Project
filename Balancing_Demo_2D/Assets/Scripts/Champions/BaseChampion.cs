@@ -67,7 +67,6 @@ public class BaseChampion : NetworkBehaviour
 
     [Header("Champion Settings")]
     public float regenTimer = 0f;
-
     public GameObject enemyChampion; // Reference to the enemy champion prefab
     public NetworkVariable<ulong> enemyChampionId = new NetworkVariable<ulong>(0); // ID of the enemy champion
 
