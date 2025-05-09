@@ -153,15 +153,21 @@ public class GameManager : NetworkBehaviour
 
     public void ResetPlayerStats(){
         if (!IsServer) return; // Only the server can clear player stats
-        string filePath = Path.Combine(Application.persistentDataPath, "Resources/PlayerStats.json");
-        if (File.Exists(filePath))
+        // Save to Assets/Resources/PlayerStats.json in the codebase
+        string dirPath = Path.Combine(Application.dataPath, "Resources");
+        string filePath = Path.Combine(dirPath, "PlayerStats.json");
+        try
         {
-            File.Delete(filePath); // Delete the file if it exists
-            Debug.Log("Player stats cleared.");
+            if (!Directory.Exists(dirPath))
+                Directory.CreateDirectory(dirPath);
+
+            // Overwrite the file with an empty stats array
+            File.WriteAllText(filePath, "{ \"stats\": [] }");
+            Debug.Log("Player stats wiped (file overwritten with empty stats array).");
         }
-        else
+        catch (System.Exception ex)
         {
-            Debug.LogWarning("Player stats file not found. Nothing to delete");
+            Debug.LogError("Failed to wipe PlayerStats.json: " + ex.Message);
         }
     }
     #endregion
@@ -283,10 +289,18 @@ public class GameManager : NetworkBehaviour
             Debug.Log("All players disconnected. Ending game.");
             // Basically, I want the server to reset the game if all players disconnect so they dont have to restart everything and reselect server yada yada
             if (IsServer)
+            {
                 if (gameEnded)
+                {
                     EndGame();
+                    EndGameUIRpc(); // Ensure UI is shown even if game ends from disconnect
+                }
                 else
+                {
                     ResetGame();
+                    EndGameUIRpc(); // Show UI if resetting due to disconnect
+                }
+            }
         }
         else if (playerIDsSpawned.Count == 1)
         {
@@ -297,9 +311,20 @@ public class GameManager : NetworkBehaviour
 
     public void ReturnToMainMenu()
     {
-        NetworkManager.Singleton.Shutdown();
-        Debug.Log("Returning to main menu.");
-        NetworkManager.Singleton.SceneManager.LoadScene("MainMenu", LoadSceneMode.Single); // Load the game scene
+        if (IsServer || IsHost)
+        {
+            // Server/Host: use NetworkManager's SceneManager before shutdown
+            Debug.Log("Returning to main menu (server/host).");
+            NetworkManager.Singleton.SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+            NetworkManager.Singleton.Shutdown();
+        }
+        else
+        {
+            // Client: shutdown first, then use Unity's SceneManager
+            Debug.Log("Returning to main menu (client).");
+            NetworkManager.Singleton.Shutdown();
+            SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+        }
     }
 
     public void ResetGame()
@@ -534,6 +559,13 @@ public class GameManager : NetworkBehaviour
             default: Debug.LogWarning($"Unknown augment type: {augmentType}"); break;
         }
     }
+
+    // Utility: Round a float to a specific number of decimal places
+    public static float RoundToDecimals(float value, int decimals)
+    {
+        float multiplier = Mathf.Pow(10, decimals);
+        return Mathf.Round(value * multiplier) / multiplier;
+    }
     #endregion
 
     #region Game End Logic
@@ -541,25 +573,25 @@ public class GameManager : NetworkBehaviour
     {
         Debug.Log("Game Over!");
         
-        PrepareEndGameAugmentLists();
+        List<Augment> player1Aug = ConvertAugmentIdsToAugments(player1Augments);
+        List<Augment> player2Aug = ConvertAugmentIdsToAugments(player2Augments);
         
         if (!IsServer) return;
         
         StartCoroutine(WaitForEndGameStats());
         ProcessEndGameCalculationsForChampions();
-    }
-
-    private void PrepareEndGameAugmentLists()
-    {
-        List<Augment> player1Aug = ConvertAugmentIdsToAugments(player1Augments);
-        List<Augment> player2Aug = ConvertAugmentIdsToAugments(player2Augments);
+        EndGameUIRpc(); // Always show UI after processing stats
     }
 
     private List<Augment> ConvertAugmentIdsToAugments(NetworkList<int> augmentIds)
     {
         List<Augment> augments = new List<Augment>();
-        foreach (int augmentID in augmentIds)
+        // Only take the last 3 augments if there are more than 3
+        int count = augmentIds.Count;
+        int startIdx = Mathf.Max(0, count - 3);
+        for (int i = startIdx; i < count; i++)
         {
+            int augmentID = augmentIds[i];
             Augment augment = AM.AugmentFromID(augmentID);
             if (augment != null)
             {
@@ -575,8 +607,6 @@ public class GameManager : NetworkBehaviour
         List<Augment> player2Aug = ConvertAugmentIdsToAugments(player2Augments);
         
         // Process passive stats
-        player1Controller.GetComponent<BaseChampion>().passive.Stats.EndGameCalculations(player1Aug, maxGameTime);
-        player2Controller.GetComponent<BaseChampion>().passive.Stats.EndGameCalculations(player2Aug, maxGameTime);
         
         // Process abilities stats
         ProcessAbilityEndGameCalculations(player1Controller, player1Aug);
@@ -586,23 +616,67 @@ public class GameManager : NetworkBehaviour
     private void ProcessAbilityEndGameCalculations(GameObject playerController, List<Augment> augments)
     {
         BaseChampion champion = playerController.GetComponent<BaseChampion>();
-        champion.ability1.Stats.EndGameCalculations(augments, maxGameTime);
-        champion.ability2.Stats.EndGameCalculations(augments, maxGameTime);
-        champion.ability3.Stats.EndGameCalculations(augments, maxGameTime);
+        // Combine mana spent from all abilities into passive before saving
+        AbilityStats.CombineManaSpentToPassive(
+            champion.ability1?.Stats,
+            champion.ability2?.Stats,
+            champion.ability3?.Stats,
+            champion.passive?.Stats
+        );
+        //champion.ability1.Stats.EndGameCalculations(augments, maxGameTime);
+        //champion.ability2.Stats.EndGameCalculations(augments, maxGameTime);
+        //champion.ability3.Stats.EndGameCalculations(augments, maxGameTime);
+        champion.passive.Stats.EndGameCalculations(augments, maxGameTime);
     }
 
     private IEnumerator WaitForEndGameStats()
     {
-        while (!recievedEndGameCalculations)
+        // Request stats from clients
+        RequestEndGameStatsRpc();
+        
+        float timeout = 10f; // Timeout after 10 seconds
+        float elapsed = 0f;
+        
+        while (!recievedEndGameCalculations && elapsed < timeout)
         {
+            elapsed += Time.deltaTime;
             yield return null;
         }
-        IGM.endGameUI.statsToList();
+        
+        // If we timed out, force proceed
+        if (!recievedEndGameCalculations)
+        {
+            Debug.LogWarning("End game calculations timed out, proceeding anyway");
+        }
+        
         EndGameUIRpc();
     }
     #endregion
 
     #region RPC Methods
+    [Rpc(SendTo.Everyone)]
+    public void RequestEndGameStatsRpc()
+    {
+        if (!IsServer && IsOwner)
+        {
+            // Clients send their stats to the server
+            SubmitPlayerStatsToServerRpc(NetworkManager.Singleton.LocalClientId);
+        }
+    }
+    
+    [Rpc(SendTo.Server)]
+    public void SubmitPlayerStatsToServerRpc(ulong clientId)
+    {
+        if (!IsServer) return;
+
+        Debug.Log($"Received end game stats from client {clientId}");
+        recievedCalcs++;
+        
+        // Ensure we don't go over our expected count
+        if (recievedCalcs > 2)
+            recievedCalcs = 2;
+    }
+    
     [Rpc(SendTo.SpecifiedInParams)]
     public void LoadAugmentsRpc(RpcParams rpcParams)
     {
@@ -654,6 +728,8 @@ public class GameManager : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     public void EndGameUIRpc()
     {
+        // Always update stats before displaying UI, on both server and clients
+        IGM.endGameUI.statsToList();
         IGM.endGameUI.displayEndGameUI();
         Debug.Log("End game UI initialized and activated.");
     }

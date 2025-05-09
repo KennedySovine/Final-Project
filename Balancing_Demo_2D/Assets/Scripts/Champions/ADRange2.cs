@@ -126,7 +126,7 @@ public class ADRange2 : BaseChampion
         if (IsOwner && iconsSet) // Only the owner should check cooldowns and mana
         {
             // Check ability 1 (Rapid Frost)
-            if (ability1 != null && isMaxStacks && ability1.CheckIfAvailable(mana.Value)) // Check if ability 1 is available and max stacks are present
+            if (ability1 != null && isMaxStacks && !ability1.isOnCooldown && mana.Value >= ability1.manaCost) // Check if ability 1 is available and max stacks are present
             {
                 IGUIM.ButtonInteractable("Q", true); // Enable button for ability 1
                 IGUIM.AsheEmpowerIcon(true, ability1); // Set empowered icon for Ashe
@@ -138,7 +138,7 @@ public class ADRange2 : BaseChampion
             }
 
             // Check ability 2 (Ranger's Focus)
-            if (ability2 != null && ability2.CheckIfAvailable(mana.Value)) // Check if ability 2 is available
+            if (ability2 != null && !ability2.isOnCooldown && mana.Value >= ability2.manaCost) // Check if ability 2 is available
             {
                 IGUIM.ButtonInteractable("W", true); // Enable button for ability 2
             }
@@ -148,7 +148,7 @@ public class ADRange2 : BaseChampion
             }
 
             // Check ability 3 (Volley)
-            if (ability3 != null && ability3.CheckIfAvailable(mana.Value)) // Check if ability 3 is available
+            if (ability3 != null && !ability3.isOnCooldown && mana.Value >= ability3.manaCost) // Check if ability 3 is available
             {
                 IGUIM.ButtonInteractable("E", true); // Enable button for ability 3
             }
@@ -233,7 +233,7 @@ public class ADRange2 : BaseChampion
         // Check for stacks of focus and if they are present, consume them
         // Check for mana
 
-        if (mana.Value < ability1.manaCost && !isMaxStacks && ability1.isOnCooldown) return; // Check if enough mana and stacks are present
+        if (mana.Value < ability1.manaCost || !isMaxStacks || ability1.isOnCooldown) return; // Check if enough mana and stacks are present
         ability1.timeOfCast = Time.time; // Set the time of cast for cooldown tracking
         if (!IsServer) return; // Ensure this is only executed on the server
         UpdateRapidFireRpc(5);

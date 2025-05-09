@@ -30,7 +30,11 @@ public class MainMenuUIManager : NetworkBehaviour
             Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
         }
         resetStatsToggle.SetActive(false); // Hide the reset stats toggle by default
-
+        // Always ensure PlayerStats.json is empty at startup if toggle is on
+        if (resetStatsToggle.GetComponent<Toggle>().isOn)
+        {
+            AbilityStats.ResetPlayerStatsFile();
+        }
     }
 
     // Update is called once per frame
@@ -47,7 +51,7 @@ public class MainMenuUIManager : NetworkBehaviour
         
 
         // Reset Stats Toggle
-        if (networkDropdown.value == 1){
+        if (networkDropdown.value == 1 || networkDropdown.value == 2){
             resetStatsToggle.SetActive(true); // Show the reset stats toggle for server
         }
         else
@@ -80,18 +84,24 @@ public class MainMenuUIManager : NetworkBehaviour
         if (networkDropdown.value == 1)
         {
             Debug.Log("Starting as Server");
-            NetworkManager.Singleton.StartServer();
-            GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the server
-            GM.ServerID = NetworkManager.Singleton.LocalClientId; // Set the server ID to the local client ID
             if (resetStatsToggle.GetComponent<Toggle>().isOn)
             {
                 GM.ResetPlayerStats(); // Reset player stats if the toggle is on
+                AbilityStats.ResetPlayerStatsFile(); // Also call static helper to ensure file is empty
             }
+            NetworkManager.Singleton.StartServer();
+            GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the server
+            GM.ServerID = NetworkManager.Singleton.LocalClientId; // Set the server ID to the local client ID
             EnterGame();
         }
         else if (networkDropdown.value == 2)
         {
             Debug.Log("Starting as Host");
+            if (resetStatsToggle.GetComponent<Toggle>().isOn)
+            {
+                GM.ResetPlayerStats(); // Reset player stats if the toggle is on
+                AbilityStats.ResetPlayerStatsFile(); // Also call static helper to ensure file is empty
+            }
             NetworkManager.Singleton.StartHost();
             GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the host
             EnterGame();

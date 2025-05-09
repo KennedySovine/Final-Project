@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5529780649511139312}
   - component: {fileID: 7283584346613323515}
-  - component: {fileID: 2750187209312509762}
   - component: {fileID: 479571641050879420}
+  - component: {fileID: 2750187209312509762}
   - component: {fileID: 5221310434119250730}
   - component: {fileID: 1182713526884703607}
   - component: {fileID: 752664424059945664}
@@ -93,6 +93,30 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &479571641050879420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3316088473501965052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffeeb5646e1fd574caec0b5cf4f9782f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  mousePosition: {x: 0, y: 0}
+  dashSpeed: 0
+  targetPositionNet:
+    m_InternalValue: {x: 0, y: 0, z: 0}
+  isDashing:
+    m_InternalValue: 0
+  personalCamera: {fileID: 4986339328056519817}
+  champion: {fileID: 2750187209312509762}
+  isMoving:
+    m_InternalValue: 0
+  enemyPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &2750187209312509762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -287,30 +311,6 @@ MonoBehaviour:
   PN: {fileID: 479571641050879420}
   iconsSet: 0
   attackStacks: 0
---- !u!114 &479571641050879420
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3316088473501965052}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d00a172e8f24f9c40bf2d028c86a4919, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  mousePosition: {x: 0, y: 0}
-  dashSpeed: 0
-  targetPositionNet:
-    m_InternalValue: {x: 0, y: 0, z: 0}
-  isDashing:
-    m_InternalValue: 0
-  personalCamera: {fileID: 4986339328056519817}
-  champion: {fileID: 2750187209312509762}
-  isMoving:
-    m_InternalValue: 0
-  enemyPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &5221310434119250730
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -45,12 +45,28 @@ public class AbilityStats
         costToDamage = damageTotal > 0 && totalManaSpent > 0 ? damageTotal / totalManaSpent : 0f; // Calculate cost to damage ratio
 
         SaveToFile(); // Save the ability stats to a JSON file
+        
+        // If we're a client, notify the server
+        if (!NetworkManager.Singleton.IsServer && NetworkManager.Singleton.IsClient)
+        {
+            var gameManager = GameManager.Instance;
+            if (gameManager != null)
+            {
+                gameManager.SubmitPlayerStatsToServerRpc(NetworkManager.Singleton.LocalClientId);
+            }
+        }
     }
 
     public void SaveToFile()
     {
-        string filePath = Path.Combine(Application.dataPath, "Resources/PlayerStats.json"); // Construct the file path
+        // Save to Assets/Resources/PlayerStats.json in the codebase
+        string dirPath = Path.Combine(Application.dataPath, "Resources");
+        string filePath = Path.Combine(dirPath, "PlayerStats.json");
         List<AbilityStats> statsList = new List<AbilityStats>();
+
+        // Ensure directory exists
+        if (!Directory.Exists(dirPath))
+            Directory.CreateDirectory(dirPath);
 
         // Check if the file exists
         if (File.Exists(filePath))
@@ -70,8 +86,39 @@ public class AbilityStats
 
         // Write the updated JSON back to the file
         File.WriteAllText(filePath, updatedJson);
-        
+
         Debug.Log($"Ability stats appended to {filePath}");
+    }
+
+    public static void ResetPlayerStatsFile()
+    {
+        // Save to Assets/Resources/PlayerStats.json in the codebase
+        string dirPath = Path.Combine(Application.dataPath, "Resources");
+        string filePath = Path.Combine(dirPath, "PlayerStats.json");
+        try
+        {
+            if (!Directory.Exists(dirPath))
+                Directory.CreateDirectory(dirPath);
+
+            // Overwrite with empty stats array
+            File.WriteAllText(filePath, "{ \"stats\": [] }");
+            Debug.Log("PlayerStats.json reset (overwritten with empty stats array).");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("Failed to reset PlayerStats.json: " + ex.Message);
+        }
+    }
+
+    // Add this static helper to combine mana spent
+    public static void CombineManaSpentToPassive(AbilityStats ability1, AbilityStats ability2, AbilityStats ability3, AbilityStats passive)
+    {
+        if (passive == null) return;
+        float totalMana = 0f;
+        if (ability1 != null) totalMana += ability1.totalManaSpent;
+        if (ability2 != null) totalMana += ability2.totalManaSpent;
+        if (ability3 != null) totalMana += ability3.totalManaSpent;
+        passive.totalManaSpent = totalMana;
     }
     #endregion
 

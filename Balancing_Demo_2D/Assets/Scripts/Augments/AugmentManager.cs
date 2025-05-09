@@ -45,7 +45,7 @@ public class AugmentManager : NetworkBehaviour
     }
 
 
-    public int GetFirstTwoDigits_Math(int value)
+    public static int GetFirstTwoDigits_Math(int value)
     {
         if (value == 0) return 0;
         

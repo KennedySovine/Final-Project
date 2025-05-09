@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using System.Collections;
 using Unity.Collections;
 
-public class EndGameUI : MonoBehaviour
+public class EndGameUI : NetworkBehaviour
 {
     #region Fields
     private static GameManager GM;
@@ -89,7 +89,7 @@ public class EndGameUI : MonoBehaviour
                 return stats; // Return empty stats list
             }
             stats.Add(champion.championType); // Add champion type to stats list
-            for (int i = 0; i < GM.player1Augments.Count; i++)
+            for (int i = 0; i < Mathf.Clamp(GM.player2Augments.Count, 0, 3); i++)
             {
                 try
                 {
@@ -100,9 +100,9 @@ public class EndGameUI : MonoBehaviour
                     Debug.LogError("Error retrieving augments: " + e.Message); // Log an error if there is an issue retrieving augments
                 }
             }
-            stats.Add(champion.passive.Stats.damageTotal.ToString()); // Add passive damage total to stats list
-            stats.Add(champion.passive.Stats.damageOverTime.ToString()); // Add passive damage over time to stats list
-            stats.Add(champion.passive.Stats.costToDamage.ToString()); // Add passive cost to damage to stats list
+            stats.Add(GameManager.RoundToDecimals(champion.passive.Stats.damageTotal, 0).ToString()); // Add passive damage total to stats list
+            stats.Add(GameManager.RoundToDecimals(champion.passive.Stats.damageOverTime, 2).ToString()); // Add passive damage over time to stats list
+            stats.Add(GameManager.RoundToDecimals(champion.passive.Stats.costToDamage, 2).ToString()); // Add passive cost to damage to stats list
         }
         else if (playerId == GM.player2ID)
         {
@@ -113,7 +113,7 @@ public class EndGameUI : MonoBehaviour
                 return stats; // Return empty stats list
             }
             stats.Add(champion.championType); // Add champion type to stats list
-            for (int i = 0; i < GM.player2Augments.Count; i++)
+            for (int i = 0; i < Mathf.Clamp(GM.player2Augments.Count, 0, 3); i++)
             {
                 try
                 {
@@ -124,9 +124,9 @@ public class EndGameUI : MonoBehaviour
                     Debug.LogError("Error retrieving augments: " + e.Message); // Log an error if there is an issue retrieving augments
                 }
             }
-            stats.Add(champion.passive.Stats.damageTotal.ToString()); // Add passive damage total to stats list
-            stats.Add(champion.passive.Stats.damageOverTime.ToString()); // Add passive damage over time to stats list
-            stats.Add(champion.passive.Stats.costToDamage.ToString()); // Add passive cost to damage to stats list
+            stats.Add(GameManager.RoundToDecimals(champion.passive.Stats.damageTotal, 0).ToString()); // Add passive damage total to stats list
+            stats.Add(GameManager.RoundToDecimals(champion.passive.Stats.damageOverTime, 2).ToString()); // Add passive damage over time to stats list
+            stats.Add(GameManager.RoundToDecimals(champion.passive.Stats.costToDamage, 2).ToString()); // Add passive cost to damage to stats list
         }
 
         if (champion == null)
@@ -164,10 +164,18 @@ public class EndGameUI : MonoBehaviour
             
             // Update UI
             updateStatsUI(p1Stats, p2Stats);
+            
+            // Notify clients that stats are ready
+            SyncEndGameStatsRpc();
         }
-        else if (NetworkManager.Singleton.IsClient && statsAssigned.Value)
+    }
+    
+    [Rpc(SendTo.ClientsAndHost)]
+    public void SyncEndGameStatsRpc()
+    {
+        if (!NetworkManager.Singleton.IsServer)
         {
-            // Client side - convert received NetworkList data to StatBlocks
+            // Convert NetworkList data to StatBlocks
             List<StatBlock> p1Stats = new List<StatBlock>();
             List<StatBlock> p2Stats = new List<StatBlock>();
             
