@@ -59,7 +59,8 @@ public class AbilityStats
 
     public void SaveToFile()
     {
-        string dirPath = Path.Combine(Application.persistentDataPath, "Resources");
+        // Save to Assets/Resources/PlayerStats.json in the codebase
+        string dirPath = Path.Combine(Application.dataPath, "Resources");
         string filePath = Path.Combine(dirPath, "PlayerStats.json");
         List<AbilityStats> statsList = new List<AbilityStats>();
 
@@ -89,10 +90,10 @@ public class AbilityStats
         Debug.Log($"Ability stats appended to {filePath}");
     }
 
-    // Add this static method for safe deletion/reset
     public static void ResetPlayerStatsFile()
     {
-        string dirPath = Path.Combine(Application.persistentDataPath, "Resources");
+        // Save to Assets/Resources/PlayerStats.json in the codebase
+        string dirPath = Path.Combine(Application.dataPath, "Resources");
         string filePath = Path.Combine(dirPath, "PlayerStats.json");
         try
         {

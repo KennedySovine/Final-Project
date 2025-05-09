@@ -153,9 +153,14 @@ public class GameManager : NetworkBehaviour
 
     public void ResetPlayerStats(){
         if (!IsServer) return; // Only the server can clear player stats
-        string filePath = Path.Combine(Application.persistentDataPath, "Resources/PlayerStats.json");
+        // Save to Assets/Resources/PlayerStats.json in the codebase
+        string dirPath = Path.Combine(Application.dataPath, "Resources");
+        string filePath = Path.Combine(dirPath, "PlayerStats.json");
         try
         {
+            if (!Directory.Exists(dirPath))
+                Directory.CreateDirectory(dirPath);
+
             // Overwrite the file with an empty stats array
             File.WriteAllText(filePath, "{ \"stats\": [] }");
             Debug.Log("Player stats wiped (file overwritten with empty stats array).");
