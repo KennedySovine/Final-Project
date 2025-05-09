@@ -89,7 +89,7 @@ public class EndGameUI : NetworkBehaviour
                 return stats; // Return empty stats list
             }
             stats.Add(champion.championType); // Add champion type to stats list
-            for (int i = 0; i < GM.player1Augments.Count; i++)
+            for (int i = 0; i < Mathf.Clamp(GM.player2Augments.Count, 0, 3); i++)
             {
                 try
                 {
@@ -100,9 +100,9 @@ public class EndGameUI : NetworkBehaviour
                     Debug.LogError("Error retrieving augments: " + e.Message); // Log an error if there is an issue retrieving augments
                 }
             }
-            stats.Add(GM.RoundToDecimals(champion.passive.Stats.damageTotal.ToString(), 0)); // Add passive damage total to stats list
-            stats.Add(GM.RoundToDecimals(champion.passive.Stats.damageOverTime.ToString(), 2)); // Add passive damage over time to stats list
-            stats.Add(GM.RoundToDecimals(champion.passive.Stats.costToDamage.ToString(), 2)); // Add passive cost to damage to stats list
+            stats.Add(GameManager.RoundToDecimals(champion.passive.Stats.damageTotal, 0).ToString()); // Add passive damage total to stats list
+            stats.Add(GameManager.RoundToDecimals(champion.passive.Stats.damageOverTime, 2).ToString()); // Add passive damage over time to stats list
+            stats.Add(GameManager.RoundToDecimals(champion.passive.Stats.costToDamage, 2).ToString()); // Add passive cost to damage to stats list
         }
         else if (playerId == GM.player2ID)
         {
@@ -113,7 +113,7 @@ public class EndGameUI : NetworkBehaviour
                 return stats; // Return empty stats list
             }
             stats.Add(champion.championType); // Add champion type to stats list
-            for (int i = 0; i < GM.player2Augments.Count; i++)
+            for (int i = 0; i < Mathf.Clamp(GM.player2Augments.Count, 0, 3); i++)
             {
                 try
                 {
@@ -124,9 +124,9 @@ public class EndGameUI : NetworkBehaviour
                     Debug.LogError("Error retrieving augments: " + e.Message); // Log an error if there is an issue retrieving augments
                 }
             }
-            stats.Add(GM.RoundToDecimals(champion.passive.Stats.damageTotal.ToString(), 0)); // Add passive damage total to stats list
-            stats.Add(GM.RoundToDecimals(champion.passive.Stats.damageOverTime.ToString(), 2)); // Add passive damage over time to stats list
-            stats.Add(GM.RoundToDecimals(champion.passive.Stats.costToDamage.ToString(), 2)); // Add passive cost to damage to stats list
+            stats.Add(GameManager.RoundToDecimals(champion.passive.Stats.damageTotal, 0).ToString()); // Add passive damage total to stats list
+            stats.Add(GameManager.RoundToDecimals(champion.passive.Stats.damageOverTime, 2).ToString()); // Add passive damage over time to stats list
+            stats.Add(GameManager.RoundToDecimals(champion.passive.Stats.costToDamage, 2).ToString()); // Add passive cost to damage to stats list
         }
 
         if (champion == null)
