@@ -154,14 +154,15 @@ public class GameManager : NetworkBehaviour
     public void ResetPlayerStats(){
         if (!IsServer) return; // Only the server can clear player stats
         string filePath = Path.Combine(Application.persistentDataPath, "Resources/PlayerStats.json");
-        if (File.Exists(filePath))
+        try
         {
-            File.Delete(filePath); // Delete the file if it exists
-            Debug.Log("Player stats cleared.");
+            // Overwrite the file with an empty stats array
+            File.WriteAllText(filePath, "{ \"stats\": [] }");
+            Debug.Log("Player stats wiped (file overwritten with empty stats array).");
         }
-        else
+        catch (System.Exception ex)
         {
-            Debug.LogWarning("Player stats file not found. Nothing to delete");
+            Debug.LogError("Failed to wipe PlayerStats.json: " + ex.Message);
         }
     }
     #endregion
@@ -533,6 +534,13 @@ public class GameManager : NetworkBehaviour
             case "MagicResist": champion.UpdateMagicResistRpc(value); break;
             default: Debug.LogWarning($"Unknown augment type: {augmentType}"); break;
         }
+    }
+
+    // Utility: Round a float to a specific number of decimal places
+    public static float RoundToDecimals(float value, int decimals)
+    {
+        float multiplier = Mathf.Pow(10, decimals);
+        return Mathf.Round(value * multiplier) / multiplier;
     }
     #endregion
 

@@ -47,7 +47,7 @@ public class MainMenuUIManager : NetworkBehaviour
         
 
         // Reset Stats Toggle
-        if (networkDropdown.value == 1){
+        if (networkDropdown.value == 1 || networkDropdown.value == 2){
             resetStatsToggle.SetActive(true); // Show the reset stats toggle for server
         }
         else
