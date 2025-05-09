@@ -80,18 +80,22 @@ public class MainMenuUIManager : NetworkBehaviour
         if (networkDropdown.value == 1)
         {
             Debug.Log("Starting as Server");
-            NetworkManager.Singleton.StartServer();
-            GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the server
-            GM.ServerID = NetworkManager.Singleton.LocalClientId; // Set the server ID to the local client ID
             if (resetStatsToggle.GetComponent<Toggle>().isOn)
             {
                 GM.ResetPlayerStats(); // Reset player stats if the toggle is on
             }
+            NetworkManager.Singleton.StartServer();
+            GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the server
+            GM.ServerID = NetworkManager.Singleton.LocalClientId; // Set the server ID to the local client ID
             EnterGame();
         }
         else if (networkDropdown.value == 2)
         {
             Debug.Log("Starting as Host");
+            if (resetStatsToggle.GetComponent<Toggle>().isOn)
+            {
+                GM.ResetPlayerStats(); // Reset player stats if the toggle is on
+            }
             NetworkManager.Singleton.StartHost();
             GM.InitializeNetworkCallbacks(); // Initialize callbacks after starting the host
             EnterGame();
