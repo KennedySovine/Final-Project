@@ -34416,7 +34416,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0.237
+  m_MatchWidthOrHeight: 0.62
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -34634,6 +34634,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 404606da3d6283d4f98fa987f5fb6d45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   IGUI: {fileID: 1056698707}
   augUI: {fileID: 1582487672}
   endGameUI: {fileID: 356187477}
@@ -39133,7 +39134,7 @@ GameObject:
   - component: {fileID: 1285085622}
   - component: {fileID: 1285085621}
   m_Layer: 5
-  m_Name: Player1
+  m_Name: Player2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39178,7 +39179,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Player 1
+  m_text: 'Player 2
 
 '
   m_isRightToLeft: 0

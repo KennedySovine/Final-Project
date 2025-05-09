@@ -1146,7 +1146,7 @@ MonoBehaviour:
   maxPlayers: 2
   gamePaused:
     m_InternalValue: 0
-  maxGameTime: 60
+  maxGameTime: 120
   gameTime:
     m_InternalValue: 60
   augmentBuffer: 0
@@ -2051,7 +2051,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.359
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -4022,7 +4022,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
-        m_MethodName: exitButtonClick
+        m_MethodName: ExitButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
