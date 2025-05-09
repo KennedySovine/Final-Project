@@ -45,6 +45,16 @@ public class AbilityStats
         costToDamage = damageTotal > 0 && totalManaSpent > 0 ? damageTotal / totalManaSpent : 0f; // Calculate cost to damage ratio
 
         SaveToFile(); // Save the ability stats to a JSON file
+        
+        // If we're a client, notify the server
+        if (!NetworkManager.Singleton.IsServer && NetworkManager.Singleton.IsClient)
+        {
+            var gameManager = GameManager.Instance;
+            if (gameManager != null)
+            {
+                gameManager.SubmitPlayerStatsToServerRpc(NetworkManager.Singleton.LocalClientId);
+            }
+        }
     }
 
     public void SaveToFile()

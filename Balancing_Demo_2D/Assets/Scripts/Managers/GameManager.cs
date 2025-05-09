@@ -541,18 +541,13 @@ public class GameManager : NetworkBehaviour
     {
         Debug.Log("Game Over!");
         
-        PrepareEndGameAugmentLists();
+        List<Augment> player1Aug = ConvertAugmentIdsToAugments(player1Augments);
+        List<Augment> player2Aug = ConvertAugmentIdsToAugments(player2Augments);
         
         if (!IsServer) return;
         
         StartCoroutine(WaitForEndGameStats());
         ProcessEndGameCalculationsForChampions();
-    }
-
-    private void PrepareEndGameAugmentLists()
-    {
-        List<Augment> player1Aug = ConvertAugmentIdsToAugments(player1Augments);
-        List<Augment> player2Aug = ConvertAugmentIdsToAugments(player2Augments);
     }
 
     private List<Augment> ConvertAugmentIdsToAugments(NetworkList<int> augmentIds)
@@ -593,16 +588,53 @@ public class GameManager : NetworkBehaviour
 
     private IEnumerator WaitForEndGameStats()
     {
-        while (!recievedEndGameCalculations)
+        // Request stats from clients
+        RequestEndGameStatsRpc();
+        
+        float timeout = 10f; // Timeout after 10 seconds
+        float elapsed = 0f;
+        
+        while (!recievedEndGameCalculations && elapsed < timeout)
         {
+            elapsed += Time.deltaTime;
             yield return null;
         }
+        
+        // If we timed out, force proceed
+        if (!recievedEndGameCalculations)
+        {
+            Debug.LogWarning("End game calculations timed out, proceeding anyway");
+        }
+        
         IGM.endGameUI.statsToList();
         EndGameUIRpc();
     }
     #endregion
 
     #region RPC Methods
+    [Rpc(SendTo.Everyone)]
+    public void RequestEndGameStatsRpc()
+    {
+        if (!IsServer && IsOwner)
+        {
+            // Clients send their stats to the server
+            SubmitPlayerStatsToServerRpc(NetworkManager.Singleton.LocalClientId);
+        }
+    }
+    
+    [Rpc(SendTo.Server)]
+    public void SubmitPlayerStatsToServerRpc(ulong clientId)
+    {
+        if (!IsServer) return;
+
+        Debug.Log($"Received end game stats from client {clientId}");
+        recievedCalcs++;
+        
+        // Ensure we don't go over our expected count
+        if (recievedCalcs > 2)
+            recievedCalcs = 2;
+    }
+    
     [Rpc(SendTo.SpecifiedInParams)]
     public void LoadAugmentsRpc(RpcParams rpcParams)
     {

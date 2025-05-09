@@ -164,10 +164,18 @@ public class EndGameUI : MonoBehaviour
             
             // Update UI
             updateStatsUI(p1Stats, p2Stats);
+            
+            // Notify clients that stats are ready
+            SyncEndGameStatsRpc();
         }
-        else if (NetworkManager.Singleton.IsClient && statsAssigned.Value)
+    }
+    
+    [Rpc(SendTo.ClientsAndHost)]
+    public void SyncEndGameStatsRpc()
+    {
+        if (!NetworkManager.Singleton.IsServer)
         {
-            // Client side - convert received NetworkList data to StatBlocks
+            // Convert NetworkList data to StatBlocks
             List<StatBlock> p1Stats = new List<StatBlock>();
             List<StatBlock> p2Stats = new List<StatBlock>();
             
