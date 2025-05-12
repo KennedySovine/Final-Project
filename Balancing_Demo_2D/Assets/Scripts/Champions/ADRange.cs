@@ -50,7 +50,7 @@ public class ADRange : BaseChampion
         );
 
         ability1 = new Ability(
-            "Tumble",
+            "Tumble (Q)",
             "Dash forward and empower next attack within 3 seconds. Deal bonus AD damage <i>(75 + 50% AP)<i>",
             6f, // Cooldown in seconds
             30f, // Mana cost
@@ -59,7 +59,7 @@ public class ADRange : BaseChampion
         ability1.icon = Resources.Load<Sprite>("Sprites/Vayne_Tumble"); // Load the icon for the ability from Resources folder
 
         ability2 = new Ability(
-            "Silver Bolts",
+            "Silver Bolts (W)",
             "Basic attacks apply a stack and at 3 stacks, deal bonus true damage based on <i>6% of the target's max health</i>. Deals minimum <i>50</i> bonus damage.",
             0f, // Cooldown in seconds
             0f, // Mana cost
@@ -68,7 +68,7 @@ public class ADRange : BaseChampion
         ability2.icon = Resources.Load<Sprite>("Sprites/Vayne_Silver_Bolts"); // Load the icon for the ability from Resources folder
 
         ability3 = new Ability(
-            "Condemn",
+            "Condemn (E)",
             "Fire an extra heavy bolt that deals extra physical damage <i>(50 + 50% AD)</i>.",
             20f, // Cooldown in seconds
             90f, // Mana cost

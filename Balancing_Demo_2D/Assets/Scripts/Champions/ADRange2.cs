@@ -62,7 +62,7 @@ public class ADRange2 : BaseChampion
         );
 
         ability1 = new Ability(
-            "Rapid Frost",
+            "Rapid Frost (Q)",
             "ACTIVE: For 6 seconds, gain <i>25% bonus attack speed<i> and fire 5 shots rapidly. Applies <i>21<i> AD per arrow. Cannot cast unless there are 4 stacks of Focus",
             0f, 
             30f, 
@@ -72,7 +72,7 @@ public class ADRange2 : BaseChampion
         ability1.icon2 = Resources.Load<Sprite>("Sprites/Ashe_RangerFocus_Empowered");
         
         ability2 = new Ability(
-            "Ranger's Focus",
+            "Ranger's Focus (W)",
             "PASSIVE: Basic attacks generate a stack of Focus for 4 seconds, which refreshes on additional attacks and stacks up to 4, expriring after a second.",
             0f, 
             0f,
@@ -81,7 +81,7 @@ public class ADRange2 : BaseChampion
         ability2.icon = Resources.Load<Sprite>("Sprites/Ashe_Enchanted_Crystal_Arrow");
 
         ability3 = new Ability(
-            "Volley",
+            "Volley (E)",
             "Next arrow applies critical Frost and deals extra physical damage.",
             18f,
             75f, 
