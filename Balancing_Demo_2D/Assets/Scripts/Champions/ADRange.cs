@@ -11,11 +11,6 @@ public class ADRange : BaseChampion
         AddAbilities();
     }
 
-    void Awake()
-    {
-        UpdateStats();
-    }
-
     // Based on Vayne from LOL
     private void UpdateStats()
     {
@@ -25,7 +20,7 @@ public class ADRange : BaseChampion
         maxHealth.Value = 550f;
         healthRegen.Value = 0.7f;
         AD.Value = 60f;
-        AP.Value = 0f;
+        AP.Value = 5f;
         armor.Value = 23f;
         magicResist.Value = 30f;
         attackSpeed.Value = 0.685f;
@@ -40,6 +35,29 @@ public class ADRange : BaseChampion
         mana.Value = maxMana.Value; // Initialize mana to max mana
         missileSpeed.Value = 33f;
         maxStacks.Value = 3; // Maximum number of stacks for the ability
+    }
+
+    public override ChampionData ForTheMainMenu(){
+        return new ChampionData
+        {
+            championType = "AD Range",
+            maxHealth = 550f,
+            healthRegen = 0.7f,
+            AD = 60f,
+            AP = 5f,
+            armor = 23f,
+            magicResist = 30f,
+            attackSpeed = 0.685f,
+            movementSpeed = 11f, // Look at Base Champ for calculation
+            maxMana = 232f,
+            manaRegen = 1.4f,
+            abilityHaste = 0f,
+            critChance = 0f,
+            critDamage = 1.75f, // 175% damage on crit
+            armorPen = 0f,
+            magicPen = 0f,
+            missileSpeed = 33f
+        };
     }
 
     private void AddAbilities()

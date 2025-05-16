@@ -98,10 +98,9 @@ public class GameManager : NetworkBehaviour
         //Save the default champion data before any adjustments are made
         foreach (var playerPrefab in playerPrefabsList)
         {
-            if (playerPrefab != null)
-            {
+            if (playerPrefab != null){
                 // 0 = Vayne, 1 = Ashe
-                playerChampionsData.Add(ChampionData.FromChampion(playerPrefab.GetComponentInChildren<BaseChampion>()));
+                playerChampionsData.Add(playerPrefab.GetComponentInChildren<BaseChampion>().ForTheMainMenu());
             }
             else
             {

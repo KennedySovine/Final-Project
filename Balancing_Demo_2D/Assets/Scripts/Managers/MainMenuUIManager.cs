@@ -64,6 +64,8 @@ public class MainMenuUIManager : NetworkBehaviour
 
         asheButton.onClick.AddListener(OnAsheButtonClicked);
         vayneButton.onClick.AddListener(OnVayneButtonClicked);
+
+        LoadStats(2); // Load stats for ASHE by default
     }
 
     // Update is called once per frame

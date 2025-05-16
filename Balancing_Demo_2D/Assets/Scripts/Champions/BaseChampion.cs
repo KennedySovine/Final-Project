@@ -126,6 +126,12 @@ public class BaseChampion : NetworkBehaviour
             };
         }
     }
+
+    public virtual ChampionData ForTheMainMenu()
+    {
+        Debug.Log("no go away");
+        return ChampionData.FromChampion(this); // Convert the champion data to a struct for the main menu
+    }
     #endregion
 
     #region RPC Methods

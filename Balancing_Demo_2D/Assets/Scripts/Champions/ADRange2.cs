@@ -31,8 +31,8 @@ public class ADRange2 : BaseChampion
         championType = "AD Range2";
         maxHealth.Value = 610f;
         healthRegen.Value = 0.7f;
-        AD.Value = 59f;
-        AP.Value = 10f;
+        AD.Value = 60f;
+        AP.Value = 0f;
         armor.Value = 26f;
         magicResist.Value = 30f;
         attackSpeed.Value = 0.658f;
@@ -49,6 +49,29 @@ public class ADRange2 : BaseChampion
         stackDuration.Value = 4f;
         rapidFire.Value = 1;
         maxStacks.Value = 4; // Maximum number of stacks for the ability
+    }
+
+    public override ChampionData ForTheMainMenu(){
+        return new ChampionData
+        {
+            championType = "AD Range2",
+            maxHealth = 610f,
+            healthRegen = 0.7f,
+            AD = 60f,
+            AP = 0f,
+            armor = 26f,
+            magicResist = 30f,
+            attackSpeed = 0.658f,
+            movementSpeed = 10.8f, // 325 original
+            maxMana = 280f,
+            manaRegen = 1.4f,
+            abilityHaste = 0f,
+            critChance = 0f,
+            critDamage = 1f, // 175% damage on crit
+            armorPen = 0f,
+            magicPen = 0f,
+            missileSpeed = 0f // or whatever default you want
+        };
     }
 
     private void AddAbilities()
