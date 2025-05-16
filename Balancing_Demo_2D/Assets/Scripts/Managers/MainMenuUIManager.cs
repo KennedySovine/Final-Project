@@ -149,6 +149,5 @@ public class MainMenuUIManager : NetworkBehaviour
             text.text = slider.value.ToString("0"); // Update the text to show the current value
         }
     }
-
     #endregion
 }
