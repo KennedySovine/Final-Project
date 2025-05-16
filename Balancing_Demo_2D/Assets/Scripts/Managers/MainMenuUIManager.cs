@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
+using UnityEngine.EventSystems;
 
 public class MainMenuUIManager : NetworkBehaviour
 {
@@ -138,6 +139,18 @@ public class MainMenuUIManager : NetworkBehaviour
     #endregion
 
     #region Champ Alteration Methods
+
+    public void UpdateSliderText()
+    {
+        GameObject selected = EventSystem.current.currentSelectedGameObject;
+        Slider slider = selected.GetComponent<Slider>();
+        GameObject valueText = selected.transform.Find("SliderValue").gameObject;
+        TextMeshProUGUI text = valueText.GetComponent<TextMeshProUGUI>();
+        if (text != null)
+        {
+            text.text = slider.value.ToString("0"); // Update the text to show the current value
+        }
+    }
 
     #endregion
 }
