@@ -18,6 +18,9 @@ public class MainMenuUIManager : NetworkBehaviour
     [SerializeField] private TMP_Dropdown networkDropdown;
     [SerializeField] private GameObject netDropDown;
     [SerializeField] private GameObject resetStatsToggle;
+    [SerializeField] private GameObject champAdjustmentUI;
+    private Button asheButton;
+    private Button vayneButton;
     #endregion
 
     #region Unity Lifecycle Methods
@@ -35,6 +38,12 @@ public class MainMenuUIManager : NetworkBehaviour
         {
             AbilityStats.ResetPlayerStatsFile();
         }
+
+        asheButton = champAdjustmentUI.transform.Find("ASHE").GetComponent<Button>();
+        vayneButton = champAdjustmentUI.transform.Find("VAYNE").GetComponent<Button>();
+
+        asheButton.enabled = false; // Disable the button at startup
+        vayneButton.enabled = true; // Disable the button at startup
     }
 
     // Update is called once per frame
@@ -117,5 +126,9 @@ public class MainMenuUIManager : NetworkBehaviour
             Debug.Log("No connection type selected");
         }
     }
+    #endregion
+
+    #region Champ Alteration Methods
+
     #endregion
 }
