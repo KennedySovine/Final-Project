@@ -9,6 +9,8 @@ public class BaseChampion : NetworkBehaviour
 
     public AbilityStatsData AbilityStatsData;
 
+    public ChampionData championData; // Reference to the ChampionData struct
+
     public InGameUIManager IGUIM; // Reference to the InGameUIManager
     [Header("Champion Stats")]
     public string championType = "";
@@ -681,6 +683,31 @@ public class BaseChampion : NetworkBehaviour
         {
             ability3.timeOfCast = castTime;
         }
+    }
+    #endregion
+
+    #region Champion Data Assignment
+    public void LoadData(ChampionData data)
+    {
+        championType = data.championType;
+        maxHealth.Value = data.maxHealth;
+        healthRegen.Value = data.healthRegen;
+        AD.Value = data.AD;
+        AP.Value = data.AP;
+        armor.Value = data.armor;
+        magicResist.Value = data.magicResist;
+        attackSpeed.Value = data.attackSpeed;
+        movementSpeed.Value = data.movementSpeed;
+        maxMana.Value = data.maxMana;
+        manaRegen.Value = data.manaRegen;
+        abilityHaste.Value = data.abilityHaste;
+        critChance.Value = data.critChance;
+        critDamage.Value = data.critDamage;
+        armorPen.Value = data.armorPen;
+        magicPen.Value = data.magicPen;
+        missileSpeed.Value = data.missileSpeed;
+
+        // Set other fields as needed
     }
     #endregion
 }

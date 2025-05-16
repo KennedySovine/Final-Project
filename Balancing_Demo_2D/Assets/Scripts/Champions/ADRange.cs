@@ -11,6 +11,11 @@ public class ADRange : BaseChampion
         AddAbilities();
     }
 
+    void Awake()
+    {
+        UpdateStats();
+    }
+
     // Based on Vayne from LOL
     private void UpdateStats()
     {

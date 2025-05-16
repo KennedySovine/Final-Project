@@ -4,6 +4,11 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using System.Linq;
 
+public class ChampionEditor : MonoBehaviour
+{
+    
+}
+
 [System.Serializable]
 public struct ChampionData{
     #region Fields
