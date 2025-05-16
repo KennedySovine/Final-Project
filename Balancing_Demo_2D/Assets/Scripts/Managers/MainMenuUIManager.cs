@@ -25,6 +25,7 @@ public class MainMenuUIManager : NetworkBehaviour
     private Button vayneButton;
 
     [SerializeField] private GameObject SaveButton;
+    private GameObject adjustmentButton;
 
     private bool statSaved = true; // Flag to check if stats are saved
 
@@ -41,6 +42,8 @@ public class MainMenuUIManager : NetworkBehaviour
             Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
         }
         resetStatsToggle.SetActive(false); // Hide the reset stats toggle by default
+        adjustmentButton = mainMenuUI.transform.Find("Adjustment").gameObject; // Find the Adjustments button in the UI
+        adjustmentButton.SetActive(false); // Hide the Adjustments button by default
         // Always ensure PlayerStats.json is empty at startup if toggle is on
         if (resetStatsToggle.GetComponent<Toggle>().isOn)
         {
@@ -72,10 +75,12 @@ public class MainMenuUIManager : NetworkBehaviour
         if (networkDropdown.value == 0)
         {
             startButton.GetComponent<Button>().interactable = false;
+            adjustmentButton.SetActive(false); // Hide the Adjustments button if no connection type is selected
         }
         else
         {
             startButton.GetComponent<Button>().interactable = true;
+            adjustmentButton.SetActive(true); // Show the Adjustments button if a connection type is selected
         }
         
 
