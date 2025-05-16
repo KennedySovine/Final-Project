@@ -60,6 +60,8 @@ public class GameManager : NetworkBehaviour
     private float defaultAugmentBuffer;
     public float augmentBuffer;
     public NetworkVariable<bool> augmentChoosing = new NetworkVariable<bool>(false); //If the player is choosing an augment, dont countdown the game time
+
+    public List<ChampionData> playerChampionsData = new List<ChampionData>(); // List of player champions data
     #endregion
 
     #region Champion Management
@@ -92,6 +94,22 @@ public class GameManager : NetworkBehaviour
         maxGameTime = gameTime.Value; // Set the maximum game time
         defaultAugmentBuffer = maxGameTime / 4; // Set the default augment buffer
         augmentBuffer = defaultAugmentBuffer; // Set the default augment buffer
+
+        //Save the default champion data before any adjustments are made
+        foreach (var playerPrefab in playerPrefabsList)
+        {
+            if (playerPrefab != null){
+                // 0 = Vayne, 1 = Ashe
+                playerChampionsData.Add(playerPrefab.GetComponentInChildren<BaseChampion>().ForTheMainMenu());
+            }
+            else
+            {
+                Debug.LogWarning("Player prefab is null. Ensure all prefabs are assigned.");
+            }
+        }
+        
+        playerChampionsData.Add(playerChampionsData[0]); //2
+        playerChampionsData.Add(playerChampionsData[1]); //3
     }
 
     private void Update()
