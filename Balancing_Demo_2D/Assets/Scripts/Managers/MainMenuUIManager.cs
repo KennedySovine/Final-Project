@@ -140,11 +140,9 @@ public class MainMenuUIManager : NetworkBehaviour
 
     #region Champ Alteration Methods
 
-    public void UpdateSliderText()
+    public void UpdateSliderText(Slider slider)
     {
-        GameObject selected = EventSystem.current.currentSelectedGameObject;
-        Slider slider = selected.GetComponent<Slider>();
-        GameObject valueText = selected.transform.Find("SliderValue").gameObject;
+        GameObject valueText = slider.transform.Find("SliderValue").gameObject;
         TextMeshProUGUI text = valueText.GetComponent<TextMeshProUGUI>();
         if (text != null)
         {

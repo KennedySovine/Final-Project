@@ -2407,10 +2407,10 @@ MonoBehaviour:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
         m_MethodName: UpdateSliderText
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 395215870}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -3467,10 +3467,10 @@ MonoBehaviour:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
         m_MethodName: UpdateSliderText
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 593677683}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -3732,10 +3732,10 @@ MonoBehaviour:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
         m_MethodName: UpdateSliderText
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 650507705}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -4253,10 +4253,10 @@ MonoBehaviour:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
         m_MethodName: UpdateSliderText
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 682472923}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -4649,10 +4649,10 @@ MonoBehaviour:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
         m_MethodName: UpdateSliderText
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 741368228}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -5734,10 +5734,10 @@ MonoBehaviour:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
         m_MethodName: UpdateSliderText
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1012264511}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -7923,10 +7923,10 @@ MonoBehaviour:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
         m_MethodName: UpdateSliderText
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1306951166}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -8101,10 +8101,10 @@ MonoBehaviour:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
         m_MethodName: UpdateSliderText
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1321487080}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -8739,10 +8739,10 @@ MonoBehaviour:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
         m_MethodName: UpdateSliderText
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1369428601}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -9237,10 +9237,10 @@ MonoBehaviour:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
         m_MethodName: UpdateSliderText
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1439310000}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -10457,10 +10457,10 @@ MonoBehaviour:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
         m_MethodName: UpdateSliderText
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1642769220}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -12647,10 +12647,10 @@ MonoBehaviour:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
         m_MethodName: UpdateSliderText
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1916415022}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -13276,10 +13276,10 @@ MonoBehaviour:
       - m_Target: {fileID: 896505102}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
         m_MethodName: UpdateSliderText
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 2012412114}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
