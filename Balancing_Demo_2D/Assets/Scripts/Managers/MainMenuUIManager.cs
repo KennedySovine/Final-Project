@@ -47,8 +47,8 @@ public class MainMenuUIManager : NetworkBehaviour
             AbilityStats.ResetPlayerStatsFile();
         }
 
-        asheButton.interactable = false; // Disable the button at startup
-        vayneButton.interactable = true; // Disable the button at startup
+        asheButton.interactable = true; // Disable the button at startup
+        vayneButton.interactable = false; // Disable the button at startup
 
         champModifiers.Clear();
         foreach (Transform child in adjustmentsParent.transform)
@@ -64,8 +64,6 @@ public class MainMenuUIManager : NetworkBehaviour
 
         asheButton.onClick.AddListener(OnAsheButtonClicked);
         vayneButton.onClick.AddListener(OnVayneButtonClicked);
-
-        LoadStats(2); // Load stats for ASHE by default
     }
 
     // Update is called once per frame
@@ -120,6 +118,7 @@ public class MainMenuUIManager : NetworkBehaviour
     }
 
     public void ChampAdjustmentClick(){
+        LoadStats(2); // Load stats for Vayne by default
         champAdjustmentUI.SetActive(true);
         mainMenuUI.SetActive(false);
     }
@@ -129,7 +128,7 @@ public class MainMenuUIManager : NetworkBehaviour
         asheButton.interactable = false;
         vayneButton.interactable = true;
         LoadStats(3); // Assuming index 3 is Ashe
-        statSaved = false;
+        statSaved = true;
     }
 
     private void OnVayneButtonClicked()
@@ -137,7 +136,7 @@ public class MainMenuUIManager : NetworkBehaviour
         asheButton.interactable = true;
         vayneButton.interactable = false;
         LoadStats(2); // Assuming index 2 is Vayne
-        statSaved = false;
+        statSaved = true;
     }
     #endregion
 
@@ -197,6 +196,7 @@ public class MainMenuUIManager : NetworkBehaviour
         {
             text.text = slider.value.ToString("0"); // Update the text to show the current value
         }
+        statSaved = false; // Set the flag to false when a stat is changed
     }
 
     public void LoadStats(int index)
@@ -237,9 +237,7 @@ public class MainMenuUIManager : NetworkBehaviour
     public void SaveChampionChanges(){
         int index = 0; // Default index
         var champData = new ChampionData(); // Create a new instance of ChampionData
-        foreach (GameObject champModifier in champModifiers)
-        {
-            if (asheButton.enabled)
+        if (asheButton.enabled)
             {
                 champData = GM.playerChampionsData[3];
                 index = 3; // Set index for ASHE
@@ -255,11 +253,13 @@ public class MainMenuUIManager : NetworkBehaviour
                 return; // Exit if no champion is selected
             }
 
+        foreach (GameObject champModifier in champModifiers)
+        {
             Slider slider = champModifier.GetComponentInChildren<Slider>();
             if (slider != null)
             {
                 float value = slider.value;
-                string statName = slider.name; // Get the name of the slider to identify the stat
+                string statName = champModifier.name; // Get the name of the slider to identify the stat
 
                 switch (statName){
                     case "MaxHealth": champData.maxHealth = value; break;
@@ -284,6 +284,7 @@ public class MainMenuUIManager : NetworkBehaviour
         }
         GM.playerChampionsData[index] = champData; // Update the player champions data with the modified stats
         statSaved = true; // Set the flag to true after saving
+        Debug.Log("Saved ChampionData: " + JsonUtility.ToJson(champData, true));
     }
     #endregion
 }
