@@ -19,8 +19,11 @@ public class MainMenuUIManager : NetworkBehaviour
     [SerializeField] private GameObject netDropDown;
     [SerializeField] private GameObject resetStatsToggle;
     [SerializeField] private GameObject champAdjustmentUI;
+    [SerializeField] private GameObject adjustmentsParent;
     private Button asheButton;
     private Button vayneButton;
+
+    private List<GameObject> champModifiers = new List<GameObject>();
     #endregion
 
     #region Unity Lifecycle Methods
@@ -44,6 +47,12 @@ public class MainMenuUIManager : NetworkBehaviour
 
         asheButton.enabled = false; // Disable the button at startup
         vayneButton.enabled = true; // Disable the button at startup
+
+        champModifiers.Clear();
+        foreach (Transform child in adjustmentsParent.transform)
+        {
+            champModifiers.Add(child.gameObject);
+        }
     }
 
     // Update is called once per frame
