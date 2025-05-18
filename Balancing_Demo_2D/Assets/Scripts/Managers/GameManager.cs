@@ -98,7 +98,8 @@ public class GameManager : NetworkBehaviour
         //Save the default champion data before any adjustments are made
         foreach (var playerPrefab in playerPrefabsList)
         {
-            if (playerPrefab != null){
+            if (playerPrefab != null)
+            {
                 // 0 = Vayne, 1 = Ashe
                 playerChampionsData.Add(playerPrefab.GetComponentInChildren<BaseChampion>().ForTheMainMenu());
             }
@@ -107,7 +108,7 @@ public class GameManager : NetworkBehaviour
                 Debug.LogWarning("Player prefab is null. Ensure all prefabs are assigned.");
             }
         }
-        
+
         playerChampionsData.Add(playerChampionsData[0]); //2
         playerChampionsData.Add(playerChampionsData[1]); //3
     }
@@ -115,9 +116,9 @@ public class GameManager : NetworkBehaviour
     private void Update()
     {
         UpdatePlayerCount();
-        
+
         if (!IsServer && !IsHost) return;
-        
+
         HandleGameLogic();
     }
     #endregion
@@ -172,7 +173,8 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    public void ResetPlayerStats(){
+    public void ResetPlayerStats()
+    {
         if (!IsServer) return; // Only the server can clear player stats
         // Save to Assets/Resources/PlayerStats.json in the codebase
         string dirPath = Path.Combine(Application.dataPath, "Resources");
@@ -207,7 +209,7 @@ public class GameManager : NetworkBehaviour
             ManageAugmentSystem();
             UpdateGameTime();
         }
-        
+
         HandleGameEnd();
     }
 
@@ -298,7 +300,7 @@ public class GameManager : NetworkBehaviour
         Debug.Log($"Removed player {clientId} from playerIDsSpawned.");
         playerCount--;
         Debug.Log($"Player count decreased. Current count: {playerCount}.");
-        
+
         HandlePlayerDisconnectGameState(clientId);
     }
 
@@ -399,7 +401,7 @@ public class GameManager : NetworkBehaviour
         }
 
         Debug.Log(playerChampions.Count + " players in the game. Spawning champions.");
-    
+
         foreach (var player in playerChampions)
         {
             SpawnChampionForPlayer(player.Value, player.Key);
@@ -409,7 +411,7 @@ public class GameManager : NetworkBehaviour
         {
             playersSpawned.Value = true;
             Debug.Log("Both players have been spawned. Starting the game.");
-        
+
             SetupPlayerReferences();
             InitializeUIForPlayers();
         }
@@ -443,6 +445,19 @@ public class GameManager : NetworkBehaviour
             default:
                 Debug.LogWarning("No available spawn points for additional players.");
                 break;
+        }
+
+        if (playerClass.GetComponentInChildren<BaseChampion>().championType == "ADRange")
+        {
+            player1Controller.GetComponent<BaseChampion>().LoadModifiedStats(playerChampionsData[2]);
+        }
+        else if (playerClass.GetComponentInChildren<BaseChampion>().championType == "ADRange2")
+        {
+            player1Controller.GetComponent<BaseChampion>().LoadModifiedStats(playerChampionsData[3]);
+        }
+        else
+        {
+            Debug.LogWarning($"Player prefab {playerClass.name} does not have a BaseChampion component.");
         }
     }
 
@@ -482,7 +497,7 @@ public class GameManager : NetworkBehaviour
         if (NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
         {
             serverCamera = GameObject.FindWithTag("MainCamera")?.GetComponent<Camera>();
-            
+
             if (serverCamera != null)
             {
                 serverCamera.enabled = true;
@@ -504,15 +519,15 @@ public class GameManager : NetworkBehaviour
         if (targetChampion == null) return;
 
         if (!HasAugmentsToApply(playerID)) return;
-        
+
         targetChampion.passive.Stats.SaveBetweenAugments();
-        
+
         Augment newAugment = GetLastAugment(playerID);
         if (newAugment == null) return;
-        
+
         float randomAdjustment = CalculateAugmentAdjustment(newAugment);
         ApplyAugmentEffect(targetChampion, newAugment.type, randomAdjustment);
-        
+
         Debug.Log($"Applied augment {newAugment.name} to player {playerID} with adjustment {randomAdjustment}.");
     }
 
@@ -522,28 +537,28 @@ public class GameManager : NetworkBehaviour
             return player1Controller?.GetComponent<BaseChampion>();
         else if (playerID == player2ID)
             return player2Controller?.GetComponent<BaseChampion>();
-        
+
         Debug.LogWarning($"Player ID {playerID} not found. Cannot apply augments.");
         return null;
     }
 
     private bool HasAugmentsToApply(ulong playerID)
     {
-        return (playerID == player1ID && player1Augments.Count > 0) || 
+        return (playerID == player1ID && player1Augments.Count > 0) ||
                (playerID == player2ID && player2Augments.Count > 0);
     }
 
     private Augment GetLastAugment(ulong playerID)
     {
-        int augmentID = (playerID == player1ID) 
-            ? player1Augments[player1Augments.Count - 1] 
+        int augmentID = (playerID == player1ID)
+            ? player1Augments[player1Augments.Count - 1]
             : player2Augments[player2Augments.Count - 1];
-            
+
         Augment newAugment = AM.AugmentFromID(augmentID);
-        
+
         if (newAugment == null)
             Debug.LogWarning($"Augment with ID {augmentID} not found.");
-            
+
         return newAugment;
     }
 
@@ -551,10 +566,10 @@ public class GameManager : NetworkBehaviour
     {
         // If min equals max, just return the value (no randomness needed)
         if (augment.min == augment.max) return augment.max;
-            
+
         // Check if the values appear to be integers
         bool isInteger = Mathf.Approximately(augment.min, Mathf.Round(augment.min)) && Mathf.Approximately(augment.max, Mathf.Round(augment.max));
-        
+
         float adjustment;
         if (isInteger)
         {
@@ -567,14 +582,14 @@ public class GameManager : NetworkBehaviour
             // For float values (like percentage multipliers)
             // Get a random float between min and max (both inclusive)
             adjustment = Random.Range(augment.min, augment.max);
-            
+
             // For small decimal values (likely percentages), keep 2 decimal places
             if (augment.max < 1)
                 adjustment = Mathf.Round(adjustment * 100) / 100f; // Round to 2 decimal places
             else
                 adjustment = Mathf.Round(adjustment * 10) / 10f;   // Round to 1 decimal place
         }
-        
+
         return adjustment;
     }
 
@@ -609,12 +624,12 @@ public class GameManager : NetworkBehaviour
     public void EndGame()
     {
         Debug.Log("Game Over!");
-        
+
         List<Augment> player1Aug = ConvertAugmentIdsToAugments(player1Augments);
         List<Augment> player2Aug = ConvertAugmentIdsToAugments(player2Augments);
-        
+
         if (!IsServer) return;
-        
+
         StartCoroutine(WaitForEndGameStats());
         ProcessEndGameCalculationsForChampions();
         EndGameUIRpc(); // Always show UI after processing stats
@@ -642,9 +657,9 @@ public class GameManager : NetworkBehaviour
     {
         List<Augment> player1Aug = ConvertAugmentIdsToAugments(player1Augments);
         List<Augment> player2Aug = ConvertAugmentIdsToAugments(player2Augments);
-        
+
         // Process passive stats
-        
+
         // Process abilities stats
         ProcessAbilityEndGameCalculations(player1Controller, player1Aug);
         ProcessAbilityEndGameCalculations(player2Controller, player2Aug);
@@ -670,22 +685,22 @@ public class GameManager : NetworkBehaviour
     {
         // Request stats from clients
         RequestEndGameStatsRpc();
-        
+
         float timeout = 10f; // Timeout after 10 seconds
         float elapsed = 0f;
-        
+
         while (!recievedEndGameCalculations && elapsed < timeout)
         {
             elapsed += Time.deltaTime;
             yield return null;
         }
-        
+
         // If we timed out, force proceed
         if (!recievedEndGameCalculations)
         {
             Debug.LogWarning("End game calculations timed out, proceeding anyway");
         }
-        
+
         EndGameUIRpc();
     }
     #endregion
@@ -700,7 +715,7 @@ public class GameManager : NetworkBehaviour
             SubmitPlayerStatsToServerRpc(NetworkManager.Singleton.LocalClientId);
         }
     }
-    
+
     [Rpc(SendTo.Server)]
     public void SubmitPlayerStatsToServerRpc(ulong clientId)
     {
@@ -708,12 +723,12 @@ public class GameManager : NetworkBehaviour
 
         Debug.Log($"Received end game stats from client {clientId}");
         recievedCalcs++;
-        
+
         // Ensure we don't go over our expected count
         if (recievedCalcs > 2)
             recievedCalcs = 2;
     }
-    
+
     [Rpc(SendTo.SpecifiedInParams)]
     public void LoadAugmentsRpc(RpcParams rpcParams)
     {
@@ -736,7 +751,7 @@ public class GameManager : NetworkBehaviour
     private void UpdateAbilityReference(ulong playerID, BaseChampion champion, string abilityKey)
     {
         Ability abilityToAssign = null;
-        
+
         switch (abilityKey)
         {
             case "Q": abilityToAssign = champion.ability1; break;
@@ -746,12 +761,12 @@ public class GameManager : NetworkBehaviour
                 Debug.LogWarning($"Invalid ability key: {abilityKey} for player {playerID}.");
                 return;
         }
-        
+
         if (playerID == player1ID)
             player1AbilityUsed = abilityToAssign;
         else
             player2AbilityUsed = abilityToAssign;
-            
+
         Debug.Log($"Player {playerID} used ability: {abilityToAssign.name}");
     }
 

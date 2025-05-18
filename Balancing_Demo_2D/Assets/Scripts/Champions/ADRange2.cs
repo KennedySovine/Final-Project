@@ -28,7 +28,7 @@ public class ADRange2 : BaseChampion
     {
         if (!IsServer) return;
         
-        championType = "AD Range2";
+        /*championType = "AD Range2";
         maxHealth.Value = 610f;
         healthRegen.Value = 0.7f;
         AD.Value = 60f;
@@ -41,9 +41,11 @@ public class ADRange2 : BaseChampion
         manaRegen.Value = 1.4f; 
         abilityHaste.Value = 0f; 
         critChance.Value = 0f;
-        critDamage.Value = 1f; // 175% damage on crit
+        critDamage.Value = 1f; // 175% damage on crit*/
         health.Value = maxHealth.Value; // Initialize health to max health
         mana.Value = maxMana.Value; // Initialize mana to max mana
+
+        //LoadModifiedStats(GM.playerChampionsData[3]);
 
         //Other stuff
         stackDuration.Value = 4f;
@@ -51,7 +53,8 @@ public class ADRange2 : BaseChampion
         maxStacks.Value = 4; // Maximum number of stacks for the ability
     }
 
-    public override ChampionData ForTheMainMenu(){
+    public override ChampionData ForTheMainMenu()
+    {
         return new ChampionData
         {
             championType = "AD Range2",

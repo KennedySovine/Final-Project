@@ -242,21 +242,22 @@ public class MainMenuUIManager : NetworkBehaviour
     public void SaveChampionChanges(){
         int index = 0; // Default index
         var champData = new ChampionData(); // Create a new instance of ChampionData
-        if (asheButton.enabled)
-            {
-                champData = GM.playerChampionsData[3];
-                index = 3; // Set index for ASHE
-            }
-            else if (vayneButton.enabled)
-            {
-                champData = GM.playerChampionsData[2];
-                index = 2; // Set index for VAYNE
-            }
-            else
-            {
-                Debug.LogError("No champion selected for modification. How did you get here?");
-                return; // Exit if no champion is selected
-            }
+
+        if (!asheButton.interactable)
+        {
+            champData = GM.playerChampionsData[3];
+            index = 3; // Set index for ASHE
+        }
+        else if (!vayneButton.interactable)
+        {
+            champData = GM.playerChampionsData[2];
+            index = 2; // Set index for VAYNE
+        }
+        else
+        {
+            Debug.LogError("No champion selected for modification. How did you get here?");
+            return; // Exit if no champion is selected
+        }
 
         foreach (GameObject champModifier in champModifiers)
         {

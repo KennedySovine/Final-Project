@@ -16,7 +16,7 @@ public class ADRange : BaseChampion
     {
         if (!IsServer) return;
 
-        championType = "AD Range";
+        /*championType = "AD Range";
         maxHealth.Value = 550f;
         healthRegen.Value = 0.7f;
         AD.Value = 60f;
@@ -29,7 +29,8 @@ public class ADRange : BaseChampion
         manaRegen.Value = 1.4f;
         abilityHaste.Value = 0f;
         critChance.Value = 0f;
-        critDamage.Value = 1.75f; // 175% damage on crit
+        critDamage.Value = 1.75f; // 175% damage on crit*/
+        //LoadModifiedStats(GM.playerChampionsData[2]); // Load the modified stats from the GameManager
 
         health.Value = maxHealth.Value; // Initialize health to max health
         mana.Value = maxMana.Value; // Initialize mana to max mana
@@ -37,7 +38,8 @@ public class ADRange : BaseChampion
         maxStacks.Value = 3; // Maximum number of stacks for the ability
     }
 
-    public override ChampionData ForTheMainMenu(){
+    public override ChampionData ForTheMainMenu()
+    {
         return new ChampionData
         {
             championType = "AD Range",
