@@ -16,8 +16,8 @@ public class ADRange : BaseChampion
     {
         if (!IsServer) return;
 
-        /*championType = "AD Range";
-        maxHealth.Value = 550f;
+        championType = "AD Range";
+        /*maxHealth.Value = 550f;
         healthRegen.Value = 0.7f;
         AD.Value = 60f;
         AP.Value = 5f;
@@ -32,8 +32,7 @@ public class ADRange : BaseChampion
         critDamage.Value = 1.75f; // 175% damage on crit*/
         //LoadModifiedStats(GM.playerChampionsData[2]); // Load the modified stats from the GameManager
 
-        health.Value = maxHealth.Value; // Initialize health to max health
-        mana.Value = maxMana.Value; // Initialize mana to max mana
+        // Don't set health/mana here, let LoadModifiedStats handle it after stats are loaded
         missileSpeed.Value = 33f;
         maxStacks.Value = 3; // Maximum number of stacks for the ability
     }
@@ -281,4 +280,12 @@ public class ADRange : BaseChampion
         // Add a knockback effect to the target if they are hit by the bolt
     }
     #endregion
+
+    // Ensure health/mana are set to max after stats are loaded
+    public override void LoadModifiedStats(ChampionData data)
+    {
+        base.LoadModifiedStats(data);
+        health.Value = maxHealth.Value;
+        mana.Value = maxMana.Value;
+    }
 }

@@ -419,27 +419,33 @@ public class GameManager : NetworkBehaviour
 
     private void SpawnChampionForPlayer(GameObject playerClass, ulong playerId)
     {
-        if (playerIDsSpawned.Contains(playerId))
-            return;
+        if (playerIDsSpawned.Contains(playerId)) return;
+
+        GameObject controller = null;
+        GameObject championInstance = null;
 
         switch (playerIDsSpawned.Count)
         {
             case 0:
                 player1 = Instantiate(playerClass, spawnPoints[0].position, Quaternion.identity);
+                championInstance = player1;
                 FindPlayerControllers(player1, ref player1Controller);
                 player1.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                 playerIDsSpawned.Add(playerId);
                 player1ID = playerId;
                 player1Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[0].position;
+                controller = player1Controller;
                 Debug.Log($"Spawned champion for Player 1 (Client {playerId}).");
                 break;
             case 1:
                 player2 = Instantiate(playerClass, spawnPoints[1].position, Quaternion.identity);
+                championInstance = player2;
                 FindPlayerControllers(player2, ref player2Controller);
                 player2.GetComponent<NetworkObject>().SpawnWithOwnership(playerId);
                 playerIDsSpawned.Add(playerId);
                 player2ID = playerId;
                 player2Controller.GetComponent<PlayerNetwork>().targetPositionNet.Value = spawnPoints[1].position;
+                controller = player2Controller;
                 Debug.Log($"Spawned champion for Player 2 (Client {playerId}).");
                 break;
             default:
@@ -447,17 +453,10 @@ public class GameManager : NetworkBehaviour
                 break;
         }
 
-        if (playerClass.GetComponentInChildren<BaseChampion>().championType == "ADRange")
+        // Start coroutine to wait for champType before applying modified stats
+        if (controller != null)
         {
-            player1Controller.GetComponent<BaseChampion>().LoadModifiedStats(playerChampionsData[2]);
-        }
-        else if (playerClass.GetComponentInChildren<BaseChampion>().championType == "ADRange2")
-        {
-            player1Controller.GetComponent<BaseChampion>().LoadModifiedStats(playerChampionsData[3]);
-        }
-        else
-        {
-            Debug.LogWarning($"Player prefab {playerClass.name} does not have a BaseChampion component.");
+            StartCoroutine(WaitAndApplyModifiedStats(controller));
         }
     }
 
@@ -487,6 +486,34 @@ public class GameManager : NetworkBehaviour
         else
         {
             Debug.LogWarning("PlayerController not found in " + parent.name);
+        }
+    }
+
+    private IEnumerator WaitAndApplyModifiedStats(GameObject controller)
+    {
+        var baseChampion = controller.GetComponent<BaseChampion>();
+        // Wait until champType is set (not empty)
+        while (baseChampion != null && string.IsNullOrEmpty(baseChampion.championType))
+        {
+            yield return null;
+        }
+
+        if (baseChampion != null)
+        {
+            var champType = baseChampion.championType;
+            Debug.Log("Champion type (after wait): " + champType);
+            if (champType == "AD Range")
+            {
+                baseChampion.LoadModifiedStats(playerChampionsData[2]);
+            }
+            else if (champType == "AD Range2")
+            {
+                baseChampion.LoadModifiedStats(playerChampionsData[3]);
+            }
+            else
+            {
+                Debug.LogWarning("Unknown champion type. Cannot load champion data.");
+            }
         }
     }
     #endregion
