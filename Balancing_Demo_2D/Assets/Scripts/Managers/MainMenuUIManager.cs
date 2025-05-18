@@ -30,6 +30,9 @@ public class MainMenuUIManager : NetworkBehaviour
     private bool statSaved = true; // Flag to check if stats are saved
 
     private List<GameObject> champModifiers = new List<GameObject>();
+
+    private bool asheSelected = true;
+    private bool vayneSelected = true;
     #endregion
 
     #region Unity Lifecycle Methods
@@ -50,8 +53,11 @@ public class MainMenuUIManager : NetworkBehaviour
             AbilityStats.ResetPlayerStatsFile();
         }
 
-        asheButton.interactable = true; // Disable the button at startup
-        vayneButton.interactable = false; // Disable the button at startup
+        asheSelected = true;
+        vayneSelected = true;
+        asheButton.interactable = true;
+        vayneButton.interactable = true;
+        UpdateChampionButtonVisuals();
 
         champModifiers.Clear();
         foreach (Transform child in adjustmentsParent.transform)
@@ -137,18 +143,32 @@ public class MainMenuUIManager : NetworkBehaviour
 
     private void OnAsheButtonClicked()
     {
-        asheButton.interactable = false;
-        vayneButton.interactable = true;
+        asheSelected = !asheSelected;
+        UpdateChampionButtonVisuals();
         LoadStats(3); // Assuming index 3 is Ashe
         statSaved = true;
     }
 
     private void OnVayneButtonClicked()
     {
-        asheButton.interactable = true;
-        vayneButton.interactable = false;
+        vayneSelected = !vayneSelected;
+        UpdateChampionButtonVisuals();
         LoadStats(2); // Assuming index 2 is Vayne
         statSaved = true;
+    }
+
+    private void UpdateChampionButtonVisuals()
+    {
+        Color32 deselectedColor = new Color32(170, 172, 179, 255); // #AAACB3
+
+        // Set the button's Image color directly
+        var asheImage = asheButton.GetComponent<Image>();
+        if (asheImage != null)
+            asheImage.color = asheSelected ? Color.white : deselectedColor;
+
+        var vayneImage = vayneButton.GetComponent<Image>();
+        if (vayneImage != null)
+            vayneImage.color = vayneSelected ? Color.white : deselectedColor;
     }
     #endregion
 
@@ -218,30 +238,126 @@ public class MainMenuUIManager : NetworkBehaviour
             Slider slider = champModifier.GetComponentInChildren<Slider>();
             if (slider != null)
             {
-                float value = slider.value;
                 string statName = champModifier.name; // Get the name of the slider to identify the stat
 
-                switch (statName){
-                    case "MaxHealth": slider.value = GM.playerChampionsData[index].maxHealth; break;
-                    case "HealthRegen": slider.value = GM.playerChampionsData[index].healthRegen; break;
-                    case "AD": slider.value = GM.playerChampionsData[index].AD; break;
-                    case "AP": slider.value = GM.playerChampionsData[index].AP; break;
-                    case "Armor": slider.value = GM.playerChampionsData[index].armor; break;
-                    case "MagicResist": slider.value = GM.playerChampionsData[index].magicResist; break;
-                    case "AttackSpeed": slider.value = GM.playerChampionsData[index].attackSpeed; break;
-                    case "MovementSpeed": slider.value = GM.playerChampionsData[index].movementSpeed; break;
-                    case "MaxMana": slider.value = GM.playerChampionsData[index].maxMana; break;
-                    case "ManaRegen": slider.value = GM.playerChampionsData[index].manaRegen; break;
-                    case "AbilityHaste": slider.value = GM.playerChampionsData[index].abilityHaste; break;
-                    case "CritChance": slider.value = GM.playerChampionsData[index].critChance; break;
-                    case "CritDamage": slider.value = GM.playerChampionsData[index].critDamage; break;
-                    case "ArmorPen": slider.value = GM.playerChampionsData[index].armorPen; break;
-                    case "MagicPen": slider.value = GM.playerChampionsData[index].magicPen; break;
-                    case "MissileSpeed": slider.value = GM.playerChampionsData[index].missileSpeed; break;
-                    default: Debug.LogError($"Unknown stat name: {statName}"); break;
-                }
+                // If both buttons are interactable, check if values differ
+                if (asheButton != null && vayneButton != null && asheSelected && vayneSelected)
+                {
+                    float asheValue = 0f, vayneValue = 0f;
+                    switch (statName)
+                    {
+                        case "MaxHealth":
+                            asheValue = GM.playerChampionsData[3].maxHealth;
+                            vayneValue = GM.playerChampionsData[2].maxHealth;
+                            break;
+                        case "HealthRegen":
+                            asheValue = GM.playerChampionsData[3].healthRegen;
+                            vayneValue = GM.playerChampionsData[2].healthRegen;
+                            break;
+                        case "AD":
+                            asheValue = GM.playerChampionsData[3].AD;
+                            vayneValue = GM.playerChampionsData[2].AD;
+                            break;
+                        case "AP":
+                            asheValue = GM.playerChampionsData[3].AP;
+                            vayneValue = GM.playerChampionsData[2].AP;
+                            break;
+                        case "Armor":
+                            asheValue = GM.playerChampionsData[3].armor;
+                            vayneValue = GM.playerChampionsData[2].armor;
+                            break;
+                        case "MagicResist":
+                            asheValue = GM.playerChampionsData[3].magicResist;
+                            vayneValue = GM.playerChampionsData[2].magicResist;
+                            break;
+                        case "AttackSpeed":
+                            asheValue = GM.playerChampionsData[3].attackSpeed;
+                            vayneValue = GM.playerChampionsData[2].attackSpeed;
+                            break;
+                        case "MovementSpeed":
+                            asheValue = GM.playerChampionsData[3].movementSpeed;
+                            vayneValue = GM.playerChampionsData[2].movementSpeed;
+                            break;
+                        case "MaxMana":
+                            asheValue = GM.playerChampionsData[3].maxMana;
+                            vayneValue = GM.playerChampionsData[2].maxMana;
+                            break;
+                        case "ManaRegen":
+                            asheValue = GM.playerChampionsData[3].manaRegen;
+                            vayneValue = GM.playerChampionsData[2].manaRegen;
+                            break;
+                        case "AbilityHaste":
+                            asheValue = GM.playerChampionsData[3].abilityHaste;
+                            vayneValue = GM.playerChampionsData[2].abilityHaste;
+                            break;
+                        case "CritChance":
+                            asheValue = GM.playerChampionsData[3].critChance;
+                            vayneValue = GM.playerChampionsData[2].critChance;
+                            break;
+                        case "CritDamage":
+                            asheValue = GM.playerChampionsData[3].critDamage;
+                            vayneValue = GM.playerChampionsData[2].critDamage;
+                            break;
+                        case "ArmorPen":
+                            asheValue = GM.playerChampionsData[3].armorPen;
+                            vayneValue = GM.playerChampionsData[2].armorPen;
+                            break;
+                        case "MagicPen":
+                            asheValue = GM.playerChampionsData[3].magicPen;
+                            vayneValue = GM.playerChampionsData[2].magicPen;
+                            break;
+                        case "MissileSpeed":
+                            asheValue = GM.playerChampionsData[3].missileSpeed;
+                            vayneValue = GM.playerChampionsData[2].missileSpeed;
+                            break;
+                        default:
+                            Debug.LogError($"Unknown stat name: {statName}");
+                            break;
+                    }
 
-                UpdateSliderText(slider); // Update the text to show the current value
+                    if (Mathf.Approximately(asheValue, vayneValue))
+                    {
+                        slider.value = asheValue;
+                        // Set text to value
+                        GameObject valueText = slider.transform.Find("SliderValue").gameObject;
+                        TextMeshProUGUI text = valueText.GetComponent<TextMeshProUGUI>();
+                        if (text != null)
+                            text.text = asheValue.ToString("0");
+                    }
+                    else
+                    {
+                        slider.value = slider.minValue;
+                        // Set text to "--"
+                        GameObject valueText = slider.transform.Find("SliderValue").gameObject;
+                        TextMeshProUGUI text = valueText.GetComponent<TextMeshProUGUI>();
+                        if (text != null)
+                            text.text = "--";
+                    }
+                }
+                else
+                {
+                    // ...existing switch for single champion...
+                    switch (statName){
+                        case "MaxHealth": slider.value = GM.playerChampionsData[index].maxHealth; break;
+                        case "HealthRegen": slider.value = GM.playerChampionsData[index].healthRegen; break;
+                        case "AD": slider.value = GM.playerChampionsData[index].AD; break;
+                        case "AP": slider.value = GM.playerChampionsData[index].AP; break;
+                        case "Armor": slider.value = GM.playerChampionsData[index].armor; break;
+                        case "MagicResist": slider.value = GM.playerChampionsData[index].magicResist; break;
+                        case "AttackSpeed": slider.value = GM.playerChampionsData[index].attackSpeed; break;
+                        case "MovementSpeed": slider.value = GM.playerChampionsData[index].movementSpeed; break;
+                        case "MaxMana": slider.value = GM.playerChampionsData[index].maxMana; break;
+                        case "ManaRegen": slider.value = GM.playerChampionsData[index].manaRegen; break;
+                        case "AbilityHaste": slider.value = GM.playerChampionsData[index].abilityHaste; break;
+                        case "CritChance": slider.value = GM.playerChampionsData[index].critChance; break;
+                        case "CritDamage": slider.value = GM.playerChampionsData[index].critDamage; break;
+                        case "ArmorPen": slider.value = GM.playerChampionsData[index].armorPen; break;
+                        case "MagicPen": slider.value = GM.playerChampionsData[index].magicPen; break;
+                        case "MissileSpeed": slider.value = GM.playerChampionsData[index].missileSpeed; break;
+                        default: Debug.LogError($"Unknown stat name: {statName}"); break;
+                    }
+                    UpdateSliderText(slider); // Update the text to show the current value
+                }
             }
         }
     }
@@ -250,12 +366,17 @@ public class MainMenuUIManager : NetworkBehaviour
         int index = 0; // Default index
         var champData = new ChampionData(); // Create a new instance of ChampionData
 
-        if (!asheButton.interactable)
+        if (asheSelected && vayneSelected)
+        {
+            Debug.LogError("Both champions are selected. How did you get here?");
+            index = 5; // MODIFY BOTH!!! 
+        }
+        else if (asheSelected)
         {
             champData = GM.playerChampionsData[3];
             index = 3; // Set index for ASHE
         }
-        else if (!vayneButton.interactable)
+        else if (vayneSelected)
         {
             champData = GM.playerChampionsData[2];
             index = 2; // Set index for VAYNE
@@ -294,6 +415,15 @@ public class MainMenuUIManager : NetworkBehaviour
                     default: Debug.LogError($"Unknown stat name: {statName}"); break;
                 }
             }
+        }
+        if (index == 5)
+        {
+            GM.playerChampionsData[2] = champData; // Update Vayne data
+            GM.playerChampionsData[3] = champData; // Update Ashe data
+        }
+        else
+        {
+            GM.playerChampionsData[index] = champData; // Update the player champions data with the modified stats
         }
         GM.playerChampionsData[index] = champData; // Update the player champions data with the modified stats
         statSaved = true; // Set the flag to true after saving
