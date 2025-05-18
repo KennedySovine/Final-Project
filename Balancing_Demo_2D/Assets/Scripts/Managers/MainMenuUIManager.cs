@@ -80,17 +80,24 @@ public class MainMenuUIManager : NetworkBehaviour
         else
         {
             startButton.GetComponent<Button>().interactable = true;
-            adjustmentButton.SetActive(true); // Show the Adjustments button if a connection type is selected
+            // Only show the Adjustments button for Host or Server (not Client)
+            if (networkDropdown.value == 1 || networkDropdown.value == 2)
+            {
+                adjustmentButton.SetActive(true);
+            }
+            else
+            {
+                adjustmentButton.SetActive(false);
+            }
         }
-        
 
         // Reset Stats Toggle
         if (networkDropdown.value == 1 || networkDropdown.value == 2){
-            resetStatsToggle.SetActive(true); // Show the reset stats toggle for server
+            resetStatsToggle.SetActive(true); // Show the reset stats toggle for server/host
         }
         else
         {
-            resetStatsToggle.SetActive(false); // Hide the reset stats toggle for client/host
+            resetStatsToggle.SetActive(false); // Hide the reset stats toggle for client/none
         }
 
         if (champAdjustmentUI.activeSelf)
