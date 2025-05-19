@@ -9,7 +9,7 @@ public class APMelee : BaseChampion
     #endregion
 
     #region Unity Lifecycle Methods
-    void Start()
+    new void Start()
     {
         base.Start();
         UpdateStats();
@@ -92,7 +92,7 @@ public class APMelee : BaseChampion
 
     #region Network RPC Methods
     [Rpc(SendTo.Server)]
-    public void UseAbility1Rpc(){
+    public override void UseAbility1Rpc(){
         for (int i = 0; i < attackStacks; i++){
             // Perform the Snip Snip! action here
             attackStacks = 0; // Reset stacks after using the ability
@@ -103,7 +103,7 @@ public class APMelee : BaseChampion
     }
 
     [Rpc(SendTo.Server)]
-    public void UseAbility2Rpc(){
+    public override void UseAbility2Rpc(){
         // Do a timedelta time thing to calculate the 5 seconds
         // Check mana and cooldown
         //  Armor and MR increase by 22 + 7% AP
@@ -111,7 +111,7 @@ public class APMelee : BaseChampion
     }
 
     [Rpc(SendTo.Server)]
-    public void UseAbility3Rpc(){
+    public override void UseAbility3Rpc(){
         // Check mana and cooldown
         // Dash to target location
         // Empower next basic attacks within the next 4 seconds to deal bonus magic damage and bonus attack range.

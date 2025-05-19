@@ -30,16 +30,9 @@ public class EndGameUI : NetworkBehaviour
     {
         // Try to find the GameManager using the correct singleton property name
         GM = GameManager.Instance;
-        
-        // If that's not found, try to find GameManager in the scene
         if (GM == null)
         {
-            GM = FindObjectOfType<GameManager>();
-        }
-        
-        if (GM == null)
-        {
-            Debug.LogError("GameManager not found!");
+            Debug.LogError("GameManager instance is null. Ensure the GameManager is active in the scene.");
         }
     }
     #endregion

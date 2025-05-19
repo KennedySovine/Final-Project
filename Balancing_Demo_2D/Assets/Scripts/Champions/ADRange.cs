@@ -4,7 +4,7 @@ using Unity.Netcode;
 public class ADRange : BaseChampion
 {
     #region Initialization Methods
-    void Start()
+    new void Start()
     {
         base.Start();
         UpdateStats();

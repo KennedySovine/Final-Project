@@ -10,7 +10,7 @@ public class ADRange2 : BaseChampion
     #endregion
 
     #region Initialization Methods
-    void Start()
+    new void Start()
     {
         base.Start();
         UpdateStats();
