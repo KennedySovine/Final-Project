@@ -16,8 +16,10 @@ public class ADRange2 : BaseChampion
         UpdateStats();
         AddAbilities();
 
-        if (IsOwner){
-            attackSpeed.OnValueChanged += (previousValue, newValue) => { // Update the attack speed value
+        if (IsOwner)
+        {
+            attackSpeed.OnValueChanged += (previousValue, newValue) =>
+            { // Update the attack speed value
                 UpdateAbility1CooldownRpc(newValue); // Update the ability cooldown based on attack speed
             };
         }
@@ -27,9 +29,9 @@ public class ADRange2 : BaseChampion
     private void UpdateStats()
     {
         if (!IsServer) return;
-        
+
         championType = "AD Range2";
-        maxHealth.Value = 610f;
+        /*maxHealth.Value = 610f;
         healthRegen.Value = 0.7f;
         AD.Value = 60f;
         AP.Value = 0f;
@@ -41,9 +43,11 @@ public class ADRange2 : BaseChampion
         manaRegen.Value = 1.4f; 
         abilityHaste.Value = 0f; 
         critChance.Value = 0f;
-        critDamage.Value = 1f; // 175% damage on crit
+        critDamage.Value = 1f; // 175% damage on crit*/
         health.Value = maxHealth.Value; // Initialize health to max health
         mana.Value = maxMana.Value; // Initialize mana to max mana
+
+        //LoadModifiedStats(GM.playerChampionsData[3]);
 
         //Other stuff
         stackDuration.Value = 4f;
@@ -51,7 +55,8 @@ public class ADRange2 : BaseChampion
         maxStacks.Value = 4; // Maximum number of stacks for the ability
     }
 
-    public override ChampionData ForTheMainMenu(){
+    public override ChampionData ForTheMainMenu()
+    {
         return new ChampionData
         {
             championType = "AD Range2",
@@ -87,19 +92,19 @@ public class ADRange2 : BaseChampion
         ability1 = new Ability(
             "Rapid Frost (Q)",
             "ACTIVE: For 6 seconds, gain <i>25% bonus attack speed<i> and fire 5 shots rapidly. Applies <i>21<i> AD per arrow. Cannot cast unless there are 4 stacks of Focus",
-            0f, 
-            30f, 
-            0f 
+            0f,
+            30f,
+            0f
         );
         ability1.icon = Resources.Load<Sprite>("Sprites/Ashe_RangerFocus_Default");
         ability1.icon2 = Resources.Load<Sprite>("Sprites/Ashe_RangerFocus_Empowered");
-        
+
         ability2 = new Ability(
             "Ranger's Focus (W)",
             "PASSIVE: Basic attacks generate a stack of Focus for 4 seconds, which refreshes on additional attacks and stacks up to 4, expriring after a second.",
-            0f, 
             0f,
-            0f 
+            0f,
+            0f
         );
         ability2.icon = Resources.Load<Sprite>("Sprites/Ashe_Enchanted_Crystal_Arrow");
 
@@ -107,18 +112,18 @@ public class ADRange2 : BaseChampion
             "Volley (E)",
             "Next arrow applies critical Frost and deals extra physical damage.",
             18f,
-            75f, 
+            75f,
             0f
         );
         ability3.icon = Resources.Load<Sprite>("Sprites/Ashe_Volley");
         ability3.SetDuration(6f);
 
-        autoAttack.SetRange(20f); 
+        autoAttack.SetRange(20f);
         ability1.SetDuration(6f);
         passive.Stats.championType = championType;
 
         abilityDict.Add("Q", ability1);
-        abilityDict.Add("W", ability2); 
+        abilityDict.Add("W", ability2);
         abilityDict.Add("E", ability3);
 
         SendToUI();
@@ -126,7 +131,8 @@ public class ADRange2 : BaseChampion
     #endregion
 
     #region Core Game Loop Methods
-    public override void Update(){
+    public override void Update()
+    {
         // Ensure ability cooldowns are updated each frame
         base.Update();
 
@@ -135,9 +141,11 @@ public class ADRange2 : BaseChampion
         // Ashe's ranger's focus cooldown is dependent on attackspeed
     }
 
-    public override void StackManager(){
+    public override void StackManager()
+    {
         // 1 stack expires after 1 second
-        if (stackCount.Value > 0){
+        if (stackCount.Value > 0)
+        {
             if (Time.time > stackStartTime.Value + stackDuration.Value) // If the stack timer is up
             {
                 UpdateStackCountRpc(-1, stackCount.Value, maxStacks.Value);
@@ -189,13 +197,15 @@ public class ADRange2 : BaseChampion
     public override GameObject EmpowerLogic(GameObject bullet)
     {
         var bulletComponent = bullet.GetComponent<Bullet>();
-        if (bulletComponent != null){
+        if (bulletComponent != null)
+        {
             bulletComponent.slowAmount = 0.2f; // Set the slow amount to 20%
         }
         return bullet;
     }
 
-    public override GameObject CritLogic(GameObject bullet){
+    public override GameObject CritLogic(GameObject bullet)
+    {
         // CRIT DOES FROST AND DOES NOT DO DMG
         float chance = Random.Range(0f, 1f);
         var bulletComponent = bullet.GetComponent<Bullet>();
@@ -212,10 +222,12 @@ public class ADRange2 : BaseChampion
         return bullet;
     }
 
-    public override GameObject Ability3Logic(GameObject bullet){
+    public override GameObject Ability3Logic(GameObject bullet)
+    {
         var bulletComponent = bullet.GetComponent<Bullet>();
-        if (bulletComponent != null){
-            bulletComponent.ADDamage = 20f + AD.Value; 
+        if (bulletComponent != null)
+        {
+            bulletComponent.ADDamage = 20f + AD.Value;
             bulletComponent.slowAmount = 0.4f; // Set the slow amount to 40%
         }
 
@@ -242,7 +254,8 @@ public class ADRange2 : BaseChampion
 
     #region RPC Methods
     [Rpc(SendTo.Server)]
-    public override void PassiveAbilityRpc(){
+    public override void PassiveAbilityRpc()
+    {
         // Add a slow thing in base champion.
         // Frost = 20% slow for 2 seconds
         // Additional frost damage = 155% of crit chance as AD damage
@@ -250,7 +263,8 @@ public class ADRange2 : BaseChampion
     }
 
     [Rpc(SendTo.Server)]
-    public override void UseAbility1Rpc(){
+    public override void UseAbility1Rpc()
+    {
         // Time delta time to count to 6 seconds or do a coroutine? Maybe?
         // 25 attack speed for 6 seconds
         // Fire 5 arrows rapidly, each doing 21 AD damage
@@ -270,7 +284,8 @@ public class ADRange2 : BaseChampion
     }
 
     [Rpc(SendTo.Server)]
-    public override void UseAbility2Rpc(){
+    public override void UseAbility2Rpc()
+    {
         // Generate focus stacks 
         // Look at ADRange for code
         if (!IsServer) return; // Ensure this is only executed on the server
@@ -278,7 +293,8 @@ public class ADRange2 : BaseChampion
     }
 
     [Rpc(SendTo.Server)]
-    public override void UseAbility3Rpc(){
+    public override void UseAbility3Rpc()
+    {
         // Check mana and cooldown
         // Crit frost and deal 20 + 100% AD damage
         if (ability3.isOnCooldown)
@@ -302,31 +318,45 @@ public class ADRange2 : BaseChampion
     public void UpdateAbility1CooldownRpc(float attackSpeed)
     {
         if (!IsServer) return; // Ensure this is only executed on the server
-        
-        if (attackSpeed < 0.75f){
+
+        if (attackSpeed < 0.75f)
+        {
             ability1.SetCooldown(6.08f);
         }
-        else if (attackSpeed < 1f){
+        else if (attackSpeed < 1f)
+        {
             ability1.SetCooldown(5.33f);
         }
-        else if (attackSpeed < 1.25f){
+        else if (attackSpeed < 1.25f)
+        {
             ability1.SetCooldown(4f);
         }
-        else if (attackSpeed < 1.5f){
+        else if (attackSpeed < 1.5f)
+        {
             ability1.SetCooldown(3.2f);
         }
-        else if (attackSpeed < 1.75f){
+        else if (attackSpeed < 1.75f)
+        {
             ability1.SetCooldown(2.67f);
         }
-        else if (attackSpeed < 2f){
+        else if (attackSpeed < 2f)
+        {
             ability1.SetCooldown(2.29f);
         }
-        else if (attackSpeed < 2.25f){
+        else if (attackSpeed < 2.25f)
+        {
             ability1.SetCooldown(1.78f);
         }
-        else if (attackSpeed < 2.5f){
+        else if (attackSpeed < 2.5f)
+        {
             ability1.SetCooldown(1.6f);
         }
     }
     #endregion
+    public override void LoadModifiedStats(ChampionData data)
+    {
+        base.LoadModifiedStats(data);
+        health.Value = maxHealth.Value;
+        mana.Value = maxMana.Value;
+    }
 }

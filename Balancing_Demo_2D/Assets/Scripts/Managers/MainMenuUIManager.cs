@@ -30,6 +30,9 @@ public class MainMenuUIManager : NetworkBehaviour
     private bool statSaved = true; // Flag to check if stats are saved
 
     private List<GameObject> champModifiers = new List<GameObject>();
+
+    private bool asheSelected = true;
+    private bool vayneSelected = true;
     #endregion
 
     #region Unity Lifecycle Methods
@@ -50,8 +53,11 @@ public class MainMenuUIManager : NetworkBehaviour
             AbilityStats.ResetPlayerStatsFile();
         }
 
-        asheButton.interactable = true; // Disable the button at startup
-        vayneButton.interactable = false; // Disable the button at startup
+        asheSelected = true;
+        vayneSelected = true;
+        asheButton.interactable = true;
+        vayneButton.interactable = true;
+        UpdateChampionButtonVisuals();
 
         champModifiers.Clear();
         foreach (Transform child in adjustmentsParent.transform)
@@ -80,17 +86,24 @@ public class MainMenuUIManager : NetworkBehaviour
         else
         {
             startButton.GetComponent<Button>().interactable = true;
-            adjustmentButton.SetActive(true); // Show the Adjustments button if a connection type is selected
+            // Only show the Adjustments button for Host or Server (not Client)
+            if (networkDropdown.value == 1 || networkDropdown.value == 2)
+            {
+                adjustmentButton.SetActive(true);
+            }
+            else
+            {
+                adjustmentButton.SetActive(false);
+            }
         }
-        
 
         // Reset Stats Toggle
         if (networkDropdown.value == 1 || networkDropdown.value == 2){
-            resetStatsToggle.SetActive(true); // Show the reset stats toggle for server
+            resetStatsToggle.SetActive(true); // Show the reset stats toggle for server/host
         }
         else
         {
-            resetStatsToggle.SetActive(false); // Hide the reset stats toggle for client/host
+            resetStatsToggle.SetActive(false); // Hide the reset stats toggle for client/none
         }
 
         if (champAdjustmentUI.activeSelf)
@@ -130,18 +143,32 @@ public class MainMenuUIManager : NetworkBehaviour
 
     private void OnAsheButtonClicked()
     {
-        asheButton.interactable = false;
-        vayneButton.interactable = true;
+        asheSelected = !asheSelected;
+        UpdateChampionButtonVisuals();
         LoadStats(3); // Assuming index 3 is Ashe
         statSaved = true;
     }
 
     private void OnVayneButtonClicked()
     {
-        asheButton.interactable = true;
-        vayneButton.interactable = false;
+        vayneSelected = !vayneSelected;
+        UpdateChampionButtonVisuals();
         LoadStats(2); // Assuming index 2 is Vayne
         statSaved = true;
+    }
+
+    private void UpdateChampionButtonVisuals()
+    {
+        Color32 deselectedColor = new Color32(170, 172, 179, 255); // #AAACB3
+
+        // Set the button's Image color directly
+        var asheImage = asheButton.GetComponent<Image>();
+        if (asheImage != null)
+            asheImage.color = asheSelected ? Color.white : deselectedColor;
+
+        var vayneImage = vayneButton.GetComponent<Image>();
+        if (vayneImage != null)
+            vayneImage.color = vayneSelected ? Color.white : deselectedColor;
     }
     #endregion
 
@@ -199,7 +226,8 @@ public class MainMenuUIManager : NetworkBehaviour
         TextMeshProUGUI text = valueText.GetComponent<TextMeshProUGUI>();
         if (text != null)
         {
-            text.text = slider.value.ToString("0"); // Update the text to show the current value
+            string format = slider.wholeNumbers ? "0" : "0.000";
+            text.text = slider.value.ToString(format); // Update the text to show the current value
         }
         statSaved = false; // Set the flag to false when a stat is changed
     }
@@ -211,85 +239,214 @@ public class MainMenuUIManager : NetworkBehaviour
             Slider slider = champModifier.GetComponentInChildren<Slider>();
             if (slider != null)
             {
-                float value = slider.value;
                 string statName = champModifier.name; // Get the name of the slider to identify the stat
 
-                switch (statName){
-                    case "MaxHealth": slider.value = GM.playerChampionsData[index].maxHealth; break;
-                    case "HealthRegen": slider.value = GM.playerChampionsData[index].healthRegen; break;
-                    case "AD": slider.value = GM.playerChampionsData[index].AD; break;
-                    case "AP": slider.value = GM.playerChampionsData[index].AP; break;
-                    case "Armor": slider.value = GM.playerChampionsData[index].armor; break;
-                    case "MagicResist": slider.value = GM.playerChampionsData[index].magicResist; break;
-                    case "AttackSpeed": slider.value = GM.playerChampionsData[index].attackSpeed; break;
-                    case "MovementSpeed": slider.value = GM.playerChampionsData[index].movementSpeed; break;
-                    case "MaxMana": slider.value = GM.playerChampionsData[index].maxMana; break;
-                    case "ManaRegen": slider.value = GM.playerChampionsData[index].manaRegen; break;
-                    case "AbilityHaste": slider.value = GM.playerChampionsData[index].abilityHaste; break;
-                    case "CritChance": slider.value = GM.playerChampionsData[index].critChance; break;
-                    case "CritDamage": slider.value = GM.playerChampionsData[index].critDamage; break;
-                    case "ArmorPen": slider.value = GM.playerChampionsData[index].armorPen; break;
-                    case "MagicPen": slider.value = GM.playerChampionsData[index].magicPen; break;
-                    case "MissileSpeed": slider.value = GM.playerChampionsData[index].missileSpeed; break;
-                    default: Debug.LogError($"Unknown stat name: {statName}"); break;
-                }
+                // If both buttons are interactable, check if values differ
+                if (asheButton != null && vayneButton != null && asheSelected && vayneSelected)
+                {
+                    float asheValue = 0f, vayneValue = 0f;
+                    switch (statName)
+                    {
+                        case "MaxHealth":
+                            asheValue = GM.playerChampionsData[3].maxHealth;
+                            vayneValue = GM.playerChampionsData[2].maxHealth;
+                            break;
+                        case "HealthRegen":
+                            asheValue = GM.playerChampionsData[3].healthRegen;
+                            vayneValue = GM.playerChampionsData[2].healthRegen;
+                            break;
+                        case "AD":
+                            asheValue = GM.playerChampionsData[3].AD;
+                            vayneValue = GM.playerChampionsData[2].AD;
+                            break;
+                        case "AP":
+                            asheValue = GM.playerChampionsData[3].AP;
+                            vayneValue = GM.playerChampionsData[2].AP;
+                            break;
+                        case "Armor":
+                            asheValue = GM.playerChampionsData[3].armor;
+                            vayneValue = GM.playerChampionsData[2].armor;
+                            break;
+                        case "MagicResist":
+                            asheValue = GM.playerChampionsData[3].magicResist;
+                            vayneValue = GM.playerChampionsData[2].magicResist;
+                            break;
+                        case "AttackSpeed":
+                            asheValue = GM.playerChampionsData[3].attackSpeed;
+                            vayneValue = GM.playerChampionsData[2].attackSpeed;
+                            break;
+                        case "MovementSpeed":
+                            asheValue = GM.playerChampionsData[3].movementSpeed;
+                            vayneValue = GM.playerChampionsData[2].movementSpeed;
+                            break;
+                        case "MaxMana":
+                            asheValue = GM.playerChampionsData[3].maxMana;
+                            vayneValue = GM.playerChampionsData[2].maxMana;
+                            break;
+                        case "ManaRegen":
+                            asheValue = GM.playerChampionsData[3].manaRegen;
+                            vayneValue = GM.playerChampionsData[2].manaRegen;
+                            break;
+                        case "AbilityHaste":
+                            asheValue = GM.playerChampionsData[3].abilityHaste;
+                            vayneValue = GM.playerChampionsData[2].abilityHaste;
+                            break;
+                        case "CritChance":
+                            asheValue = GM.playerChampionsData[3].critChance;
+                            vayneValue = GM.playerChampionsData[2].critChance;
+                            break;
+                        case "CritDamage":
+                            asheValue = GM.playerChampionsData[3].critDamage;
+                            vayneValue = GM.playerChampionsData[2].critDamage;
+                            break;
+                        case "ArmorPen":
+                            asheValue = GM.playerChampionsData[3].armorPen;
+                            vayneValue = GM.playerChampionsData[2].armorPen;
+                            break;
+                        case "MagicPen":
+                            asheValue = GM.playerChampionsData[3].magicPen;
+                            vayneValue = GM.playerChampionsData[2].magicPen;
+                            break;
+                        case "MissileSpeed":
+                            asheValue = GM.playerChampionsData[3].missileSpeed;
+                            vayneValue = GM.playerChampionsData[2].missileSpeed;
+                            break;
+                        default:
+                            Debug.LogError($"Unknown stat name: {statName}");
+                            break;
+                    }
 
-                UpdateSliderText(slider); // Update the text to show the current value
+                    GameObject valueText = slider.transform.Find("SliderValue").gameObject;
+                    TextMeshProUGUI text = valueText.GetComponent<TextMeshProUGUI>();
+                    string format = slider.wholeNumbers ? "0" : "0.000";
+                    if (Mathf.Approximately(asheValue, vayneValue))
+                    {
+                        slider.value = asheValue;
+                        if (text != null)
+                            text.text = asheValue.ToString(format);
+                    }
+                    else
+                    {
+                        slider.value = slider.minValue;
+                        if (text != null)
+                            text.text = "--";
+                    }
+                }
+                else
+                {
+                    // ...existing switch for single champion...
+                    switch (statName){
+                        case "MaxHealth": slider.value = GM.playerChampionsData[index].maxHealth; break;
+                        case "HealthRegen": slider.value = GM.playerChampionsData[index].healthRegen; break;
+                        case "AD": slider.value = GM.playerChampionsData[index].AD; break;
+                        case "AP": slider.value = GM.playerChampionsData[index].AP; break;
+                        case "Armor": slider.value = GM.playerChampionsData[index].armor; break;
+                        case "MagicResist": slider.value = GM.playerChampionsData[index].magicResist; break;
+                        case "AttackSpeed": slider.value = GM.playerChampionsData[index].attackSpeed; break;
+                        case "MovementSpeed": slider.value = GM.playerChampionsData[index].movementSpeed; break;
+                        case "MaxMana": slider.value = GM.playerChampionsData[index].maxMana; break;
+                        case "ManaRegen": slider.value = GM.playerChampionsData[index].manaRegen; break;
+                        case "AbilityHaste": slider.value = GM.playerChampionsData[index].abilityHaste; break;
+                        case "CritChance": slider.value = GM.playerChampionsData[index].critChance; break;
+                        case "CritDamage": slider.value = GM.playerChampionsData[index].critDamage; break;
+                        case "ArmorPen": slider.value = GM.playerChampionsData[index].armorPen; break;
+                        case "MagicPen": slider.value = GM.playerChampionsData[index].magicPen; break;
+                        case "MissileSpeed": slider.value = GM.playerChampionsData[index].missileSpeed; break;
+                        default: Debug.LogError($"Unknown stat name: {statName}"); break;
+                    }
+                    UpdateSliderText(slider); // Update the text to show the current value
+                }
             }
         }
     }
 
     public void SaveChampionChanges(){
         int index = 0; // Default index
-        var champData = new ChampionData(); // Create a new instance of ChampionData
-        if (asheButton.enabled)
-            {
-                champData = GM.playerChampionsData[3];
-                index = 3; // Set index for ASHE
-            }
-            else if (vayneButton.enabled)
-            {
-                champData = GM.playerChampionsData[2];
-                index = 2; // Set index for VAYNE
-            }
-            else
-            {
-                Debug.LogError("No champion selected for modification. How did you get here?");
-                return; // Exit if no champion is selected
-            }
 
-        foreach (GameObject champModifier in champModifiers)
+        if (asheSelected && vayneSelected)
         {
-            Slider slider = champModifier.GetComponentInChildren<Slider>();
-            if (slider != null)
-            {
-                float value = slider.value;
-                string statName = champModifier.name; // Get the name of the slider to identify the stat
+            // Save both champions, but preserve their ChampionType
+            var vayneData = GM.playerChampionsData[2];
+            var asheData = GM.playerChampionsData[3];
 
-                switch (statName){
-                    case "MaxHealth": champData.maxHealth = value; break;
-                    case "HealthRegen": champData.healthRegen = value; break;
-                    case "AD": champData.AD = value; break;
-                    case "AP": champData.AP = value; break;
-                    case "Armor": champData.armor = value; break;
-                    case "MagicResist": champData.magicResist = value; break;
-                    case "AttackSpeed": champData.attackSpeed = value; break;
-                    case "MovementSpeed": champData.movementSpeed = value; break;
-                    case "MaxMana": champData.maxMana = value; break;
-                    case "ManaRegen": champData.manaRegen = value; break;
-                    case "AbilityHaste": champData.abilityHaste = value; break;
-                    case "CritChance": champData.critChance = value; break;
-                    case "CritDamage": champData.critDamage = value; break;
-                    case "ArmorPen": champData.armorPen = value; break;
-                    case "MagicPen": champData.magicPen = value; break;
-                    case "MissileSpeed": champData.missileSpeed = value; break;
-                    default: Debug.LogError($"Unknown stat name: {statName}"); break;
+            foreach (GameObject champModifier in champModifiers)
+            {
+                Slider slider = champModifier.GetComponentInChildren<Slider>();
+                if (slider != null)
+                {
+                    float value = slider.value;
+                    string statName = champModifier.name;
+
+                    // Apply to both, but keep their ChampionType
+                    switch (statName) {
+                        case "MaxHealth": vayneData.maxHealth = value; asheData.maxHealth = value; break;
+                        case "HealthRegen": vayneData.healthRegen = value; asheData.healthRegen = value; break;
+                        case "AD": vayneData.AD = value; asheData.AD = value; break;
+                        case "AP": vayneData.AP = value; asheData.AP = value; break;
+                        case "Armor": vayneData.armor = value; asheData.armor = value; break;
+                        case "MagicResist": vayneData.magicResist = value; asheData.magicResist = value; break;
+                        case "AttackSpeed": vayneData.attackSpeed = value; asheData.attackSpeed = value; break;
+                        case "MovementSpeed": vayneData.movementSpeed = value; asheData.movementSpeed = value; break;
+                        case "MaxMana": vayneData.maxMana = value; asheData.maxMana = value; break;
+                        case "ManaRegen": vayneData.manaRegen = value; asheData.manaRegen = value; break;
+                        case "AbilityHaste": vayneData.abilityHaste = value; asheData.abilityHaste = value; break;
+                        case "CritChance": vayneData.critChance = value; asheData.critChance = value; break;
+                        case "CritDamage": vayneData.critDamage = value; asheData.critDamage = value; break;
+                        case "ArmorPen": vayneData.armorPen = value; asheData.armorPen = value; break;
+                        case "MagicPen": vayneData.magicPen = value; asheData.magicPen = value; break;
+                        case "MissileSpeed": vayneData.missileSpeed = value; asheData.missileSpeed = value; break;
+                        default: Debug.LogError($"Unknown stat name: {statName}"); break;
+                    }
                 }
             }
+            vayneData.championType = "AD Range";
+            asheData.championType = "AD Range2";
+
+            GM.playerChampionsData[2] = vayneData;
+            GM.playerChampionsData[3] = asheData;
+            Debug.Log("Saved Vayne: " + JsonUtility.ToJson(vayneData, true));
+            Debug.Log("Saved Ashe: " + JsonUtility.ToJson(asheData, true));
         }
-        GM.playerChampionsData[index] = champData; // Update the player champions data with the modified stats
+        else
+        {
+            var champData = new ChampionData(); // Create a new instance of ChampionData
+            if (vayneSelected) { index = 2; champData = GM.playerChampionsData[index]; }
+            else if (asheSelected){ index = 3; champData = GM.playerChampionsData[index]; }
+            else return; // Exit if no champion is selected
+
+            foreach (GameObject champModifier in champModifiers)
+            {
+                Slider slider = champModifier.GetComponentInChildren<Slider>();
+                if (slider != null)
+                {
+                    float value = slider.value;
+                    string statName = champModifier.name;
+                    switch (statName)
+                    {
+                        case "MaxHealth": champData.maxHealth = value; break;
+                        case "HealthRegen": champData.healthRegen = value; break;
+                        case "AD": champData.AD = value; break;
+                        case "AP": champData.AP = value; break;
+                        case "Armor": champData.armor = value; break;
+                        case "MagicResist": champData.magicResist = value; break;
+                        case "AttackSpeed": champData.attackSpeed = value; break;
+                        case "MovementSpeed": champData.movementSpeed = value; break;
+                        case "MaxMana": champData.maxMana = value; break;
+                        case "ManaRegen": champData.manaRegen = value; break;
+                        case "AbilityHaste": champData.abilityHaste = value; break;
+                        case "CritChance": champData.critChance = value; break;
+                        case "CritDamage": champData.critDamage = value; break;
+                        case "ArmorPen": champData.armorPen = value; break;
+                        case "MagicPen": champData.magicPen = value; break;
+                        case "MissileSpeed": champData.missileSpeed = value; break;
+                        default: Debug.LogError($"Unknown stat name: {statName}"); break;
+                    }
+                }
+            }
+            GM.playerChampionsData[index] = champData;
+            Debug.Log("Saved " + champData.championType + ": " + JsonUtility.ToJson(champData, true));
+        }
         statSaved = true; // Set the flag to true after saving
-        Debug.Log("Saved ChampionData: " + JsonUtility.ToJson(champData, true));
     }
     #endregion
 }

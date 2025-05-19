@@ -48,7 +48,8 @@ public class BaseChampion : NetworkBehaviour
     public NetworkVariable<bool> ability3Used = new NetworkVariable<bool>(false); // Flag to check if ability 3 has been used
     public NetworkVariable<int> rapidFire = new NetworkVariable<int>(1);
 
-    public bool isMaxStacks {
+    public bool isMaxStacks
+    {
         get { return maxStacks.Value == stackCount.Value; } // Check if the current stack count is equal to the maximum stack count
     }
 
@@ -136,25 +137,45 @@ public class BaseChampion : NetworkBehaviour
 
     #region RPC Methods
     [Rpc(SendTo.Server)]
-    public virtual void PassiveAbilityRpc(){ Debug.Log("No passive ability assigned");}
+    public virtual void PassiveAbilityRpc() { Debug.Log("No passive ability assigned"); }
     [Rpc(SendTo.Server)]
-    public virtual void UseAbility1Rpc(){ Debug.Log("No ability 1 assigned");}
+    public virtual void UseAbility1Rpc() { Debug.Log("No ability 1 assigned"); }
     [Rpc(SendTo.Server)]
-    public virtual void UseAbility2Rpc(){ Debug.Log("No ability 2 assigned");}
+    public virtual void UseAbility2Rpc() { Debug.Log("No ability 2 assigned"); }
     [Rpc(SendTo.Server)]
-    public virtual void UseAbility3Rpc(){ Debug.Log("No ability 3 assigned");}
+    public virtual void UseAbility3Rpc() { Debug.Log("No ability 3 assigned"); }
 
-    public virtual GameObject EmpowerLogic(GameObject bullet){ Debug.Log("No empower logic assigned"); return bullet;}
-    public virtual GameObject StackLogic(GameObject bullet){ Debug.Log("No stack logic assigned"); return bullet;}
-    public virtual GameObject Ability3Logic(GameObject bullet){ Debug.Log("No stack logic assigned"); return bullet;}
+    public virtual GameObject EmpowerLogic(GameObject bullet) { Debug.Log("No empower logic assigned"); return bullet; }
+    public virtual GameObject StackLogic(GameObject bullet) { Debug.Log("No stack logic assigned"); return bullet; }
+    public virtual GameObject Ability3Logic(GameObject bullet) { Debug.Log("No stack logic assigned"); return bullet; }
 
-    public virtual void StackManager(){ Debug.Log("No stack manager assigned");}
+    public virtual void StackManager() { Debug.Log("No stack manager assigned"); }
+    public virtual void LoadModifiedStats(ChampionData data)
+    {
+        championType = data.championType;
+        maxHealth.Value = data.maxHealth;
+        healthRegen.Value = data.healthRegen;
+        AD.Value = data.AD;
+        AP.Value = data.AP;
+        armor.Value = data.armor;
+        magicResist.Value = data.magicResist;
+        attackSpeed.Value = data.attackSpeed;
+        movementSpeed.Value = data.movementSpeed;
+        maxMana.Value = data.maxMana;
+        manaRegen.Value = data.manaRegen;
+        abilityHaste.Value = data.abilityHaste;
+        critChance.Value = data.critChance;
+        critDamage.Value = data.critDamage;
+        armorPen.Value = data.armorPen;
+        magicPen.Value = data.magicPen;
+    }
     #endregion
 
     #region Update Logic
     public virtual void Update()
     {
-        if (!gameEndStuff && GM.gameTime.Value <= 0f){
+        if (!gameEndStuff && GM.gameTime.Value <= 0f)
+        {
             gameEndStuff = true; // Set the flag to true to prevent multiple calls
             SubmitFinalAbilityStatsServerRpc(
                 AbilityStatsData.FromAbilityStats(ability1.Stats),
@@ -169,7 +190,8 @@ public class BaseChampion : NetworkBehaviour
             PassiveAbilityRpc(); // Call the passive ability logic
         }
 
-        if (IsOwner){
+        if (IsOwner)
+        {
             AbilityIconCooldownManaChecks(); // Check cooldowns and mana for abilities
         }
 
@@ -177,7 +199,8 @@ public class BaseChampion : NetworkBehaviour
         //Timer for stacks
         HealthandManaRegen();
 
-        if (isEmpowered.Value){
+        if (isEmpowered.Value)
+        {
             if (Time.time > empowerStartTime.Value + empowerDuration.Value)
             {
                 UpdateIsEmpoweredRpc(false); // Reset the empowered state
@@ -237,7 +260,8 @@ public class BaseChampion : NetworkBehaviour
     public void SendToUI()
     {
         if (!IsOwner) return;
-        while (!iconsSet){
+        while (!iconsSet)
+        {
             if (abilityDict.ContainsKey("E")) // Check if the abilities are not null and icons are not set
             {
                 Debug.Log("Setting abilities to buttons for player " + NetworkManager.Singleton.LocalClientId);
@@ -282,7 +306,8 @@ public class BaseChampion : NetworkBehaviour
         enemyChampion = NetworkManager.Singleton.SpawnManager.SpawnedObjects[enemyId].gameObject; // Get the enemy champion object
     }
 
-    public virtual GameObject CritLogic(GameObject bullet){
+    public virtual GameObject CritLogic(GameObject bullet)
+    {
         float chance = Random.Range(0f, 1f);
         var bulletComponent = bullet.GetComponent<Bullet>();
         if (chance <= critChance.Value) // If the random chance is less than or equal to critChance
@@ -363,7 +388,8 @@ public class BaseChampion : NetworkBehaviour
     public void ApplySlowRpc(float slowAmount, float duration)
     {
         if (!IsServer) return; // Only the server should apply the slow
-        if (slowAmount == 0f){
+        if (slowAmount == 0f)
+        {
             slowAmount = 0f; // Ignore if the slow amount is zero or negative
             slowStartTime.Value = 0f; // Reset the slow start time
             slowDuration.Value = 0f; // Reset the slow duration
@@ -505,7 +531,7 @@ public class BaseChampion : NetworkBehaviour
             mana.Value += maxMana.Value;
         }
     }
-    
+
     [Rpc(SendTo.Server)]
     public void UpdateManaRegenRpc(float manaRegenChange)
     {
@@ -594,27 +620,32 @@ public class BaseChampion : NetworkBehaviour
     public void UpdateStackCountRpc(int change, int current, int max)
     {
         if (!IsServer) return; // Ensure this is only executed on the server
-        if (change == 0){
-            if (current > max){
+        if (change == 0)
+        {
+            if (current > max)
+            {
                 stackCount.Value = max; // Set the stack count to max
             }
             return; // No change to the stack count
         }
-        else if (change < 0){
+        else if (change < 0)
+        {
             stackCount.Value += change; // Decrease the stack count
             stackStartTime.Value = Time.time; // Reset the stack start time
-            if (stackCount.Value < 0){
+            if (stackCount.Value < 0)
+            {
                 stackCount.Value = 0; // Ensure the stack count does not go below zero
             }
             return;
         }
-        else if (current + change >= max){
+        else if (current + change >= max)
+        {
             Debug.Log("Max stacks reached: " + max);
             stackCount.Value = max; // Set the stack count to max
             stackStartTime.Value = Time.time;
             return;
         }
- 
+
         Debug.Log("Adding stacks: " + change);
         stackCount.Value += change;
         stackStartTime.Value = Time.time; // Reset the stack start time
@@ -637,7 +668,7 @@ public class BaseChampion : NetworkBehaviour
     {
         if (!IsServer) return; // Ensure this is only executed on the server
         isEmpowered.Value = value;
-        
+
     }
 
     [Rpc(SendTo.Server)]
