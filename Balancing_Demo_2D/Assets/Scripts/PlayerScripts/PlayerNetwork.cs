@@ -57,6 +57,12 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (!IsOwner || GM.gamePaused.Value) return; // Only the owner can control the player and only if the game is not paused
 
+        if (champion.health.Value <= 0)
+        {
+            RespawnPlayer(); // Respawn the player if dead
+            return; // If the champion is dead, do not update
+        }
+
         // Constantly update mouse position
         mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition);
         CheckInputs(); // Check for player inputs
@@ -65,10 +71,9 @@ public class PlayerNetwork : NetworkBehaviour
         {
             MovePlayer(); // Move the player if not dashing
         }
-
-        //TODO: Check if colliding with terrain and if so stop moving
     }
 
+    // Terrain Collision Detection
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Terrain"))
@@ -100,8 +105,9 @@ public class PlayerNetwork : NetworkBehaviour
         }
 
         if (Input.GetMouseButton(1)) // Right Mouse Button Pressed and Stay down
+        {
+            if (!AttackOrMove())
             {
-            if (!AttackOrMove()){
                 //Debug.Log("Move input detected.");
                 SendMousePositionRpc(mousePosition); // Send mouse position to the server
                 clickPosition = mousePosition; // Store the click position
@@ -110,7 +116,7 @@ public class PlayerNetwork : NetworkBehaviour
                 float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
                 UpdateRotationRpc(angle); // Update rotation
             }
-            
+
         }
 
         if (Input.GetKeyDown(KeyCode.Q)) // Q key pressed
@@ -150,7 +156,8 @@ public class PlayerNetwork : NetworkBehaviour
     #endregion
 
     #region Combat & Abilities
-    public bool AttackOrMove(){
+    public bool AttackOrMove()
+    {
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
         if (hit.collider != null && hit.collider.GetComponentInParent<NetworkObject>() != null && (hit.collider.GetComponentInParent<NetworkObject>().OwnerClientId != champion.GetComponentInParent<NetworkObject>().OwnerClientId))
         {
@@ -214,7 +221,8 @@ public class PlayerNetwork : NetworkBehaviour
         Vector2 targetPosition = (Vector2)transform.position + dashDirection * distance;
         targetPositionNet.Value = targetPosition;
         dashSpeed = speed;
-        if (IsServer){
+        if (IsServer)
+        {
             isDashing.Value = true;
         }
 
@@ -246,7 +254,7 @@ public class PlayerNetwork : NetworkBehaviour
             Debug.Log($"Time: {Time.time}, Last Auto Attack Time: {champion.lastAutoAttackTime.Value}, Attack Speed: {champion.attackSpeed.Value}");
             return;
         }
-        
+
 
         StartCoroutine(PerformAutoAttackCoroutine(targetPosition, enemyChampion, rapidFire));
         Debug.Log("Auto-attack performed on the server.");
@@ -279,7 +287,7 @@ public class PlayerNetwork : NetworkBehaviour
             Vector3 direc = enemyPosition - transform.position;
             float angle = Mathf.Atan2(direc.y, direc.x) * Mathf.Rad2Deg;
             UpdateRotationRpc(angle); // Update rotation
-            
+
             if (distance <= champion.autoAttack.range)
             {
                 Debug.Log("Player is in range of the enemy champion.");
@@ -295,7 +303,7 @@ public class PlayerNetwork : NetworkBehaviour
                 PerformAutoAttackRpc(enemyPosition, enemyChampion.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value);
                 yield break; // Exit the coroutine after attacking
             }
-            
+
             // Move toward the enemy
             Debug.Log("Moving toward the enemy champion.");
             RequestMoveRpc(enemyPosition); // Request movement to the enemy position
@@ -315,7 +323,7 @@ public class PlayerNetwork : NetworkBehaviour
         }
 
         transform.position = targetPositionNet.Value; // Snap to the target position
-        isDashing.Value = false; // Reset the dash state
+        if (IsServer) isDashing.Value = false; // Reset the dash state
         Debug.Log("Dash completed.");
     }
 
@@ -378,7 +386,7 @@ public class PlayerNetwork : NetworkBehaviour
             Debug.Log("Auto-attack performed.");
             // Update the last auto-attack time after firing each bullet
             champion.UpdateStackCountRpc(1, champion.stackCount.Value, champion.maxStacks.Value); // Update the stack count
-            
+
 
             // Wait for 0.1 seconds before firing the next bullet
             yield return new WaitForSeconds(0.1f);
@@ -396,7 +404,7 @@ public class PlayerNetwork : NetworkBehaviour
 
     private IEnumerator MoveGhostBullet(GameObject GB, Vector3 targetPosition, float speed)
     {
-        while (GB!= null && Vector3.Distance(GB.transform.position, targetPosition) > 0.1f)
+        while (GB != null && Vector3.Distance(GB.transform.position, targetPosition) > 0.1f)
         {
             //Debug.Log("Moving ghost bullet towards target position.");
             //Debug.Log("Speed: " + speed);
@@ -406,6 +414,24 @@ public class PlayerNetwork : NetworkBehaviour
         }
 
         Destroy(GB); // Destroy the ghost bullet after reaching the target position
+    }
+
+    private void RespawnPlayer()
+    {
+        if (!IsServer) return;
+        champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+        if (GM.player1.GetComponent<NetworkObject>().NetworkObjectId == champion.GetComponentInParent<NetworkObject>().NetworkObjectId)
+        {
+            champion.transform.position = GM.spawnPoints[0].position;
+        }
+        else
+        {
+            champion.transform.position = GM.spawnPoints[1].position;
+        }
+        // Optionally reset health/mana
+        targetPositionNet.Value = champion.transform.position;
+        champion.health.Value = champion.maxHealth.Value;
+        champion.mana.Value = champion.maxMana.Value;
     }
     #endregion
 }
