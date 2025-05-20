@@ -52,10 +52,10 @@ public class PlayerNetwork : NetworkBehaviour
             //Set velocity 0
             champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
 
-            // Subscribe to champion health changes for respawn logic
+            // Subscribe directly to health value change for respawn logic
             if (champion != null)
             {
-                champion.OnHealthValueChanged += OnChampionHealthChanged;
+                champion.health.OnValueChanged += OnChampionHealthChanged;
             }
         }
     }
@@ -65,7 +65,7 @@ public class PlayerNetwork : NetworkBehaviour
         // Unsubscribe from health change event
         if (IsOwner && champion != null)
         {
-            champion.OnHealthValueChanged -= OnChampionHealthChanged;
+            champion.health.OnValueChanged -= OnChampionHealthChanged;
         }
     }
 
@@ -73,22 +73,7 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (!IsOwner || GM.gamePaused.Value) return;
 
-        // Remove health polling/respawn logic from here
-        /*
-        if (champion.health.Value <= 0)
-        {
-            if (IsServer && !isRespawning)
-            {
-                isRespawning = true;
-                RespawnPlayer();
-            }
-            return;
-        }
-        else
-        {
-            isRespawning = false; // Reset flag when alive
-        }
-        */
+        // No polling for health here
 
         // Constantly update mouse position
         mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -99,7 +84,7 @@ public class PlayerNetwork : NetworkBehaviour
         }
     }
 
-    // New handler for champion health changes
+    // Handler for champion health changes
     private void OnChampionHealthChanged(float previousValue, float newValue)
     {
         if (!IsServer) return;
