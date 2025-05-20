@@ -124,42 +124,6 @@ public class ADRange : BaseChampion
             }
         }
     }
-
-    public override void AbilityIconCooldownManaChecks()
-    {
-        if (IsOwner && iconsSet) // Only the owner should check cooldowns and mana
-        {
-            // Q: Only enable if not on cooldown AND enough mana
-            if (ability1 != null && !ability1.isOnCooldown && mana.Value >= ability1.manaCost)
-            {
-                IGUIM.ButtonInteractable("Q", true);
-            }
-            else
-            {
-                IGUIM.ButtonInteractable("Q", false);
-            }
-
-            // W
-            if (ability2 != null && !ability2.isOnCooldown && mana.Value >= ability2.manaCost)
-            {
-                IGUIM.ButtonInteractable("W", true);
-            }
-            else
-            {
-                IGUIM.ButtonInteractable("W", false);
-            }
-
-            // E
-            if (ability3 != null && !ability3.isOnCooldown && mana.Value >= ability3.manaCost)
-            {
-                IGUIM.ButtonInteractable("E", true);
-            }
-            else
-            {
-                IGUIM.ButtonInteractable("E", false);
-            }
-        }
-    }
     #endregion
 
     #region Ability Logic Methods
