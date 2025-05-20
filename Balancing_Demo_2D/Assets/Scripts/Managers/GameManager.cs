@@ -70,6 +70,11 @@ public class GameManager : NetworkBehaviour
     public Transform[] spawnPoints; // Array of spawn points for champions
     public int recievedCalcs = 0;
     private bool recievedEndGameCalculations => recievedCalcs >= 2;
+
+    [Header("Augment Selection Timer")]
+    public float augmentSelectionTimeLimit = 15f; // seconds
+    private float augmentSelectionTimer = 0f;
+    public bool augmentTimerActive = false;
     #endregion
 
     #region Unity Lifecycle Methods
@@ -117,9 +122,26 @@ public class GameManager : NetworkBehaviour
     {
         UpdatePlayerCount();
 
-        if (!IsServer && !IsHost) return;
-
         HandleGameLogic();
+
+        if (augmentTimerActive && augmentChoosing.Value)
+        {
+            augmentSelectionTimer -= Time.deltaTime;
+            if (augmentSelectionTimer <= 0)
+            {
+                augmentChoosing.Value = false;
+                gamePaused.Value = false;
+                augmentTimerActive = false;
+                Debug.Log("Augment selection time expired.");
+
+                if (AM.augmentUI.activeSelf && IsOwner)
+                {
+                    int randomIndex = UnityEngine.Random.Range(0, 3);
+                    Debug.Log($"Auto-selecting augment at index {randomIndex} due to timeout.");
+                    AM.AugmentSelection(randomIndex);
+                }
+            }
+        }
     }
     #endregion
 
@@ -228,6 +250,8 @@ public class GameManager : NetworkBehaviour
         if (augmentBuffer <= 0)
         {
             augmentChoosing.Value = true;
+            augmentSelectionTimer = augmentSelectionTimeLimit;
+            augmentTimerActive = true;
         }
 
         if (augmentChoosing.Value)
@@ -409,11 +433,11 @@ public class GameManager : NetworkBehaviour
 
         if (player1 != null && player2 != null) // If both players are spawned in
         {
-            playersSpawned.Value = true;
             Debug.Log("Both players have been spawned. Starting the game.");
 
             SetupPlayerReferences();
             InitializeUIForPlayers();
+            playersSpawned.Value = true;
         }
     }
 

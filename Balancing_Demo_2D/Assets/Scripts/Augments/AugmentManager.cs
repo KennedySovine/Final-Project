@@ -281,6 +281,7 @@ public class AugmentManager : NetworkBehaviour
         {
             Debug.Log("Both players have selected their augments, resuming game");
             GM.gamePaused.Value = false;
+            GM.augmentTimerActive = false;
         }
     }
 
