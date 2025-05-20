@@ -91,12 +91,34 @@ public class PlayerNetwork : NetworkBehaviour
         if (newValue <= 0 && !isRespawning)
         {
             isRespawning = true;
-            RespawnPlayer();
+            Vector3 respawnPos = GM.player1.GetComponent<NetworkObject>().NetworkObjectId == champion.GetComponentInParent<NetworkObject>().NetworkObjectId
+                ? GM.spawnPoints[0].position
+                : GM.spawnPoints[1].position;
+            RespawnPlayerRpc(respawnPos);
+
+            // Only the server should update health/mana NetworkVariables
+            champion.health.Value = champion.maxHealth.Value;
+            champion.mana.Value = champion.maxMana.Value;
+            targetPositionNet.Value = respawnPos;
         }
         else if (newValue > 0)
         {
             isRespawning = false;
         }
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void RespawnPlayerRpc(Vector3 respawnPosition)
+    {
+        // Set position and velocity on all clients
+        // Set the root champion object's position (not just the controller)
+        var root = champion.transform.root;
+        if (root != null)
+            root.position = respawnPosition;
+        else
+            champion.transform.position = respawnPosition;
+
+        champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
     }
 
     // Terrain Collision Detection
@@ -444,24 +466,6 @@ public class PlayerNetwork : NetworkBehaviour
         }
 
         Destroy(GB); // Destroy the ghost bullet after reaching the target position
-    }
-
-    private void RespawnPlayer()
-    {
-        if (!IsServer) return;
-        champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
-        if (GM.player1.GetComponent<NetworkObject>().NetworkObjectId == champion.GetComponentInParent<NetworkObject>().NetworkObjectId)
-        {
-            champion.transform.position = GM.spawnPoints[0].position;
-        }
-        else
-        {
-            champion.transform.position = GM.spawnPoints[1].position;
-        }
-        // Optionally reset health/mana
-        targetPositionNet.Value = champion.transform.position;
-        champion.health.Value = champion.maxHealth.Value;
-        champion.mana.Value = champion.maxMana.Value;
     }
     #endregion
 }
