@@ -26,7 +26,6 @@ public class PlayerNetwork : NetworkBehaviour
     public Vector3 enemyPosition; // Position of the enemy champion
 
     private GameObject enemyChampion; // Reference to the enemy champion
-    private bool isRespawning = false; // Add this field
     #endregion
 
     #region Unity Lifecycle Methods
@@ -51,21 +50,6 @@ public class PlayerNetwork : NetworkBehaviour
             dashSpeed = champion.movementSpeed.Value;
             //Set velocity 0
             champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
-
-            // Subscribe directly to health value change for respawn logic
-            if (champion != null)
-            {
-                champion.health.OnValueChanged += OnChampionHealthChanged;
-            }
-        }
-    }
-
-    private void OnDestroy()
-    {
-        // Unsubscribe from health change event
-        if (IsOwner && champion != null)
-        {
-            champion.health.OnValueChanged -= OnChampionHealthChanged;
         }
     }
 
@@ -73,7 +57,7 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (!IsOwner || GM.gamePaused.Value) return;
 
-        // No polling for health here
+        // Remove isRespawning debug and health polling
 
         // Constantly update mouse position
         mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -84,41 +68,44 @@ public class PlayerNetwork : NetworkBehaviour
         }
     }
 
-    // Handler for champion health changes
-    private void OnChampionHealthChanged(float previousValue, float newValue)
-    {
-        if (!IsServer) return;
-        if (newValue <= 0 && !isRespawning)
-        {
-            isRespawning = true;
-            Vector3 respawnPos = GM.player1.GetComponent<NetworkObject>().NetworkObjectId == champion.GetComponentInParent<NetworkObject>().NetworkObjectId
-                ? GM.spawnPoints[0].position
-                : GM.spawnPoints[1].position;
-            RespawnPlayerRpc(respawnPos);
-
-            // Only the server should update health/mana NetworkVariables
-            champion.health.Value = champion.maxHealth.Value;
-            champion.mana.Value = champion.maxMana.Value;
-            targetPositionNet.Value = respawnPos;
-        }
-        else if (newValue > 0)
-        {
-            isRespawning = false;
-        }
-    }
+    // Remove OnChampionHealthChanged
 
     [Rpc(SendTo.Everyone)]
     public void RespawnPlayerRpc(Vector3 respawnPosition)
     {
-        // Set position and velocity on all clients
-        // Set the root champion object's position (not just the controller)
-        var root = champion.transform.root;
-        if (root != null)
-            root.position = respawnPosition;
-        else
-            champion.transform.position = respawnPosition;
+        Debug.Log($"[RespawnPlayerRpc] Called on {(IsServer ? "Server" : "Client")} | Setting transform.position and champion.transform.position to {respawnPosition}");
 
-        champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+        // Snap both the controller and the champion to the respawn position
+        transform.position = respawnPosition;
+        champion.transform.position = respawnPosition;
+
+        // Reset velocity for both
+        var rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            Debug.Log("[RespawnPlayerRpc] Reset PlayerController Rigidbody2D velocity to zero.");
+        }
+        else
+        {
+            Debug.LogWarning("[RespawnPlayerRpc] PlayerController Rigidbody2D is null.");
+        }
+
+        var champRb = champion.GetComponent<Rigidbody2D>();
+        if (champRb != null)
+        {
+            champRb.linearVelocity = Vector2.zero;
+            Debug.Log("[RespawnPlayerRpc] Reset Champion Rigidbody2D velocity to zero.");
+        }
+        else
+        {
+            Debug.LogWarning("[RespawnPlayerRpc] Champion Rigidbody2D is null.");
+        }
+
+        // On all clients, update the local target position so MovePlayer() doesn't walk back
+        Debug.Log("[RespawnPlayerRpc] Sending move/position update to server.");
+        SendMousePositionRpc(respawnPosition);
+        RequestMoveRpc(respawnPosition); // Request movement to the respawn position
     }
 
     // Terrain Collision Detection
@@ -463,7 +450,7 @@ public class PlayerNetwork : NetworkBehaviour
             //Debug.Log("Moving ghost bullet towards target position.");
             //Debug.Log("Speed: " + speed);
             GB.transform.position = Vector3.MoveTowards(GB.transform.position, targetPosition, speed * Time.deltaTime);
-            Debug.Log("Ghost bullet position: " + GB.transform.position);
+            //Debug.Log("Ghost bullet position: " + GB.transform.position);
             yield return null;
         }
 

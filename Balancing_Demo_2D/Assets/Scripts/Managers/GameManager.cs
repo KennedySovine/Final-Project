@@ -124,6 +124,13 @@ public class GameManager : NetworkBehaviour
 
         HandleGameLogic();
 
+        // --- Authoritative respawn logic ---
+        if (playersSpawned.Value)
+        {
+            CheckAndHandleRespawn(player1Controller, spawnPoints[0].position);
+            CheckAndHandleRespawn(player2Controller, spawnPoints[1].position);
+        }
+
         if (augmentTimerActive && augmentChoosing.Value)
         {
             augmentSelectionTimer -= Time.deltaTime;
@@ -141,6 +148,30 @@ public class GameManager : NetworkBehaviour
                     AM.AugmentSelection(randomIndex);
                 }
             }
+        }
+    }
+
+    // Add this method:
+    private void CheckAndHandleRespawn(GameObject playerController, Vector3 respawnPosition)
+    {
+        if (playerController == null) return;
+        var champ = playerController.GetComponent<BaseChampion>();
+        var net = playerController.GetComponent<PlayerNetwork>();
+        if (champ == null || net == null) return;
+
+        // Only the server should do this
+        if (!IsServer) return;
+
+        // If dead, respawn
+        if (champ.health.Value <= 0)
+        {
+            // Reset health/mana/position on the server
+            champ.health.Value = champ.maxHealth.Value;
+            champ.mana.Value = champ.maxMana.Value;
+            net.targetPositionNet.Value = respawnPosition;
+
+            // Snap the player on all clients
+            net.RespawnPlayerRpc(respawnPosition);
         }
     }
     #endregion
