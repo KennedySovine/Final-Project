@@ -26,9 +26,6 @@ public class PlayerNetwork : NetworkBehaviour
     public Vector3 enemyPosition; // Position of the enemy champion
 
     private GameObject enemyChampion; // Reference to the enemy champion
-    // Replace the local isRespawning with a NetworkVariable
-    // private bool isRespawning = false;
-    public NetworkVariable<bool> isRespawning = new NetworkVariable<bool>(false);
     #endregion
 
     #region Unity Lifecycle Methods
@@ -53,21 +50,6 @@ public class PlayerNetwork : NetworkBehaviour
             dashSpeed = champion.movementSpeed.Value;
             //Set velocity 0
             champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
-
-            // Subscribe directly to health value change for respawn logic
-            if (champion != null)
-            {
-                champion.health.OnValueChanged += OnChampionHealthChanged;
-            }
-        }
-    }
-
-    private void OnDestroy()
-    {
-        // Unsubscribe from health change event
-        if (IsOwner && champion != null)
-        {
-            champion.health.OnValueChanged -= OnChampionHealthChanged;
         }
     }
 
@@ -75,13 +57,7 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (!IsOwner || GM.gamePaused.Value) return;
 
-        // Debug log for respawning state
-        if (isRespawning.Value)
-        {
-            Debug.Log($"[Update] isRespawning is TRUE for client {NetworkManager.Singleton.LocalClientId}");
-        }
-
-        // No polling for health here
+        // Remove isRespawning debug and health polling
 
         // Constantly update mouse position
         mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -92,30 +68,7 @@ public class PlayerNetwork : NetworkBehaviour
         }
     }
 
-    // Handler for champion health changes
-    private void OnChampionHealthChanged(float previousValue, float newValue)
-    {
-        Debug.Log($"[OnChampionHealthChanged] Called on {(IsServer ? "Server" : "Client")} | previousValue: {previousValue}, newValue: {newValue}, isRespawning: {isRespawning.Value}");
-        if (!IsServer) return;
-        if (newValue <= 0 && !isRespawning.Value)
-        {
-            isRespawning.Value = true;
-            Vector3 respawnPos = GM.player1.GetComponent<NetworkObject>().NetworkObjectId == champion.GetComponentInParent<NetworkObject>().NetworkObjectId
-                ? GM.spawnPoints[0].position
-                : GM.spawnPoints[1].position;
-            Debug.Log($"[OnChampionHealthChanged] Server is calling RespawnPlayerRpc for respawnPos: {respawnPos}");
-            RespawnPlayerRpc(respawnPos);
-
-            // Only the server should update health/mana NetworkVariables
-            champion.health.Value = champion.maxHealth.Value;
-            champion.mana.Value = champion.maxMana.Value;
-            targetPositionNet.Value = respawnPos;
-        }
-        else if (newValue > 0)
-        {
-            isRespawning.Value = false;
-        }
-    }
+    // Remove OnChampionHealthChanged
 
     [Rpc(SendTo.Everyone)]
     public void RespawnPlayerRpc(Vector3 respawnPosition)
@@ -153,9 +106,6 @@ public class PlayerNetwork : NetworkBehaviour
         Debug.Log("[RespawnPlayerRpc] Sending move/position update to server.");
         SendMousePositionRpc(respawnPosition);
         RequestMoveRpc(respawnPosition); // Request movement to the respawn position
-
-        // Set isRespawning to false after respawn is complete
-        isRespawning.Value = false;
     }
 
     // Terrain Collision Detection
