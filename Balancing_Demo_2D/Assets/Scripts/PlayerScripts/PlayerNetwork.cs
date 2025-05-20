@@ -343,9 +343,10 @@ public class PlayerNetwork : NetworkBehaviour
                 SendMousePositionRpc(transform.position);
                 RequestMoveRpc(transform.position);
 
-                direc = targetPositionNet.Value - transform.position;
+                // Ensure facing the enemy before attacking
+                direc = enemyPosition - transform.position;
                 angle = Mathf.Atan2(direc.y, direc.x) * Mathf.Rad2Deg;
-                UpdateRotationRpc(angle); // Update rotation
+                UpdateRotationRpc(angle); // Face the enemy
 
                 // Perform the auto-attack
                 PerformAutoAttackRpc(enemyPosition, enemyChampion.GetComponentInParent<NetworkObject>().NetworkObjectId, champion.rapidFire.Value);
