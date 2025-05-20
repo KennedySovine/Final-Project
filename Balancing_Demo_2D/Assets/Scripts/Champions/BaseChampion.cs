@@ -128,7 +128,7 @@ public class BaseChampion : NetworkBehaviour
         }
     }
 
-    private void OnDestroy()
+    new private void OnDestroy()
     {
         if (IsOwner)
         {
