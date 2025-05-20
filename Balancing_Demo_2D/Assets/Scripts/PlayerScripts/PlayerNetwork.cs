@@ -267,12 +267,13 @@ public class PlayerNetwork : NetworkBehaviour
         distance = Mathf.Min(distance, maxRange);
 
         Vector2 targetPosition = (Vector2)transform.position + dashDirection * distance;
-        targetPositionNet.Value = targetPosition;
-        dashSpeed = speed;
+        // Only the server should set the NetworkVariable
         if (IsServer)
         {
+            targetPositionNet.Value = targetPosition;
             isDashing.Value = true;
         }
+        dashSpeed = speed;
 
         StartCoroutine(DashToTarget(targetPosition));
     }
