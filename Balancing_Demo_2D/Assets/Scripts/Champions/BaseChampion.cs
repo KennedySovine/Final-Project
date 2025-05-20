@@ -104,6 +104,9 @@ public class BaseChampion : NetworkBehaviour
         GM = GameManager.Instance;
         IGUIM = GM.IGUIM;
 
+        // Subscribe to health value change for UI and for external listeners
+        health.OnValueChanged += HandleHealthValueChanged;
+
         if (IsOwner)
         {
             health.OnValueChanged += (previousValue, newValue) =>
@@ -126,6 +129,47 @@ public class BaseChampion : NetworkBehaviour
                 IGUIM.UpdateMaxManaSlider(previousValue, newValue);
             };
         }
+    }
+
+    private void OnDestroy()
+    {
+        // Unsubscribe from health value change
+        health.OnValueChanged -= HandleHealthValueChanged;
+
+        if (IsOwner)
+        {
+            health.OnValueChanged -= (previousValue, newValue) =>
+            {
+                IGUIM.UpdateHealthSlider(previousValue, newValue);
+            };
+
+            mana.OnValueChanged -= (previousValue, newValue) =>
+            {
+                IGUIM.UpdateManaSlider(previousValue, newValue);
+            };
+
+            maxHealth.OnValueChanged -= (previousValue, newValue) =>
+            {
+                IGUIM.UpdateMaxHealthSlider(previousValue, newValue);
+            };
+
+            maxMana.OnValueChanged -= (previousValue, newValue) =>
+            {
+                IGUIM.UpdateMaxManaSlider(previousValue, newValue);
+            };
+        }
+    }
+
+    // Handler for health value changes
+    private void HandleHealthValueChanged(float previousValue, float newValue)
+    {
+        // Call UI update if owner
+        if (IsOwner && IGUIM != null)
+        {
+            IGUIM.UpdateHealthSlider(previousValue, newValue);
+        }
+        // Raise the event for external subscribers
+        OnHealthValueChanged?.Invoke(previousValue, newValue);
     }
 
     public virtual ChampionData ForTheMainMenu()

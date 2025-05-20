@@ -26,6 +26,7 @@ public class PlayerNetwork : NetworkBehaviour
     public Vector3 enemyPosition; // Position of the enemy champion
 
     private GameObject enemyChampion; // Reference to the enemy champion
+    private bool isRespawning = false; // Add this field
     #endregion
 
     #region Unity Lifecycle Methods
@@ -50,26 +51,66 @@ public class PlayerNetwork : NetworkBehaviour
             dashSpeed = champion.movementSpeed.Value;
             //Set velocity 0
             champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+
+            // Subscribe to champion health changes for respawn logic
+            if (champion != null)
+            {
+                champion.OnHealthValueChanged += OnChampionHealthChanged;
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Unsubscribe from health change event
+        if (IsOwner && champion != null)
+        {
+            champion.OnHealthValueChanged -= OnChampionHealthChanged;
         }
     }
 
     void Update()
     {
-        if (!IsOwner || GM.gamePaused.Value) return; // Only the owner can control the player and only if the game is not paused
+        if (!IsOwner || GM.gamePaused.Value) return;
 
+        // Remove health polling/respawn logic from here
+        /*
         if (champion.health.Value <= 0)
         {
-            RespawnPlayer(); // Respawn the player if dead
-            return; // If the champion is dead, do not update
+            if (IsServer && !isRespawning)
+            {
+                isRespawning = true;
+                RespawnPlayer();
+            }
+            return;
         }
+        else
+        {
+            isRespawning = false; // Reset flag when alive
+        }
+        */
 
         // Constantly update mouse position
         mousePosition = personalCamera.ScreenToWorldPoint(Input.mousePosition);
-        CheckInputs(); // Check for player inputs
-
-        if (!isDashing.Value) // If not dashing and not colliding with terrain
+        CheckInputs();
+        if (!isDashing.Value)
         {
-            MovePlayer(); // Move the player if not dashing
+            MovePlayer();
+        }
+    }
+
+    // New handler for champion health changes
+    private void OnChampionHealthChanged(float previousValue, float newValue)
+    {
+        if (!IsServer) return;
+        if (newValue <= 0 && !isRespawning)
+        {
+            isRespawning = true;
+            RespawnPlayer();
+        }
+        else if (newValue > 0)
+        {
+            isRespawning = false;
         }
     }
 
@@ -385,7 +426,11 @@ public class PlayerNetwork : NetworkBehaviour
             Debug.Log("Bullet spawned on the server.");
             Debug.Log("Auto-attack performed.");
             // Update the last auto-attack time after firing each bullet
-            champion.UpdateStackCountRpc(1, champion.stackCount.Value, champion.maxStacks.Value); // Update the stack count
+            // This should stop Ashe from getting stacks with the Q
+            if (champion.rapidFire.Value == 1)
+            {
+                champion.UpdateStackCountRpc(1, champion.stackCount.Value, champion.maxStacks.Value); // Update the stack count
+            }
 
 
             // Wait for 0.1 seconds before firing the next bullet
