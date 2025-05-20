@@ -110,15 +110,20 @@ public class PlayerNetwork : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     public void RespawnPlayerRpc(Vector3 respawnPosition)
     {
-        // Set position and velocity on all clients
-        // Set the root champion object's position (not just the controller)
-        var root = champion.transform.root;
-        if (root != null)
-            root.position = respawnPosition;
-        else
-            champion.transform.position = respawnPosition;
+        // Snap both the controller and the champion to the respawn position
+        // This ensures both the PlayerController and the Champion object are moved
+        transform.position = respawnPosition;
+        champion.transform.position = respawnPosition;
 
-        champion.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+        // Reset velocity for both
+        var rb = GetComponent<Rigidbody2D>();
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+        var champRb = champion.GetComponent<Rigidbody2D>();
+        if (champRb != null) champRb.linearVelocity = Vector2.zero;
+
+        // On all clients, update the local target position so MovePlayer() doesn't walk back
+        SendMousePositionRpc(respawnPosition);
+        RequestMoveRpc(respawnPosition); // Request movement to the respawn position
     }
 
     // Terrain Collision Detection
